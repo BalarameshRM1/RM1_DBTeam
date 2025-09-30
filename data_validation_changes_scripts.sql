@@ -1,5 +1,5 @@
 create table master_salutation (
-id serial not null,
+id serial not null, 
 salutation varchar(100),
 is_active boolean default true,
 constraint pk_master_salutation_id primary key(id));
