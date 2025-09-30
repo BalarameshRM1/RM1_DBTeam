@@ -1231,3 +1231,11 @@ select sub_district_code,id from master_sub_district;
 
 
 call sp_copy_files('master_village','E:\RM1 Coders Project Files\HIMS\master_village.csv');
+
+create table if not exists master_address_type(id serial not null,
+address_type varchar(255) not null,is_active boolean default true,
+constraint pk_master_address_type_id primary key(id),
+constraint uk_master_address_type_address_type unique(address_type));
+
+insert into master_address_type(address_type) select 'Permanent' where not exists (select 1 from master_address_type where address_type='Permanent');
+
