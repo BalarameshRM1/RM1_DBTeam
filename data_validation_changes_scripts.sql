@@ -20,23 +20,19 @@ SELECT * FROM master_salutation;
 
 create table if not exists master_gender (
 id serial not null,
-gender varchar (100),
+gender varchar not null(100) ,
 is_active boolean default true,
 constraint pk_master_gender_id primary key(id)
 );
 
-insert into master_gender (gender)
-select 'Male' where not exists (select 1 from master_gender where gender = 'Male' );
-
-insert into master_gender (gender)
-select 'Female' where not exists (select 1 from master_gender where gender = 'Female');
-
-insert into master_gender (gender)
-select 'Others' where not exists (select 1 from master_gender where gender = 'Others');
+insert into master_gender (gender) select 'Male' where not exists (select 1 from master_gender where gender = 'Male' );
+insert into master_gender (gender) select 'Female' where not exists (select 1 from master_gender where gender = 'Female');
+insert into master_gender (gender) select 'Others' where not exists (select 1 from master_gender where gender = 'Others');
 
 select * from master_gender;
 
 --- create master nationality table
+
 create table master_nationality(
 id serial not null,
 nationality varchar(255) not null,
@@ -44,11 +40,29 @@ is_active boolean default true,
 constraint pk_master_nationality_id primary key(id)
 );
 
-insert into master_nationality(nationality)
-select 'Indian' where not exists (select 1 from master_nationality where nationality = 'Indian' );
-
-insert into master_nationality(nationality)
-select 'Non-Indian' where not exists (select 1 from master_nationality where nationality = 'Non-Indian' );
+insert into master_nationality(nationality) select 'Indian' where not exists (select 1 from master_nationality where nationality = 'Indian' );
+insert into master_nationality(nationality) select 'Non-Indian' where not exists (select 1 from master_nationality where nationality = 'Non-Indian' );
 
 select * from master_nationality
+
+--Create master blood group table
+  
+create table master_blood_group(
+id serial not null,
+blood_group varchar(5) not null,
+is_active boolean default true,
+constraint pk_master_blood_group_id primary key(id)
+);
+
+insert into master_blood_group(blood_group) select 'A⁺' where not exists(select 1 from master_blood_group where blood_group = 'A⁺');
+insert into master_blood_group(blood_group) select 'A⁻' where not exists(select 1 from master_blood_group where blood_group = 'A⁻');
+insert into master_blood_group(blood_group) select 'B⁺' where not exists(select 1 from master_blood_group where blood_group = 'B⁺');
+insert into master_blood_group(blood_group) select 'B⁻' where not exists(select 1 from master_blood_group where blood_group = 'B⁻');
+insert into master_blood_group(blood_group) select 'AB⁺' where not exists(select 1 from master_blood_group where blood_group = 'AB⁺');
+insert into master_blood_group(blood_group) select 'AB⁻' where not exists(select 1 from master_blood_group where blood_group = 'AB⁻');
+insert into master_blood_group(blood_group) select 'O⁺' where not exists(select 1 from master_blood_group where blood_group = 'O⁺');
+insert into master_blood_group(blood_group) select 'O⁻' where not exists(select 1 from master_blood_group where blood_group = 'O⁻');
+
+select * from master_blood_group
+
 
