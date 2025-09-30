@@ -1,3 +1,24 @@
+create table if not exists master_occupation (
+id serial not null,
+occupation varchar(255) not null,
+is_active boolean default true,
+constraint pk_master_occupation_id primary key (id),
+constraint uk_master_occupation_occupation unique (occupation)
+);
+
+insert into master_occupation (occupation)select 'Doctor' where not exists (select 1 from master_occupation where occupation = 'Doctor');
+insert into master_occupation (occupation)select 'Engineer' where not exists (select 1 from master_occupation where occupation = 'Engineer');
+insert into master_occupation (occupation)select 'Student' where not exists (select 1 from master_occupation where occupation = 'Student');
+insert into master_occupation (occupation)select 'Bussinessman' where not exists (select 1 from master_occupation where occupation = 'Bussinessman');
+insert into master_occupation (occupation)select 'Farmer' where not exists (select 1 from master_occupation where occupation = 'Farmer');
+insert into master_occupation (occupation)select 'Government Employee' where not exists (select 1 from master_occupation where occupation = 'Government Employee');
+insert into master_occupation (occupation)select 'Private  Employee' where not exists (select 1 from master_occupation where occupation = 'Private  Employee');
+insert into master_occupation (occupation)select 'House-wife' where not exists (select 1 from master_occupation where occupation = 'House-wife');
+insert into master_occupation (occupation)select 'Un-Employed' where not exists (select 1 from master_occupation where occupation = 'Un-Employed');
+
+select * from master_occupation
+ 
+
 create table if not exists master_marital_status (
 id serial not null,
 marital_status_name varchar(100) not null,
