@@ -1,3 +1,17 @@
+create table if not exists master_marital_status (
+id serial not null,
+marital_status_name varchar(100) not null,
+is_active boolean default true,
+constraint pk_master_marital_status_id primary key(id),
+constraint uk_master_marital_status_marital_status_name unique (marital_status_name));
+
+insert into master_marital_status (marital_status_name) select 'Single' where not exists (select 1 from master_marital_status  where marital_status_name='Single');
+insert into master_marital_status (marital_status_name) select 'Married' where not exists (select 1 from master_marital_status  where marital_status_name='Married');
+insert into master_marital_status (marital_status_name) select 'Divorced' where not exists (select 1 from master_marital_status  where marital_status_name='Divorced');
+
+select* FROM master_marital_status;
+
+
 create table if not exists master_religion (
 id serial not null,
 religion_name varchar(100) not null,
@@ -52,6 +66,8 @@ insert into master_exemption (exemption_name) select 'Active Cancer Treatment' w
 select * from master_exemption ;
 
 
+
+
 create table if not exists master_gender (
 id serial not null,
 gender varchar(100)  not null,
@@ -79,6 +95,8 @@ insert into master_nationality(nationality) select 'Non-Indian' where not exists
 
 select * from master_nationality;
 
+
+
  
 create table if not exists master_blood_group(
 id serial not null,
@@ -98,6 +116,8 @@ insert into master_blood_group(blood_group) select 'O⁺' where not exists(selec
 insert into master_blood_group(blood_group) select 'O⁻' where not exists(select 1 from master_blood_group where blood_group = 'O⁻');
 
 select * from master_blood_group;
+
+
 
 
 create table if not exists master_country(id serial not null,
