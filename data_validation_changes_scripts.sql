@@ -1219,3 +1219,15 @@ select * from master_sub_district;
 
 call sp_copy_files('master_sub_district','E:\RM1 Coders Project Files\HIMS\master_sub_district.csv');
 
+create table if not exists master_village(id bigserial not  null,
+village_code bigint not null,village_version integer,village_name varchar(255) not null,
+sub_district_id integer not null,census_2001_code bigint,census_2011_code bigint,
+is_active boolean default true,
+constraint pk_master_village_id primary key(id),
+constraint fk_master_village_sub_district_id foreign key(sub_district_id) references master_sub_district(id),
+constraint uk_master_village_village_code unique(village_code));
+
+select sub_district_code,id from master_sub_district;
+
+
+call sp_copy_files('master_village','E:\RM1 Coders Project Files\HIMS\master_village.csv');
