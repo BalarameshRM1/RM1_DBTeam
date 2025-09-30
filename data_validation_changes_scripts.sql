@@ -1192,5 +1192,16 @@ INSERT INTO master_district (district_code, district_name, state_id, census_2001
 
 select * from master_district;
 
+create table if not exists master_sub_district(id serial not null,
+sub_district_code bigint,sub_district_version integer,sub_district_name varchar(255) not null,
+district_id integer not null,
+census_2001_code integer,census_2011_code bigint,
+is_active boolean default true,
+constraint pk_master_sub_district_id primary key(id),
+constraint uk_master_sub_district_sub_district_code unique(sub_district_code),
+constraint fk_master_sub_district_district_id foreign key(district_id) references master_district(id));
 
+select * from master_sub_district;
+
+call sp_copy_files('master_sub_district','E:\RM1 Coders Project Files\HIMS\master_sub_district.csv');
 
