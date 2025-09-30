@@ -35,3 +35,20 @@ insert into master_gender (gender)
 select 'Others' where not exists (select 1 from master_gender where gender = 'Others');
 
 select * from master_gender;
+
+--- create master nationality table
+create table master_nationality(
+id serial not null,
+nationality varchar(255) not null,
+is_active boolean default true,
+constraint pk_master_nationality_id primary key(id)
+);
+
+insert into master_nationality(nationality)
+select 'Indian' where not exists (select 1 from master_nationality where nationality = 'Indian' );
+
+insert into master_nationality(nationality)
+select 'Non-Indian' where not exists (select 1 from master_nationality where nationality = 'Non-Indian' );
+
+select * from master_nationality
+
