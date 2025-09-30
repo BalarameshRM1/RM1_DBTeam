@@ -41,7 +41,8 @@ create table if not exists master_gender (
 id serial not null,
 gender varchar not null(100) ,
 is_active boolean default true,
-constraint pk_master_gender_id primary key(id)
+constraint pk_master_gender_id primary key(id),
+constraint uk_master_gender_gender unique (gender)
 );
 
 insert into master_gender (gender) select 'Male' where not exists (select 1 from master_gender where gender = 'Male' );
@@ -56,7 +57,9 @@ create table master_nationality(
 id serial not null,
 nationality varchar(255) not null,
 is_active boolean default true,
-constraint pk_master_nationality_id primary key(id)
+constraint pk_master_nationality_id primary key(id),
+constraint uk_master_nationality_nationality unique (nationality)
+
 );
 
 insert into master_nationality(nationality) select 'Indian' where not exists (select 1 from master_nationality where nationality = 'Indian' );
@@ -70,7 +73,8 @@ create table master_blood_group(
 id serial not null,
 blood_group varchar(5) not null,
 is_active boolean default true,
-constraint pk_master_blood_group_id primary key(id)
+constraint pk_master_blood_group_id primary key(id),
+constraint uk_master_blood_group_blood_group unique (blood_group)
 );
 
 insert into master_blood_group(blood_group) select 'A⁺' where not exists(select 1 from master_blood_group where blood_group = 'A⁺');
