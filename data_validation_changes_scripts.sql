@@ -1,8 +1,11 @@
+--Creting a master Salutation table
+  
 create table master_salutation (
-id serial not null, 
+id serial not null,
 salutation varchar(100) not null,
 is_active boolean default true,
-constraint pk_master_salutation_id primary key(id));
+constraint pk_master_salutation_id primary key(id)
+constraint uk_master_salutation_salutation unique(salutation));
 
 insert into master_salutation (salutation) select 'Mr.' where not exists (select 1 from master_salutation  where salutation='Mr.');
 insert into master_salutation (salutation) select 'Mrs.' where not exists (select 1 from master_salutation  where salutation='Mrs.');
@@ -14,6 +17,22 @@ insert into master_salutation (salutation) select 'Rev.' where not exists (selec
 insert into master_salutation (salutation) select 'Sir' where not exists (select 1 from master_salutation  where salutation='Sir');
 insert into master_salutation (salutation) select 'Madam' where not exists (select 1 from master_salutation  where salutation='Madam');
 SELECT * FROM master_salutation;
+
+--Creating Master Exemption table
+  create table master_exemption (
+id serial not null,
+exemption_name varchar(100) not null,
+is_active boolean default true,
+constraint pk_master_exemption_id primary key(id)
+constraint uk_master_exemption_exemption_name unique (exemption_name));
+
+insert into master_exemption (exemption_name) select 'Recent Organ Transplant' where not exists (select 1 from master_exemption  where exemption_name='Recent Organ Transplant');
+insert into master_exemption (exemption_name) select 'Tuberculosis or other Active Infection' where not exists (select 1 from master_exemption  where exemption_name='Tuberculosis or other Active Infection');
+insert into master_exemption (exemption_name) select 'Pregnancy' where not exists (select 1 from master_exemption  where exemption_name='Pregnancy');
+insert into master_exemption (exemption_name) select 'Acute Severe Illness' where not exists (select 1 from master_exemption  where exemption_name='Acute Severe Illness');
+insert into master_exemption (exemption_name) select 'Neurological Disorders' where not exists (select 1 from master_exemption  where exemption_name='Neurological Disorders');
+insert into master_exemption (exemption_name) select 'Active Cancer Treatment' where not exists (select 1 from master_exemption  where exemption_name='Active Cancer Treatment');
+select * from master_exemption ;
 
 
 --create master gender table
