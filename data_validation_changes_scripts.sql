@@ -14,3 +14,24 @@ insert into master_salutation (salutation) select 'Rev.' where not exists (selec
 insert into master_salutation (salutation) select 'Sir' where not exists (select 1 from master_salutation  where salutation='Sir');
 insert into master_salutation (salutation) select 'Madam' where not exists (select 1 from master_salutation  where salutation='Madam');
 SELECT * FROM master_salutation;
+
+
+--create master gender table
+
+create table if not exists master_gender (
+id serial not null,
+gender varchar (100),
+is_active boolean default true,
+constraint pk_master_gender_id primary key(id)
+);
+
+insert into master_gender (gender)
+select 'Male' where not exists (select 1 from master_gender where gender = 'Male' );
+
+insert into master_gender (gender)
+select 'Female' where not exists (select 1 from master_gender where gender = 'Female');
+
+insert into master_gender (gender)
+select 'Others' where not exists (select 1 from master_gender where gender = 'Others');
+
+select * from master_gender;
