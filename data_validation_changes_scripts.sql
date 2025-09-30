@@ -1,3 +1,17 @@
+create table if not exists master_case_type (
+id serial not null,
+case_type varchar(255) not null,
+is_active boolean default true,
+constraint pk_master_case_type_id primary key (id),
+constraint uk_master_case_type_case_type unique (case_type)
+);
+
+insert into master_case_type (case_type)select 'Outpatient' where not exists (select 1 from master_case_type where case_type = 'Outpatient');
+insert into master_case_type (case_type)select 'Inpatient' where not exists (select 1 from master_case_type where case_type = 'Inpatient	');
+insert into master_case_type (case_type)select 'Emergency' where not exists (select 1 from master_case_type where case_type = 'Emergency');
+
+select * from master_case_type
+
 create table if not exists master_occupation (
 id serial not null,
 occupation varchar(255) not null,
