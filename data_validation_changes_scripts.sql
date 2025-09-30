@@ -1,3 +1,21 @@
+create table if not exists master_religion (
+id serial not null,
+religion_name varchar(100) not null,
+is_active boolean default true,
+constraint pk_master_religion_id primary key(id),
+constraint uk_master_religion_religion_name unique (religion_name));
+
+insert into master_religion (religion_name) select 'Christian' where not exists (select 1 from master_religion  where religion_name='Christian');
+insert into master_religion (religion_name) select 'Hindu' where not exists (select 1 from master_religion  where religion_name='Hindu');
+insert into master_religion (religion_name) select 'Muslim' where not exists (select 1 from master_religion  where religion_name='Muslim');
+insert into master_religion (religion_name) select 'Islam' where not exists (select 1 from master_religion  where religion_name='Islam');
+insert into master_religion (religion_name) select 'Sikhism' where not exists (select 1 from master_religion  where religion_name='Sikhism');
+insert into master_religion (religion_name) select 'Jainism' where not exists (select 1 from master_religion  where religion_name='Jainism');
+insert into master_religion (religion_name) select 'Other' where not exists (select 1 from master_religion  where religion_name='Other');
+
+
+
+
 create table if not exists master_salutation (
 id serial not null,
 salutation varchar(100) not null,
