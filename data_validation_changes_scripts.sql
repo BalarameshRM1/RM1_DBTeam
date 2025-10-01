@@ -28,7 +28,7 @@ create table if not exists master_patient_type (
 	patient_type varchar(255) not null,
 	is_active boolean default true,
 	constraint pk_master_patient_type_id primary key(id),
-	constraint uk_master_patient_type_patient_type unique (tariff_name)
+	constraint uk_master_patient_type_patient_type unique (patient_type)
 );
 
 insert into master_patient_type(patient_type) select 'Regular' where not exists (select 1 from master_patient_type where patient_type = 'Regular');
