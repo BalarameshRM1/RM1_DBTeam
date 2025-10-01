@@ -1,3 +1,51 @@
+create table if not exists master_paytype(
+
+id serial not null,
+pay_type varchar(255) not null,
+is_active boolean default true,
+constraint pk_master_paytype_id primary key(id),
+constraint uk_master_paytype_pay_type unique (pay_type)
+);
+
+insert into master_paytype (pay_type) select 'Direct(cash)'  where not exists (select 1 from master_paytype where pay_type = 'Direct(cash)');
+
+select * from master_paytype
+
+
+create table if not exists master_tariff  (
+	id serial not null,
+	tariff_name varchar(255) not null,
+	is_active boolean default true,
+	constraint pk_master_tariff_id primary key(id),
+	constraint uk_master_tariff_tariff_name unique (tariff_name)
+);
+
+insert into master_tariff(tariff_name) select 'Base Tariff' where not exists (select 1 from master_tariff where tariff_name = 'Base Tariff');
+
+
+create table if not exists master_patient_type (
+	id serial not null,
+	patient_type varchar(255) not null,
+	is_active boolean default true,
+	constraint pk_master_patient_type_id primary key(id),
+	constraint uk_master_patient_type_patient_type unique (tariff_name)
+);
+
+insert into master_patient_type(patient_type) select 'Regular' where not exists (select 1 from master_patient_type where patient_type = 'Regular');
+
+
+create table if not exists master_priority (
+	id serial not null,
+	priority varchar(255) not null,
+	is_active boolean default true,
+	constraint pk_master_priority_id primary key(id),
+	constraint uk_master_priority_priority unique (priority)
+);
+
+insert into master_priority(priority) select 'Normal' where not exists (select 1 from master_priority where priority = 'Normal');
+insert into master_priority(priority) select 'High' where not exists (select 1 from master_priority where priority = 'High');
+
+
 create table if not exists master_case_type (
 id serial not null,
 case_type varchar(255) not null,
