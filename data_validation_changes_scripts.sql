@@ -8269,4 +8269,8 @@ INSERT INTO support_tickets (customer_id, order_id, subject_id, description) VAL
 INSERT INTO support_tickets (customer_id, order_id, subject_id, description) VALUES (5,1,5, 'Customer received black instead of navy-blue hoodie. Replacement in review.');
 
 ----------------
- 
+--Done on 27-10-2025
+-- modified orders table
+alter table if exists orders add column if not exists quantity integer;
+
+update orders set quantity = 2 where product_id = 3;
