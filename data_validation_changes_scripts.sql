@@ -8268,8 +8268,8 @@ INSERT INTO support_tickets (customer_id, order_id, subject_id, description) VAL
 INSERT INTO support_tickets (customer_id, order_id, subject_id, description) VALUES (4,3,2, 'Customer entered incorrect address. Updated successfully before dispatch.');
 INSERT INTO support_tickets (customer_id, order_id, subject_id, description) VALUES (5,1,5, 'Customer received black instead of navy-blue hoodie. Replacement in review.');
 
-----------------
---Done on 27-10-2025
+----------------------------------------------------------
+--Authored by Sahitha on 27-10-2025
 -- modified orders table
 alter table if exists orders add column if not exists quantity integer;
 
@@ -8281,4 +8281,84 @@ UPDATE customer set first_name = 'Aman', last_name = 'Verma', user_id = 4, mobil
 UPDATE customer set first_name = 'Sneha', last_name = 'Reddy', user_id = 5, mobile = '9876500004',age = 26 WHERE id = 3;
 DELETE FROM customer WHERE id IN (4, 5);
 update support_tickets set customer_id = 2 where id = 10;
+
+----------------------------------------------------------------
+
+--Authored by Sahitha on 28-10-2025
+
+-- inserting data into user_registration table
+insert into public.user_registration (first_name, last_name, role_id, email, password, mobile, age, gender_id)
+values ('Kalyan', 'kurma', 3, 'kalyan@example.com', 'kal@230', '9876500005', 25, 1 );
+
+insert into public.user_registration (first_name, last_name, role_id, email, password, mobile, age, gender_id)
+values ('Yashu', 'Roi', 3, 'yashu@example.com', 'yash@089', '9876500006', 29, 1 );
+
+insert into public.user_registration (first_name, last_name, role_id, email, password, mobile, age, gender_id)
+values ('Monika', 'Shetty', 3, 'monika@example.com', 'mon@2560', '9876500007', 31, 2 );
+
+begin;
+
+insert into public.user_registration (first_name, last_name, role_id, email, password, mobile, age, gender_id)
+values ('Tharun', 'Varma', 3, 'tharun@example.com', 'tharun@900', '9876500008', 34, 1 );
+
+insert into public.user_registration (first_name, last_name, role_id, email, password, mobile, age, gender_id)
+values ('Sivani', 'Illa', 3, 'sivani@example.com', 'siv@340', '9876500009', 19, 2 );
+
+rollback;
+commit;
+
+--insert data into customer table
+begin;
+
+insert into public.customer (first_name, last_name, user_id, mobile, age, gender_id) values ('Kalyan', 'kurma', 6, '9876500005', 25, 1 );
+insert into public.customer (first_name, last_name, user_id, mobile, age, gender_id) values ('Yashu', 'Roi', 7, '9876500006', 29, 1 );
+insert into public.customer (first_name, last_name, user_id, mobile, age, gender_id) values ('Monika', 'Shetty', 8, '9876500007', 31, 2 );
+insert into public.customer (first_name, last_name, user_id, mobile, age, gender_id) values ('Tharun', 'Varma', 9, '9876500008', 34, 1 );
+insert into public.customer (first_name, last_name, user_id, mobile, age, gender_id) values ('Sivani', 'Illa', 10, '9876500009', 19, 2 );
+
+rollback;
+commit;
+end;
+
+-- insert data into inventory table
+begin;
+
+insert into inventory (product_id , stock)
+values (4, 100),
+        (5, 90),
+		(6, 150),
+		(7, 25),
+		(8, 58);
+commit;
+
+--insert data into orders table
+begin;
+
+insert into orders (customer_id, product_id, status_id, order_date, total, quantity) values (4,5,1,now(),1788, 2);
+insert into orders (customer_id, product_id, status_id, order_date, total, quantity) values (5,3,3,now(),1999, 1);
+insert into orders (customer_id, product_id, status_id, order_date, total, quantity) values (6,6,1,now(),2799, 1);
+insert into orders (customer_id, product_id, status_id, order_date, total, quantity) values (7,8,4,now(),2599, 1);
+insert into orders (customer_id, product_id, status_id, order_date, total, quantity) values (4,7,2,now(),3199, 1);
+insert into orders (customer_id, product_id, status_id, order_date, total, quantity) values (8,1,6,now(),2998, 2);
+insert into orders (customer_id, product_id, status_id, order_date, total, quantity) values (3,4,6,now(),799, 1);
+insert into orders (customer_id, product_id, status_id, order_date, total, quantity) values (2,6,1,now(),2799, 1);
+insert into orders (customer_id, product_id, status_id, order_date, total, quantity) values (5,5,1,now(),1798, 2 );
+
+commit;
+
+--insert data into order_tracking
+begin;
+
+insert into order_tracking (order_id, status_id)
+values (4,1),
+       (5,3),
+	   (6,1),
+	   (7,4),
+	   (8,2),
+	   (9,6),
+	   (10,6),
+	   (11,1),
+	   (12,1);
+commit;
+--------------------------------------------------------------------------------------------------------------------------------------------------------------
 
