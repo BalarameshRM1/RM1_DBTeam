@@ -8349,16 +8349,17 @@ commit;
 --insert data into order_tracking
 begin;
 
-insert into order_tracking (order_id, status_id)
-values (4,1),
-       (5,3),
-	   (6,1),
-	   (7,4),
-	   (8,2),
-	   (9,6),
-	   (10,6),
-	   (11,1),
-	   (12,1);
+insert into order_tracking (order_id, status_id) values (4,1);
+insert into order_tracking (order_id, status_id) values (5,3);
+insert into order_tracking (order_id, status_id) values (6,1);
+insert into order_tracking (order_id, status_id) values (7,4);
+insert into order_tracking (order_id, status_id) values (8,2);
+insert into order_tracking (order_id, status_id) values (9,6);
+insert into order_tracking (order_id, status_id) values (10,6);
+insert into order_tracking (order_id, status_id) values (11,1);
+insert into order_tracking (order_id, status_id) values (12,1);
+
 commit;
 --------------------------------------------------------------------------------------------------------------------------------------------------------------
+
 
