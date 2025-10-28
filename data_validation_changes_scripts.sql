@@ -8323,12 +8323,11 @@ end;
 -- insert data into inventory table
 begin;
 
-insert into inventory (product_id , stock)
-values (4, 100),
-        (5, 90),
-		(6, 150),
-		(7, 25),
-		(8, 58);
+insert into inventory (product_id , stock) values  (4, 100);
+insert into inventory (product_id , stock) values  (5, 90);
+insert into inventory (product_id , stock) values  (6, 150);
+insert into inventory (product_id , stock) values  (7, 25);
+insert into inventory (product_id , stock) values  (8, 58);
 commit;
 
 --insert data into orders table
@@ -8361,5 +8360,6 @@ insert into order_tracking (order_id, status_id) values (12,1);
 
 commit;
 --------------------------------------------------------------------------------------------------------------------------------------------------------------
+
 
 
