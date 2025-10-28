@@ -1024,3 +1024,82 @@ constraint pk_service_tracking_id primary key(id),
 constraint fk_service_tracking_service_booking_id foreign key(service_booking_id) references service_booking(id),
 constraint fk_service_tracking_status_id foreign key(status_id) references master_status(id)
 );
+-------------------------------------
+--Authored by Anand on 28-10-2025.
+select * from master_department;
+
+update master_department set department_name = 'With Basement / Without Basement' where id = 5;
+
+select setval('master_department_id_seq',(select max(id)+1 from master_department));
+
+ALTER TABLE IF EXISTS master_service DROP COLUMN regular,DROP COLUMN premium,DROP COLUMN ultimate,DROP COLUMN is_regular,DROP COLUMN is_premium,DROP COLUMN is_ultimate;
+
+select * from  master_service;
+
+DELETE FROM master_service_mapping;
+
+DELETE FROM user_auth where user_id in 
+(select id from user_registration where service_id in 
+(select id from master_service));
+
+DELETE FROM user_department where user_id in 
+(select id from user_registration where service_id in 
+(select id from master_service));
+
+DELETE FROM user_registration WHERE service_id IN 
+(select id from master_service);
+
+DELETE FROM service_booking;
+DELETE FROM master_service;
+
+select * from master_service;
+
+select * from user_registration;
+
+ALTER SEQUENCE master_service_id_seq RESTART WITH 1;
+
+ALTER TABLE IF EXISTS master_service ADD COLUMN IF NOT EXISTS dept_id bigint;
+
+ALTER TABLE IF EXISTS master_service ADD CONSTRAINT fk_master_service_dept_id FOREIGN KEY (dept_id) REFERENCES master_department(id);
+
+insert into public.master_service (service_name,dept_id)  SELECT 'Single',3 WHERE NOT EXISTS (SELECT 1 FROM public.master_service WHERE service_name='Single' and dept_id = 3 );
+insert into public.master_service (service_name,dept_id)  SELECT 'Double',3 WHERE NOT EXISTS (SELECT 1 FROM public.master_service WHERE service_name='Double' and dept_id = 3);
+insert into public.master_service (service_name,dept_id)  SELECT 'Triple',3 WHERE NOT EXISTS (SELECT 1 FROM public.master_service WHERE service_name='Triple' and dept_id = 3);
+insert into public.master_service (service_name,dept_id)  SELECT '4Bedroom',3 WHERE NOT EXISTS (SELECT 1 FROM public.master_service WHERE service_name='4Bedroom' and dept_id = 3) ;
+insert into public.master_service (service_name,dept_id)  SELECT 'Single',2 WHERE NOT EXISTS (SELECT 1 FROM public.master_service WHERE service_name='Single' and dept_id = 2);
+insert into public.master_service (service_name,dept_id)  SELECT 'Double',2 WHERE NOT EXISTS (SELECT 1 FROM public.master_service WHERE service_name='Double' and dept_id = 2);
+insert into public.master_service (service_name,dept_id)  SELECT 'Triple',2 WHERE NOT EXISTS (SELECT 1 FROM public.master_service WHERE service_name='Triple' and dept_id = 2);
+insert into public.master_service (service_name,dept_id)  SELECT 'Small',1 WHERE NOT EXISTS (SELECT 1 FROM public.master_service WHERE service_name='Small' and dept_id = 1);
+insert into public.master_service (service_name,dept_id)  SELECT 'Medium',1 WHERE NOT EXISTS (SELECT 1 FROM public.master_service WHERE service_name='Medium' and dept_id = 1);
+insert into public.master_service (service_name,dept_id)  SELECT 'Large',1 WHERE NOT EXISTS (SELECT 1 FROM public.master_service WHERE service_name='Large' and dept_id = 1);
+insert into public.master_service (service_name,dept_id)  SELECT 'With Dining',4 WHERE NOT EXISTS (SELECT 1 FROM public.master_service WHERE service_name='With Dining' and dept_id = 4);
+insert into public.master_service (service_name,dept_id)  SELECT 'Without Dining',4 WHERE NOT EXISTS (SELECT 1 FROM public.master_service WHERE service_name='Without Dining' and dept_id = 4);
+
+select * from master_service;
+
+ALTER TABLE IF EXISTS public.master_service DROP CONSTRAINT uk_master_service_service_name;
+ALTER TABLE IF EXISTS public.master_service ADD CONSTRAINT uk_master_service_service_name unique(service_name,dept_id);
+
+select setval('master_service_id_seq',(select max(id)+1 from master_service));
+
+create table if not exists public.master_service_type(
+id bigserial not null,
+service_type varchar(255) not null,
+price numeric(10,2),
+hours integer,
+is_active boolean default true,
+constraint pk_master_service_type_id primary key(id));
+
+
+INSERT INTO public.master_service_type (service_type,price,hours)  SELECT 'Normal Cleaning',49.00,3 WHERE NOT EXISTS (SELECT 1 FROM public.master_service_type WHERE service_type='Normal Cleaning' and price=49.00 and hours=3);
+INSERT INTO public.master_service_type (service_type,price,hours)  SELECT 'Deep Cleaning',49.00,3 WHERE NOT EXISTS (SELECT 1 FROM public.master_service_type WHERE service_type='Deep Cleaning' and price=49.00 and hours=3);
+
+DROP TABLE IF EXISTS master_service_mapping;
+
+select * from master_service_type;
+
+
+alter table if exists service_booking add column if not exists service_type_id bigint,add constraint fk_service_booking_service_type_id foreign key(service_type_id) references master_service_type(id);
+alter table if exists service_booking DROP COLUMN IF EXISTS is_regular;
+alter table if exists service_booking DROP COLUMN IF EXISTS is_premium;
+alter table if exists service_booking DROP COLUMN IF EXISTS is_ultimate;
