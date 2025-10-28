@@ -8274,3 +8274,11 @@ INSERT INTO support_tickets (customer_id, order_id, subject_id, description) VAL
 alter table if exists orders add column if not exists quantity integer;
 
 update orders set quantity = 2 where product_id = 3;
+
+--updated data in customer table and support_tickets table
+UPDATE customer set first_name = 'Priya', last_name = 'Sharma', user_id = 3, mobile = '9876500002',age = 23 WHERE id = 1;
+UPDATE customer set first_name = 'Aman', last_name = 'Verma', user_id = 4, mobile = '9876500003',age = 24 WHERE id = 2;
+UPDATE customer set first_name = 'Sneha', last_name = 'Reddy', user_id = 5, mobile = '9876500004',age = 26 WHERE id = 3;
+DELETE FROM customer WHERE id IN (4, 5);
+update support_tickets set customer_id = 2 where id = 10;
+
