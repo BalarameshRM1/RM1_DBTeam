@@ -1103,3 +1103,22 @@ alter table if exists service_booking add column if not exists service_type_id b
 alter table if exists service_booking DROP COLUMN IF EXISTS is_regular;
 alter table if exists service_booking DROP COLUMN IF EXISTS is_premium;
 alter table if exists service_booking DROP COLUMN IF EXISTS is_ultimate;
+
+-------------------
+--Authored by Anand A on 29-10-2025.
+alter table if exists service_booking add column if not exists total numeric(10,2);
+alter table if exists service_booking add column if not exists subtotal numeric(10,2);
+alter table if exists service_booking add column if not exists customer_requested_amount numeric(10,2);
+alter table if exists service_booking add column if not exists discount_amount numeric(10,2);
+alter table if exists service_booking add column if not exists discount_percentage numeric(10,2);
+alter table if exists service_booking add column if not exists discount_total numeric(10,2);
+alter table if exists service_booking drop column if  exists service_id;
+alter table if exists service_booking drop column if  exists dept_id;
+
+alter table if exists service_tracking add column if not exists dept_id bigint;
+alter table if exists service_tracking add column if not exists service_id bigint;
+alter table if exists service_tracking add column if not exists service_type_id bigint;
+alter table if exists service_tracking add constraint fk_service_tracking_dept_id foreign key(dept_id) references master_department(id);
+alter table if exists service_tracking add constraint fk_service_tracking_service_id foreign key(service_id) references master_service(id)
+alter table if exists service_tracking add constraint fk_service_tracking_service_type_id foreign key(service_type_id) references master_service_type(id)
+alter table if exists service_tracking add column if not exists booking_id varchar(100);
