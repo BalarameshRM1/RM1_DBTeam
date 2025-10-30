@@ -1122,3 +1122,21 @@ alter table if exists service_tracking add constraint fk_service_tracking_dept_i
 alter table if exists service_tracking add constraint fk_service_tracking_service_id foreign key(service_id) references master_service(id)
 alter table if exists service_tracking add constraint fk_service_tracking_service_type_id foreign key(service_type_id) references master_service_type(id)
 alter table if exists service_tracking add column if not exists booking_id varchar(100);
+----------------------------------------------------------------------------------
+--Authored by Anand A on 30-10-2025.
+create table if not exists master_service_mapping(id bigserial not null,
+service_id bigint not null,service_type_id bigint not null,is_active boolean default true,
+constraint pk_master_service_mapping_id primary key(id),
+constraint fk_master_service_mapping_service_id foreign key(service_id) references master_service(id),
+constraint fk_master_service_mapping_service_type_id foreign key(service_type_id) references master_service_type(id),
+constraint uk_master_service_mapping_service_id_service_type_id unique(service_type_id,service_id));
+
+insert into master_service_mapping(service_id,service_type_id)
+select * from 
+(select * from 
+(select id,1 from master_service order by 1)a
+union
+select * from 
+(select id,2 from master_service order by 1)b)c
+order by 1;
+
