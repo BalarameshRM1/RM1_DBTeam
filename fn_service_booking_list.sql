@@ -1,3 +1,4 @@
+--Authored by Anand A on 30-10-2025.
 --DROP FUNCTION IF EXISTS fn_service_booking_list;
 create or replace function fn_service_booking_list(custid bigint DEFAULT NULL,empid bigint DEFAULT NULL)
 
@@ -65,5 +66,73 @@ $$;
 SELECT * FROM fn_service_booking_list();--all service_booking list
 SELECT * FROM fn_service_booking_list(custid:=1);--for customer wise service booking list
 SELECT * FROM fn_service_booking_list(empid:=1);--for employee wise service booking list
+----------------------------------------------
+--Remodified by Anand A on 31-10-2025.
+--DROP FUNCTION IF EXISTS fn_service_booking_list;
+create or replace function fn_service_booking_list(tickt_id bigint DEFAULT NULL,custid bigint DEFAULT NULL,empid bigint DEFAULT NULL)
+
+returns table (id bigint,booking_id character varying,slot_id bigint,slot_time character varying,full_name character varying,phone character varying,email character varying,address character varying,assign_to bigint,employee_name character varying,employee_email character varying,status_id bigint,status character varying,dept_id bigint,department_name character varying,service_id bigint,service_name character varying,service_type_id bigint,service_type character varying,total numeric,subtotal numeric,customer_requested_amount numeric,discount_amount numeric,discount_percentage numeric,discount_total numeric,created_by bigint,customer_name character varying,created_date timestamp without time zone)
+language 'plpgsql'
+AS $$
+BEGIN
 
 
+IF tickt_id IS NOT NULL THEN
+RETURN QUERY
+ 
+select sb.id,sb.booking_id,sb.slot_id,ms.slot_time,sb.full_name,sb.phone,sb.email,sb.address,sb.assign_to,concat_ws(' ',ur.first_name ,ur.last_name)::varchar as employee_name,ur.email as employee_email,
+sb.status_id,ms2.status,st.dept_id,md.department_name,st.service_id,msc.service_name,st.service_type_id,mst.service_type,
+sb.total,sb.subtotal,sb.customer_requested_amount,sb.discount_amount,sb.discount_percentage,sb.discount_total,
+sb.created_by,concat_ws(' ',ur2.first_name ,ur2.last_name)::varchar as customer_name,sb.created_date
+from service_booking sb 
+join service_tracking st on st.service_booking_id = sb.id and sb.is_active =true and st.is_active =true 
+left join master_slots ms on ms.id = sb.slot_id and ms.is_active =true
+left join master_department md on md.id = st.dept_id and md.is_active =true
+left join master_service msc on msc.id = st.service_id and msc.is_active = true
+left join master_service_type mst on mst.id = st.service_type_id and mst.is_active =true
+left join master_status ms2 on ms2.id = sb.status_id and ms2.is_active =true
+left join user_registration ur on ur.id = sb.assign_to and ur.is_active = true and ur.role_id = 3
+left join user_registration ur2 on ur2.id = sb.created_by and ur2.is_active =true and ur2.role_id =4
+WHERE (sb.id = tickt_id or -1=tickt_id);
+
+ELSIF custid IS NOT NULL THEN
+RETURN QUERY
+select sb.id,sb.booking_id,sb.slot_id,ms.slot_time,sb.full_name,sb.phone,sb.email,sb.address,sb.assign_to,concat_ws(' ',ur.first_name ,ur.last_name)::varchar as employee_name,ur.email as employee_email,
+sb.status_id,ms2.status,st.dept_id,md.department_name,st.service_id,msc.service_name,st.service_type_id,mst.service_type,
+sb.total,sb.subtotal,sb.customer_requested_amount,sb.discount_amount,sb.discount_percentage,sb.discount_total,
+sb.created_by,concat_ws(' ',ur2.first_name ,ur2.last_name)::varchar as customer_name,sb.created_date
+from service_booking sb 
+join service_tracking st on st.service_booking_id = sb.id and sb.is_active =true and st.is_active =true 
+left join master_slots ms on ms.id = sb.slot_id and ms.is_active =true
+left join master_department md on md.id = st.dept_id and md.is_active =true
+left join master_service msc on msc.id = st.service_id and msc.is_active = true
+left join master_service_type mst on mst.id = st.service_type_id and mst.is_active =true
+left join master_status ms2 on ms2.id = sb.status_id and ms2.is_active =true
+left join user_registration ur on ur.id = sb.assign_to and ur.is_active = true and ur.role_id = 3
+left join user_registration ur2 on ur2.id = sb.created_by and ur2.is_active =true and ur2.role_id =4
+where (sb.created_by =custid or -1=custid);
+
+ELSIF empid IS NOT NULL THEN 
+RETURN QUERY
+select sb.id,sb.booking_id,sb.slot_id,ms.slot_time,sb.full_name,sb.phone,sb.email,sb.address,sb.assign_to,concat_ws(' ',ur.first_name ,ur.last_name)::varchar as employee_name,ur.email as employee_email,
+sb.status_id,ms2.status,st.dept_id,md.department_name,st.service_id,msc.service_name,st.service_type_id,mst.service_type,
+sb.total,sb.subtotal,sb.customer_requested_amount,sb.discount_amount,sb.discount_percentage,sb.discount_total,
+sb.created_by,concat_ws(' ',ur2.first_name ,ur2.last_name)::varchar as customer_name,sb.created_date
+from service_booking sb 
+join service_tracking st on st.service_booking_id = sb.id and sb.is_active =true and st.is_active =true 
+left join master_slots ms on ms.id = sb.slot_id and ms.is_active =true
+left join master_department md on md.id = st.dept_id and md.is_active =true
+left join master_service msc on msc.id = st.service_id and msc.is_active = true
+left join master_service_type mst on mst.id = st.service_type_id and mst.is_active =true
+left join master_status ms2 on ms2.id = sb.status_id and ms2.is_active =true
+left join user_registration ur on ur.id = sb.assign_to and ur.is_active = true and ur.role_id = 3
+left join user_registration ur2 on ur2.id = sb.created_by and ur2.is_active =true and ur2.role_id =4
+where (sb.assign_to =empid or -1=empid);
+
+END IF;
+END;
+$$;
+
+SELECT * FROM fn_service_booking_list(tickt_id:=-1);--all service_booking list
+SELECT * FROM fn_service_booking_list(custid:=1);--for customer wise service booking list
+SELECT * FROM fn_service_booking_list(empid:=1);--for employee wise service booking list
