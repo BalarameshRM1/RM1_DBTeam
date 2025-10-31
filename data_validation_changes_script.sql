@@ -1150,4 +1150,6 @@ delete from master_service where dept_id in
 (select id from master_department where id = 6);
 
 delete from master_department where id=6;
-
+---------------------------------------------------------------------------------
+update service_booking set service_type_id=1;
+update service_tracking set service_type_id=1;
