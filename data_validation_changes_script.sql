@@ -1139,4 +1139,15 @@ union
 select * from 
 (select id,2 from master_service order by 1)b)c
 order by 1;
+---------------------------------------------------------------------------------
+--Authored by Anand on 31-10-2025.
+--to remove all related departments.
+delete from master_service_mapping where service_id in 
+(select id from master_service where dept_id in 
+(select id from master_department where id = 6));
+
+delete from master_service where dept_id in 
+(select id from master_department where id = 6);
+
+delete from master_department where id=6;
 
