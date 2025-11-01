@@ -1153,3 +1153,7 @@ delete from master_department where id=6;
 ---------------------------------------------------------------------------------
 update service_booking set service_type_id=1;
 update service_tracking set service_type_id=1;
+-----------------------------------------------------------------------------------------
+--Authored by Anand A on 01-11-2025.
+alter table if exists service_booking add column if not exists hours integer;
+alter table if exists service_booking add column if not exists add_on_hours integer;
