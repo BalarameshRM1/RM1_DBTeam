@@ -1157,3 +1157,8 @@ update service_tracking set service_type_id=1;
 --Authored by Anand A on 01-11-2025.
 alter table if exists service_booking add column if not exists hours integer;
 alter table if exists service_booking add column if not exists add_on_hours integer;
+-------------------------------------------------------------------------------------
+--Authored by Anand A on 02-11-2025.
+
+update master_slots set slot_time='9AM - 12PM' where id=1;
+
