@@ -1162,3 +1162,24 @@ alter table if exists service_booking add column if not exists add_on_hours inte
 
 update master_slots set slot_time='9AM - 12PM' where id=1;
 
+delete from master_service_mapping where service_id in 
+(select id from master_service where dept_id in 
+(select id from master_department where id in (6,7)));
+
+delete from master_service where dept_id in 
+(select id from master_department where id in (6,7));
+
+delete from user_department where dept_id in 
+(select id from master_department where id in (6,7));
+
+delete from master_department where id in (6,7);
+
+delete from master_service_type where id in (3,4,5);
+
+select setval('master_department_id_seq',(select max(id)+1 from master_department));
+select setval('user_department_id_seq',(select max(id)+1 from user_department));
+select setval('master_service_id_seq',(select max(id)+1 from master_service));
+select setval('master_service_mapping_id_seq',(select max(id)+1 from master_service_mapping));
+select setval('master_service_type_id_seq',(select max(id)+1 from master_service_type));
+
+update master_department set is_active = false where id=5;
