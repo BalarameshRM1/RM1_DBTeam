@@ -305,7 +305,7 @@ RETURN QUERY
 select sb.id,sb.booking_id,sb.slot_id,ms.slot_time,sb.hours,sb.add_on_hours,sb.full_name,sb.phone,sb.email,sb.address,sb.assign_to,concat_ws(' ',ur.first_name ,ur.last_name)::varchar as employee_name,ur.email as employee_email,
 sb.status_id,ms2.status,st.dept_id,md.department_name,st.service_id,msc.service_name,st.service_type_id,mst.service_type,
 sb.total,sb.subtotal,sb.customer_requested_amount,sb.discount_amount,sb.discount_percentage,sb.discount_total,
-sb.created_by,concat_ws(' ',ur2.first_name ,ur2.last_name)::varchar as customer_name,sb.created_date,sb.preferred_date,room_sqfts,with_basement
+sb.created_by,concat_ws(' ',ur2.first_name ,ur2.last_name)::varchar as customer_name,sb.created_date,sb.preferred_date,st.room_sqfts,st.with_basement
 from service_booking sb 
 join service_tracking st on st.service_booking_id = sb.id and sb.is_active =true and st.is_active =true 
 left join master_slots ms on ms.id = sb.slot_id and ms.is_active =true
@@ -324,7 +324,7 @@ RETURN QUERY
 select sb.id,sb.booking_id,sb.slot_id,ms.slot_time,sb.hours,sb.add_on_hours,sb.full_name,sb.phone,sb.email,sb.address,sb.assign_to,concat_ws(' ',ur.first_name ,ur.last_name)::varchar as employee_name,ur.email as employee_email,
 sb.status_id,ms2.status,st.dept_id,md.department_name,st.service_id,msc.service_name,st.service_type_id,mst.service_type,
 sb.total,sb.subtotal,sb.customer_requested_amount,sb.discount_amount,sb.discount_percentage,sb.discount_total,
-sb.created_by,concat_ws(' ',ur2.first_name ,ur2.last_name)::varchar as customer_name,sb.created_date,sb.preferred_date,room_sqfts,with_basement
+sb.created_by,concat_ws(' ',ur2.first_name ,ur2.last_name)::varchar as customer_name,sb.created_date,sb.preferred_date,st.room_sqfts,st.with_basement
 from service_booking sb 
 join service_tracking st on st.service_booking_id = sb.id and sb.is_active =true and st.is_active =true 
 left join master_slots ms on ms.id = sb.slot_id and ms.is_active =true
@@ -343,7 +343,7 @@ RETURN QUERY
 select sb.id,sb.booking_id,sb.slot_id,ms.slot_time,sb.hours,sb.add_on_hours,sb.full_name,sb.phone,sb.email,sb.address,sb.assign_to,concat_ws(' ',ur.first_name ,ur.last_name)::varchar as employee_name,ur.email as employee_email,
 sb.status_id,ms2.status,st.dept_id,md.department_name,st.service_id,msc.service_name,st.service_type_id,mst.service_type,
 sb.total,sb.subtotal,sb.customer_requested_amount,sb.discount_amount,sb.discount_percentage,sb.discount_total,
-sb.created_by,concat_ws(' ',ur2.first_name ,ur2.last_name)::varchar as customer_name,sb.created_date,sb.preferred_date,room_sqfts,with_basement
+sb.created_by,concat_ws(' ',ur2.first_name ,ur2.last_name)::varchar as customer_name,sb.created_date,sb.preferred_date,st.room_sqfts,st.with_basement
 from service_booking sb 
 join service_tracking st on st.service_booking_id = sb.id and sb.is_active =true and st.is_active =true 
 left join master_slots ms on ms.id = sb.slot_id and ms.is_active =true
@@ -360,5 +360,6 @@ LIMIT p_limit OFFSET p_offset;
 END IF;
 END;
 $BODY$;
+
 
 
