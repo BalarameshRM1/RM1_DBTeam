@@ -1183,3 +1183,9 @@ select setval('master_service_mapping_id_seq',(select max(id)+1 from master_serv
 select setval('master_service_type_id_seq',(select max(id)+1 from master_service_type));
 
 update master_department set is_active = false where id=5;
+-------------------------------------------
+--Authored by Anand A on 04-11-2025.
+alter table if exists booking_template add constraint fk_booking_template_created_by foreign key(created_by) references user_registration(id);
+alter table if exists booking_template add constraint fk_booking_template_modified_by foreign key(modified_by) references user_registration(id);
+
+
