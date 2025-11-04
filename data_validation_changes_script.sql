@@ -1187,5 +1187,7 @@ update master_department set is_active = false where id=5;
 --Authored by Anand A on 04-11-2025.
 alter table if exists booking_template add constraint fk_booking_template_created_by foreign key(created_by) references user_registration(id);
 alter table if exists booking_template add constraint fk_booking_template_modified_by foreign key(modified_by) references user_registration(id);
+alter table if exists service_tracking add column if not exists room_sqfts varchar(100);
+alter table if exists service_tracking add column if not exists with_basement boolean;
 
 
