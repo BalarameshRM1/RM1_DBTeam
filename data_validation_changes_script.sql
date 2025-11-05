@@ -1189,5 +1189,15 @@ alter table if exists booking_template add constraint fk_booking_template_create
 alter table if exists booking_template add constraint fk_booking_template_modified_by foreign key(modified_by) references user_registration(id);
 alter table if exists service_tracking add column if not exists room_sqfts varchar(100);
 alter table if exists service_tracking add column if not exists with_basement boolean;
+----------------------------------------------
+--Authored by Anand A on 05-11-2025.
+alter table if exists booking_template rename to email_template;
+alter table if exists email_template rename constraint fk_booking_template_created_by to fk_email_template_created_by;
+alter table if exists email_template rename constraint fk_booking_template_modified_by to fk_email_template_modified_by;
+alter table if exists email_template rename constraint pk_booking_template_id to pk_booking_template_id;
+alter table if exists email_template rename constraint uk_booking_template_title to uk_email_template_title;
+alter index idx_booking_template_created_by rename to idx_email_template_created_by;
+alter index idx_booking_template_modified_by rename to idx_email_template_modified_by;
+
 
 
