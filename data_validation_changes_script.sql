@@ -1198,6 +1198,10 @@ alter table if exists email_template rename constraint pk_booking_template_id to
 alter table if exists email_template rename constraint uk_booking_template_title to uk_email_template_title;
 alter index idx_booking_template_created_by rename to idx_email_template_created_by;
 alter index idx_booking_template_modified_by rename to idx_email_template_modified_by;
-
+--
+update master_service set service_name='1' where service_name='Single';
+update master_service set service_name='2' where service_name='Double';
+update master_service set service_name='3' where service_name='Triple';
+update master_service set service_name='4' where service_name='4Bedroom';
 
 
