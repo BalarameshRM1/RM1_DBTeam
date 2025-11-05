@@ -1204,4 +1204,9 @@ update master_service set service_name='2' where service_name='Double';
 update master_service set service_name='3' where service_name='Triple';
 update master_service set service_name='4' where service_name='4Bedroom';
 
+---------------------------------------
+05-11-2025 - Dhanusha
+alter table if exists email_template rename constraint pk_booking_template_id to pk_email_template_id;
+
+
 
