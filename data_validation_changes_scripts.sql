@@ -8383,4 +8383,78 @@ alter table if exists inventory add column if not exists category_id bigint;
 alter table if exists inventory add constraint fk_inventory_category_id foreign key(category_id) references master_category(id);
 
 alter table if exists inventory add column if not exists price numeric;
+-----------------------------------------------------------
+--Authored by Anand A on 06-11-2025.
+select * from master_category;
+
+delete from inventory where inventory.product_id in 
+(select id from products);
+
+delete from order_tracking where order_id in
+(select id from orders where orders.product_id in 
+(select id from products));
+
+delete from support_tickets where order_id in 
+(select id from orders where orders.product_id in 
+(select id from products));
+
+delete from orders where orders.product_id in 
+(select id from products);
+
+delete from products;
+
+delete from master_category;
+
+
+alter sequence products_id_seq restart with 1;
+alter sequence master_category_id_seq restart with 1;
+alter sequence inventory_id_seq restart with 1;
+alter sequence support_tickets_id_seq restart with 1;
+alter sequence order_tracking_id_seq restart with 1;
+alter sequence orders_id_seq restart with 1;
+
+select setval('products_id_seq',(select max(id)+1 from products));
+select setval('master_category_id_seq',(select max(id)+1 from master_category));
+select setval('inventory_id_seq',(select max(id)+1 from inventory));
+select setval('support_tickets_id_seq',(select max(id)+1 from support_tickets));
+select setval('order_tracking_id_seq',(select max(id)+1 from order_tracking));
+select setval('orders_id_seq',(select max(id)+1 from orders));
+
+
+insert into master_category(category_name)  select 'Fandom Fusion'  where not exists (select 1 from master_category  where category_name='Fandom Fusion');
+insert into master_category(category_name)  select 'Limited Editions'  where not exists (select 1 from master_category  where category_name='Limited Editions');
+insert into master_category(category_name)  select 'New Arrivals'  where not exists (select 1 from master_category  where category_name='New Arrivals');
+insert into master_category(category_name)  select 'Official Merchandise'  where not exists (select 1 from master_category  where category_name='Official Merchandise');
+insert into master_category(category_name)  select 'Our Essentials'  where not exists (select 1 from master_category  where category_name='Our Essentials');
+insert into master_category(category_name)  select 'Shop By Themes'  where not exists (select 1 from master_category  where category_name='Shop By Themes');
+
+insert into products(product_name,category_id,price,stock,product_status_id)  select 'Ajith Kumar Racing Motorsport Fan Hoodie',2,999,10,1  where not exists (select 1 from products  where product_name='Ajith Kumar Racing Motorsport Fan Hoodie' and category_id=2 and price=999 and stock=10 and product_status_id=1);
+insert into products(product_name,category_id,price,stock,product_status_id)  select 'Ajith Kumar Car Racing Motorsport Hoodie',2,999,12,1  where not exists (select 1 from products  where product_name='Ajith Kumar Car Racing Motorsport Hoodie' and category_id=2 and price=999 and stock=12  and product_status_id=1);
+insert into products(product_name,category_id,price,stock,product_status_id)  select 'Ajith Kumar Racing Motorsport Hoodie Black',2,999,50,1  where not exists (select 1 from products  where product_name='Ajith Kumar Racing Motorsport Hoodie Black' and category_id=2 and price=999 and stock=50  and product_status_id=1);
+insert into products(product_name,category_id,price,stock,product_status_id)  select 'Customized Ajith Kumar Racing Hoodie',2,999,70,1  where not exists (select 1 from products  where product_name='Customized Ajith Kumar Racing Hoodie' and category_id=2 and price=999 and stock=70  and product_status_id=1);
+insert into products(product_name,category_id,price,stock,product_status_id)  select 'Itachi & Sasuke White Unisex Oversized T-Shirt',3,699,40,1  where not exists (select 1 from products  where product_name='Itachi & Sasuke White Unisex Oversized T-Shirt' and category_id=3 and price=699 and stock=40  and product_status_id=1);
+insert into products(product_name,category_id,price,stock,product_status_id)  select 'Ronaldo Siuuuuuu Unisex Oversized Football T-shirt',3,899,13,1  where not exists (select 1 from products  where product_name='Ronaldo Siuuuuuu Unisex Oversized Football T-shirt' and category_id=3 and price=899 and stock=13  and product_status_id=1);
+insert into products(product_name,category_id,price,stock,product_status_id)  select 'Men’s Textured Shirt (Navy)',3,999,12,1  where not exists (select 1 from products  where product_name='Men’s Textured Shirt (Navy)' and category_id=3 and price=999 and stock=12  and product_status_id=1);
+insert into products(product_name,category_id,price,stock,product_status_id)  select 'McLaren Club Black Hoodie – Limited Edition Motorsport',3,999,20,1  where not exists (select 1 from products  where product_name='McLaren Club Black Hoodie – Limited Edition Motorsport' and category_id=3 and price=999 and stock=20  and product_status_id=1);
+
+select * from products
+
+select * into inventory_1 from inventory;
+select * into support_tickets_1 from support_tickets;
+select * into order_tracking_1 from order_tracking;
+
+
+insert into orders(customer_id,product_id,status_id,order_date,total,created_date,quantity) select 1,1,1,now(),999,now(),1  where not exists (select 1 from orders where customer_id=1 and product_id=1 and status_id=1);
+insert into orders(customer_id,product_id,status_id,order_date,total,created_date,quantity) select 2,2,3,now(),999,now(),1  where not exists (select 1 from orders where customer_id=2 and product_id=2 and status_id=3);
+insert into orders(customer_id,product_id,status_id,order_date,total,created_date,quantity) select 3,3,4,now(),999,now(),1  where not exists (select 1 from orders where customer_id=3 and product_id=3 and status_id=4);
+insert into orders(customer_id,product_id,status_id,order_date,total,created_date,quantity) select 4,5,1,now(),1398,now(),2  where not exists (select 1 from orders where customer_id=4 and product_id=5 and status_id=1);
+insert into orders(customer_id,product_id,status_id,order_date,total,created_date,quantity) select 5,3,3,now(),999,now(),1  where not exists (select 1 from orders where customer_id=5 and product_id=3 and status_id=3);
+insert into orders(customer_id,product_id,status_id,order_date,total,created_date,quantity) select 6,6,1,now(),899,now(),1  where not exists (select 1 from orders where customer_id=6 and product_id=6 and status_id=1);
+insert into orders(customer_id,product_id,status_id,order_date,total,created_date,quantity) select 7,8,4,now(),999,now(),1  where not exists (select 1 from orders where customer_id=7 and product_id=8 and status_id=4);
+insert into orders(customer_id,product_id,status_id,order_date,total,created_date,quantity) select 4,7,2,now(),999,now(),1  where not exists (select 1 from orders where customer_id=4 and product_id=7 and status_id=2);
+insert into orders(customer_id,product_id,status_id,order_date,total,created_date,quantity) select 8,1,6,now(),1998,now(),2  where not exists (select 1 from orders where customer_id=8 and product_id=1 and status_id=6);
+insert into orders(customer_id,product_id,status_id,order_date,total,created_date,quantity) select 3,4,6,now(),999,now(),1  where not exists (select 1 from orders where customer_id=3 and product_id=4 and status_id=6);
+insert into orders(customer_id,product_id,status_id,order_date,total,created_date,quantity) select 2,6,1,now(),899,now(),1  where not exists (select 1 from orders where customer_id=2 and product_id=6 and status_id=1);
+insert into orders(customer_id,product_id,status_id,order_date,total,created_date,quantity) select 5,5,1,now(),1398,now(),2  where not exists (select 1 from orders where customer_id=5 and product_id=5 and status_id=1);
+
 
