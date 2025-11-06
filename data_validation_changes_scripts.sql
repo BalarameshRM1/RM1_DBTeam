@@ -8360,6 +8360,27 @@ insert into order_tracking (order_id, status_id) values (12,1);
 
 commit;
 --------------------------------------------------------------------------------------------------------------------------------------------------------------
+--modified on 06-11-2025
+
+create table if not exists public.master_product_status(
+  id bigserial not null,
+  product_status varchar(100) not null,
+  is_active boolean default true,
+  constraint pk_master_product_status_id primary key(id)
+);
+
+INSERT INTO public.master_product_status (product_status) SELECT 'Available' WHERE NOT EXISTS (SELECT 1 FROM public.master_product_status WHERE product_status = 'Available');
+INSERT INTO public.master_product_status (product_status) SELECT 'Low Stock' WHERE NOT EXISTS (SELECT 1 FROM public.master_product_status WHERE product_status = 'Low Stock');
+INSERT INTO public.master_product_status (product_status) SELECT 'Out of Stock' WHERE NOT EXISTS (SELECT 1 FROM public.master_product_status WHERE product_status = 'Out of Stock');
 
 
+alter table if exists products add column if not exists stock integer;
+
+alter table if exists products add column if not exists product_status_id bigint;  
+alter table if exists products add constraint fk_products_product_status_id foreign key(product_status_id) references master_product_status(id);
+
+alter table if exists inventory add column if not exists category_id bigint; 
+alter table if exists inventory add constraint fk_inventory_category_id foreign key(category_id) references master_category(id);
+
+alter table if exists inventory add column if not exists price numeric;
 
