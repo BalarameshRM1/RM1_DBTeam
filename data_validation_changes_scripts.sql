@@ -8439,11 +8439,6 @@ insert into products(product_name,category_id,price,stock,product_status_id)  se
 
 select * from products
 
-select * into inventory_1 from inventory;
-select * into support_tickets_1 from support_tickets;
-select * into order_tracking_1 from order_tracking;
-
-
 insert into orders(customer_id,product_id,status_id,order_date,total,created_date,quantity) select 1,1,1,now(),999,now(),1  where not exists (select 1 from orders where customer_id=1 and product_id=1 and status_id=1);
 insert into orders(customer_id,product_id,status_id,order_date,total,created_date,quantity) select 2,2,3,now(),999,now(),1  where not exists (select 1 from orders where customer_id=2 and product_id=2 and status_id=3);
 insert into orders(customer_id,product_id,status_id,order_date,total,created_date,quantity) select 3,3,4,now(),999,now(),1  where not exists (select 1 from orders where customer_id=3 and product_id=3 and status_id=4);
@@ -8456,5 +8451,37 @@ insert into orders(customer_id,product_id,status_id,order_date,total,created_dat
 insert into orders(customer_id,product_id,status_id,order_date,total,created_date,quantity) select 3,4,6,now(),999,now(),1  where not exists (select 1 from orders where customer_id=3 and product_id=4 and status_id=6);
 insert into orders(customer_id,product_id,status_id,order_date,total,created_date,quantity) select 2,6,1,now(),899,now(),1  where not exists (select 1 from orders where customer_id=2 and product_id=6 and status_id=1);
 insert into orders(customer_id,product_id,status_id,order_date,total,created_date,quantity) select 5,5,1,now(),1398,now(),2  where not exists (select 1 from orders where customer_id=5 and product_id=5 and status_id=1);
-
-
+------------------------------------------------
+--Authored by Anand A on 07-11-2025.
+insert into inventory(product_id,stock,category_id,price) values(1,10,2,999);
+insert into inventory(product_id,stock,category_id,price) values(2,12,2,999);
+insert into inventory(product_id,stock,category_id,price) values(3,50,2,999);
+insert into inventory(product_id,stock,category_id,price) values(4,70,2,999);
+insert into inventory(product_id,stock,category_id,price) values(5,40,3,699);
+insert into inventory(product_id,stock,category_id,price) values(6,13,3,899);
+insert into inventory(product_id,stock,category_id,price) values(7,12,3,999);
+insert into inventory(product_id,stock,category_id,price) values(8,20,3,999);
+--
+INSERT INTO public.support_tickets (customer_id, order_id, subject_id, description,  product_id) VALUES (1, 1, 1, 'Customer received a Medium instead of Large size hoodie. Requested exchange.',  1) ;
+INSERT INTO public.support_tickets (customer_id, order_id, subject_id, description,  product_id) VALUES (2, 2, 2, 'Customer paid via Razorpay but order status still shows “Pending Payment.” Need reconciliation.',  2) ;
+INSERT INTO public.support_tickets (customer_id, order_id, subject_id, description,  product_id) VALUES (3, 3, 3, 'Product packaging torn and item defective. Replacement shipped on 2025-10-20.',  3) ;
+INSERT INTO public.support_tickets (customer_id, order_id, subject_id, description,  product_id) VALUES (2, 1, 4, 'Delivery delayed by 3 days due to courier strike. Customer informed and accepted delay.',  4) ;
+INSERT INTO public.support_tickets (customer_id, order_id, subject_id, description,  product_id) VALUES (1, 2, 5, 'Order cancelled 5 days ago, refund not yet initiated. Customer demanding status update.',  5) ;
+INSERT INTO public.support_tickets (customer_id, order_id, subject_id, description,  product_id) VALUES (1, 3, 6, 'Customer ordered “Women’s Crop Tee” but received “Men’s T-Shirt.” Replacement process ongoing.',  1) ;
+INSERT INTO public.support_tickets (customer_id, order_id, subject_id, description,  product_id) VALUES (2, 1, 3, 'Order showing as processing for over 48 hours. Courier assignment pending.',  2) ;
+INSERT INTO public.support_tickets (customer_id, order_id, subject_id, description,  product_id) VALUES (3, 2, 4, 'Discount coupon TMNEW10 not applied during checkout. Manual refund issued.',  3) ;
+INSERT INTO public.support_tickets (customer_id, order_id, subject_id, description,  product_id) VALUES (3, 3, 2, 'Customer entered incorrect address. Updated successfully before dispatch.',  4) ;
+INSERT INTO public.support_tickets (customer_id, order_id, subject_id, description,  product_id) VALUES (2,1,5, 'Customer received black instead of navy-blue hoodie. Replacement in review.',  3) ;
+--
+INSERT INTO public.order_tracking (order_id, status_id) VALUES (1, 1) ;
+INSERT INTO public.order_tracking (order_id, status_id) VALUES (2, 3) ;
+INSERT INTO public.order_tracking (order_id, status_id) VALUES (3, 4) ;
+INSERT INTO public.order_tracking (order_id, status_id) VALUES (4, 1) ;
+INSERT INTO public.order_tracking (order_id, status_id) VALUES (5, 3) ;
+INSERT INTO public.order_tracking (order_id, status_id) VALUES (6, 1) ;
+INSERT INTO public.order_tracking (order_id, status_id) VALUES (7, 4) ;
+INSERT INTO public.order_tracking (order_id, status_id) VALUES (8, 2) ;
+INSERT INTO public.order_tracking (order_id, status_id) VALUES (9, 6) ;
+INSERT INTO public.order_tracking (order_id, status_id) VALUES (10, 6);
+INSERT INTO public.order_tracking (order_id, status_id) VALUES (11, 1);
+INSERT INTO public.order_tracking (order_id, status_id) VALUES (12, 1);
