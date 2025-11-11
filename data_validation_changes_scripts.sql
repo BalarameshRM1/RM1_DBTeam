@@ -8138,7 +8138,7 @@ select * from  support_tickets;
 --Done on 24-10-2025.
 alter table public.products rename constraint pk_master_product_id to pk_products_id;
 alter table public.products rename constraint uk_master_product_product_name to uk_products_product_name;
-alter table public.products rename constraint fk_master_product_category_id to uk_products_category_id;
+alter table public.products rename constraint fk_master_product_category_id to fk_products_category_id;
 
 ALTER SEQUENCE master_product_id_seq RENAME TO products_id_seq;
 
@@ -8485,3 +8485,25 @@ INSERT INTO public.order_tracking (order_id, status_id) VALUES (9, 6) ;
 INSERT INTO public.order_tracking (order_id, status_id) VALUES (10, 6);
 INSERT INTO public.order_tracking (order_id, status_id) VALUES (11, 1);
 INSERT INTO public.order_tracking (order_id, status_id) VALUES (12, 1);
+
+---on 11-11-2025--------------------------------------------------------------------------
+
+begin
+update products set product_status_id = 3 where id = 3;
+update products set product_status_id = 2 where id = 5;
+update products set product_status_id = 3 where id = 7;
+rollback;
+commit;
+
+begin;
+update customer set is_active = false where id = 6 ;
+update customer set is_active = false where id = 7 ;
+update customer set is_active = false where id = 8 ;
+
+update user_registration set is_active = false where id = 8;
+update user_registration set is_active = false where id = 9;
+update user_registration set is_active = false where id = 10;
+
+select * from user_registration;
+commit;
+-------------------------------------------------------------------------------------------------------------------------------------------
