@@ -8486,7 +8486,7 @@ INSERT INTO public.order_tracking (order_id, status_id) VALUES (10, 6);
 INSERT INTO public.order_tracking (order_id, status_id) VALUES (11, 1);
 INSERT INTO public.order_tracking (order_id, status_id) VALUES (12, 1);
 
----on 11-11-2025--------------------------------------------------------------------------
+---modified on 11-11-2025--------------------------------------------------------------------------
 
 begin
 update products set product_status_id = 3 where id = 3;
@@ -8507,3 +8507,20 @@ update user_registration set is_active = false where id = 10;
 select * from user_registration;
 commit;
 -------------------------------------------------------------------------------------------------------------------------------------------
+---modified on 12/11/2025
+
+begin;
+alter table inventory add column product_status_id bigint;
+alter table inventory add constraint fk_product_status_id foreign key(product_status_id) references master_product_status(id);
+
+update inventory set product_status_id = 1 where id in (1,2) ;
+update inventory set product_status_id = 3 where id = 3 ;
+update inventory set product_status_id = 1 where id = 4 ;
+update inventory set product_status_id = 2 where id = 5 ;
+update inventory set product_status_id = 1 where id = 6 ;
+update inventory set product_status_id = 3 where id = 7 ;
+update inventory set product_status_id = 1 where id = 8 ;
+
+commit;
+
+------------------------------------------------------------------------------------------------------------------------------------------------
