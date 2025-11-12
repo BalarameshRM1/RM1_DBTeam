@@ -8523,4 +8523,10 @@ update inventory set product_status_id = 1 where id = 8 ;
 
 commit;
 
+begin;
+alter table if exists products drop column stock;
+select * from products;
+commit;
+
 ------------------------------------------------------------------------------------------------------------------------------------------------
+
