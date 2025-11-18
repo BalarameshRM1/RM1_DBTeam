@@ -1207,6 +1207,23 @@ update master_service set service_name='4' where service_name='4Bedroom';
 ---------------------------------------
 05-11-2025 - Dhanusha
 alter table if exists email_template rename constraint pk_booking_template_id to pk_email_template_id;
+------------------------------------------------
+--Authored by Anand A on 18-11-2025.
+select 'ALTER SEQUENCE  '||table_name||'_id_seq RESTART WITH 1;' from information_schema.tables where table_type='BASE TABLE' and table_schema='public' and table_name not ilike 'master_%';
 
+DELETE FROM service_tracking;
+DELETE FROM service_booking;
+DELETE FROM user_department;
+DELETE FROM customer_complaints;
+DELETE FROM otp_history;
+DELETE FROM user_auth;
+DELETE FROM user_registration;
 
+ALTER SEQUENCE  service_booking_id_seq RESTART WITH 1;
+ALTER SEQUENCE  user_department_id_seq RESTART WITH 1;
+ALTER SEQUENCE  customer_complaints_id_seq RESTART WITH 1;
+ALTER SEQUENCE  otp_history_id_seq RESTART WITH 1;
+ALTER SEQUENCE  service_tracking_id_seq RESTART WITH 1;
+ALTER SEQUENCE  user_auth_id_seq RESTART WITH 1;
+ALTER SEQUENCE  user_registration_id_seq RESTART WITH 1;
 
