@@ -1226,4 +1226,8 @@ ALTER SEQUENCE  otp_history_id_seq RESTART WITH 1;
 ALTER SEQUENCE  service_tracking_id_seq RESTART WITH 1;
 ALTER SEQUENCE  user_auth_id_seq RESTART WITH 1;
 ALTER SEQUENCE  user_registration_id_seq RESTART WITH 1;
+--------------------------------------
+--Authored by Anand A on 20-11-2025
+alter table if exists otp_history add column if not exists booking_id bigint;
+alter table if exists otp_history add constraint fk_otp_history_booking_id foreign key(booking_id) references service_booking(id);
 
