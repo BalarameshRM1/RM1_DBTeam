@@ -1230,4 +1230,84 @@ ALTER SEQUENCE  user_registration_id_seq RESTART WITH 1;
 --Authored by Anand A on 20-11-2025
 alter table if exists otp_history add column if not exists booking_id bigint;
 alter table if exists otp_history add constraint fk_otp_history_booking_id foreign key(booking_id) references service_booking(id);
+-------------------------------------
+--Authored buy Dhanusha on 20-11-2025
+--created customer table 
+
+create table if not exists public.customer (
+	id serial not null,
+	user_id bigint not null,
+	first_name varchar(255) not null,
+	last_name varchar(255) not null,
+	mobile varchar(255) not null,
+	email varchar(100) not null,
+	address text,
+	created_by bigint,
+	created_date timestamp default now(),
+	modified_by bigint,
+	modified_date timestamp,
+	is_active boolean default true, 
+constraint pk_customer_id primary key (id),
+constraint fk_customer_user_id foreign key (user_id) references user_registration(id),
+constraint fk_customer_created_by foreign key (created_by) references user_registration(id),
+constraint fk_customer_modified_by foreign key (modified_by) references user_registration (id),
+constraint uk_customer_mobile unique (mobile),
+constraint uk_customer_email unique (email)
+	);
+
+--insert the unique data from user_registration table from servie booking tbl
+  begin;
+INSERT INTO user_registration (role_id, first_name, last_name, mobile, email) VALUES
+(4, 'bala', 'ramesh', '9989833321', 'balaramesh@yopmail.com'),
+(4, 'Anil', 'kumar', '8998989989', 'Papisettysurya1@gmail.com'),
+(4, 'krishna', 'kumari', '9876543210', 'klm1122@gmail.com'),
+(4, 'kundeti', 'jay', '1276546815', 'kundetyjay@gmail.com'),
+(4, 'teja', 'sriram', '9986579473', 'tejasriram944@gmail.com'),
+(4, 'Harish', 'Yadav', '9866644898', 'cc@gmail.com'),
+(4, 'tonshika', 'y', '7846798946', 'nimmagaddakrishna1234@gmail.com'),
+(4, 'krish', 'k', '8787906543', 'krishnakumari.nimmagada@gmail.com'),
+(4, 'Krishnakumari', 'Nimmagadda', '9999999999', 'testing@yopmail.com'),
+(4, 'harish', 'y', '9848022337', 'harishyadav.pilli@rm1codershub.com'),
+(4, 'Hari', 'Yadav', '7815855787', '11@gmail.com'),
+(4, 'krishna', 'kk', '1111111111', 'rakul@gmail.com'),
+(4, 'kim', 'john', '8989899898', '88@gmail.com'),
+(4, 'nithin', 'akuthota', '8989898989', 'nithinakuthota@gmail.com'),
+(4, 'anil', 'p', '6767676787', 'papisettyanil99@gmail.com'),
+(4, 'raju', 'kk', '7032394662', 'kk11@gmail.com'),
+(4, 'nithin', 'a', '9876543219', 'kkk@gmail.com'),
+(4, 'Anil', 'QA', '7998899898', 'testing22@gmail.com'),
+(4, 'krishna', 'kk', '8899443322', 'swachify1@gmai.com'),
+(4, 'Krishnakumari', 'g', '9899988989', 'ghg11@gmail.com'),
+(4, 'khasim', 'ahemed', '-9876543119', 'khasim.ahmed@example.com'),
+(4, 'tejesh', 'g', '9177010175', 'tejesharyahgudla@gmail.com'),
+(4, 'kesani', 'mahesh', '8688513687', 'kesanimahesh0@gmail.com'),
+(4, 'nithin', 'bookingpopup', '8856445609', 'abc11@gmail.com'),
+(4, 'Sai', 'Kim', '8790604243', 'kk@gmail.com'),
+(4, 'Khasim', 'Ahmed', '9878654664', 'user@example.com'),
+(4, 'bala', 'kollu', '9121635390', 'balakollu6994@gmail.com'),
+(4, 'sreeja', 'j', '9391733409', 'jivilkasreeja@gmail.com'),
+(4, 'krishna', 'a', '7895859575', 'Ak@g.com'),
+(4, 'khasim', 'meeravali', '4563738924', 'khasim.meeravali@example.com'),
+(4, 'bhargav', 'k', '8333866647', 'bharghava@gmail.com'),
+(4, 'yaswanthi', 'b', '9390776776', 'yaswanthibaswa@gmail.com'),
+(4, 'katragadda', 'bhargav', '7786567689', 'Katragaddabharghava@gmail.com'),
+(4, 'jayanth', 'k', '7676767676', 'jayanth@gmail.com'),
+(4, 'Ak', 'h', '7382405380', 'hh@gmail.com'),
+(4, 'Khasim', 'm', '9608754213', '238438555@gmail.com'),
+(4, 'krish', 'k', '4562367894', 'krishnakumari.nimmagadda@rm1codershub.com');
+
+commit;
+
+--- insert data into customer table
+begin;
+insert into customer (
+	user_id,first_name,last_name,mobile,email,created_by,modified_by
+	)
+
+select id as user_id,first_name,last_name,mobile,email,created_by,modified_by
+from user_registration
+where role_id=4 and created_date::date=current_date;
+
+commit;
+
 
