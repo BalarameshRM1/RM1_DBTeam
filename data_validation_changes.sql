@@ -71,3 +71,51 @@ create table if not exists public.user_registration(
   constraint fk_user_registration_state_id foreign key(state_id) references master_state(id),
   constraint fk_user_registration_district_id foreign key(district_id) references master_district(id)
 );
+
+--created employee table
+
+create table if not exists public.employee(
+	id bigserial not null,
+	full_name varchar(255) not null,
+	date_of_birth date,
+	age int,
+	mobile varchar(255) not null,
+	email varchar(100) not null, 
+	skill_id integer not null,
+	experience_summary varchar,
+	experience_doc varchar(500) not null,
+	government_id varchar(500) not null,
+	created_by bigint,
+	created_date timestamp default now(),
+	modified_by bigint,
+	modified_date timestamp,
+	is_active boolean default true,
+constraint pk_employee_id primary key(id),
+constraint uk_employee_mobile unique (mobile),
+constraint uk_employee_email unique (email),
+constraint fk_employee_skill_id foreign key (skill_id) references master_skill (id)
+	);
+
+
+--- create master role table
+
+create table if not exists public.master_role (
+
+	id serial not null,
+	role_name varchar(255) not null,
+	is_active boolean default true,
+constraint pk_master_role_id primary key (id)
+	);
+
+--insert data into master role
+
+
+select * from master_role
+INSERT INTO public.master_role (role_name) SELECT 'Admin' WHERE NOT EXISTS (SELECT 1 FROM public.master_role WHERE role_name = 'Admin');
+INSERT INTO public.master_role (role_name) SELECT 'Customer' WHERE NOT EXISTS (SELECT 1 FROM public.master_role WHERE role_name = 'Customer');
+INSERT INTO public.master_role (role_name) SELECT 'Delivery_Partner' WHERE NOT EXISTS (SELECT 1 FROM public.master_role WHERE role_name = 'Delivery_Partner');
+INSERT INTO public.master_role (role_name) SELECT 'Employee' WHERE NOT EXISTS (SELECT 1 FROM public.master_role WHERE role_name = 'Employee');
+INSERT INTO public.master_role (role_name) SELECT 'Student' WHERE NOT EXISTS (SELECT 1 FROM public.master_role WHERE role_name = 'Student');
+INSERT INTO public.master_role (role_name) SELECT 'Vendor' WHERE NOT EXISTS (SELECT 1 FROM public.master_role WHERE role_name = 'Vendor');
+
+
