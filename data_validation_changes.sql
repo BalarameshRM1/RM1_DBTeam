@@ -120,7 +120,7 @@ INSERT INTO public.master_role (role_name) SELECT 'Vendor' WHERE NOT EXISTS (SEL
 
 
 ----
---- 26/11/2025 create master tables
+--- 26/11/2025 create master modules tables
 create table if not exists public.master_module(
 	id serial not null,
 	module_name varchar(255) not null,
@@ -139,4 +139,74 @@ insert into public.master_module (module_name) SELECT 'Construction Materials' W
 insert into public.master_module (module_name) SELECT 'Freelancer' WHERE NOT EXISTS (SELECT 1 FROM public.master_module WHERE module_name = 'Freelancer');	
 insert into public.master_module (module_name) SELECT 'Education' WHERE NOT EXISTS (SELECT 1 FROM public.master_module WHERE module_name = 'Education');
 insert into public.master_module (module_name) SELECT 'Farming' WHERE NOT EXISTS (SELECT 1 FROM public.master_module WHERE module_name = 'Farming');
+
+--------------------------
+create table if not exists public.master_sub_module(
+  id serial not null,
+  sub_module_name varchar(255) not null,
+  module_id integer not null,
+  is_active boolean default true,
+  constraint pk_master_sub_module_id primary key(id),
+  constraint fk_master_sub_module_module_id foreign key(module_id) references master_module(id),
+  constraint uk_master_sub_module_sub_module_name_module_id unique(sub_module_name, module_id)
+);
+
+INSERT INTO public.master_sub_module (sub_module_name, module_id)
+ SELECT 'Residential Cleaning', 1 WHERE NOT EXISTS ( SELECT 1 FROM public.master_sub_module WHERE sub_module_name = 'Residential Cleaning' AND module_id = 1 );
+INSERT INTO public.master_sub_module (sub_module_name, module_id)
+ SELECT 'Commercial Cleaning', 1 WHERE NOT EXISTS ( SELECT 1 FROM public.master_sub_module WHERE sub_module_name = 'Commercial Cleaning' AND module_id = 1 );
+INSERT INTO public.master_sub_module (sub_module_name, module_id)
+ SELECT 'Specialized Cleaning', 1 WHERE NOT EXISTS ( SELECT 1 FROM public.master_sub_module WHERE sub_module_name = 'Specialized Cleaning' AND module_id = 1 );
+INSERT INTO public.master_sub_module (sub_module_name, module_id)
+ SELECT 'Industrial Cleaning', 1 WHERE NOT EXISTS ( SELECT 1 FROM public.master_sub_module WHERE sub_module_name = 'Industrial Cleaning' AND module_id = 1 );
+INSERT INTO public.master_sub_module (sub_module_name, module_id)
+ SELECT 'Post-Construction Cleaning', 2 WHERE NOT EXISTS ( SELECT 1 FROM public.master_sub_module WHERE sub_module_name = 'Post-Construction Cleaning' AND module_id = 2 );
+INSERT INTO public.master_sub_module (sub_module_name, module_id)
+ SELECT 'Passenger Transport', 2 WHERE NOT EXISTS ( SELECT 1 FROM public.master_sub_module WHERE sub_module_name = 'Passenger Transport' AND module_id = 2 );
+INSERT INTO public.master_sub_module (sub_module_name, module_id)
+ SELECT 'Logistics & Cargo', 2 WHERE NOT EXISTS ( SELECT 1 FROM public.master_sub_module WHERE sub_module_name = 'Logistics & Cargo' AND module_id = 2 );
+INSERT INTO public.master_sub_module (sub_module_name, module_id)
+ SELECT 'Rental Services', 2 WHERE NOT EXISTS ( SELECT 1 FROM public.master_sub_module WHERE sub_module_name = 'Rental Services' AND module_id = 2 );
+INSERT INTO public.master_sub_module (sub_module_name, module_id)
+ SELECT 'Specialized Transport', 2 WHERE NOT EXISTS ( SELECT 1 FROM public.master_sub_module WHERE sub_module_name = 'Specialized Transport' AND module_id = 2 );
+INSERT INTO public.master_sub_module (sub_module_name, module_id)
+ SELECT 'Cleaning Services', 3 WHERE NOT EXISTS ( SELECT 1 FROM public.master_sub_module WHERE sub_module_name = 'Cleaning Services' AND module_id = 3 );
+INSERT INTO public.master_sub_module (sub_module_name, module_id)
+ SELECT 'Electrical Services', 3 WHERE NOT EXISTS ( SELECT 1 FROM public.master_sub_module WHERE sub_module_name = 'Electrical Services' AND module_id = 3 );
+INSERT INTO public.master_sub_module (sub_module_name, module_id)
+ SELECT 'Plumbing Service', 3 WHERE NOT EXISTS ( SELECT 1 FROM public.master_sub_module WHERE sub_module_name = 'Plumbing Service' AND module_id = 3 );
+INSERT INTO public.master_sub_module (sub_module_name, module_id)
+ SELECT 'Appliances Repair', 3 WHERE NOT EXISTS ( SELECT 1 FROM public.master_sub_module WHERE sub_module_name = 'Appliances Repair' AND module_id = 3 );
+INSERT INTO public.master_sub_module (sub_module_name, module_id)
+ SELECT 'Carpentary & Furniture', 3 WHERE NOT EXISTS ( SELECT 1 FROM public.master_sub_module WHERE sub_module_name = 'Carpentary & Furniture' AND module_id = 3 );
+INSERT INTO public.master_sub_module (sub_module_name, module_id)
+ SELECT 'Painting & Renovation', 3 WHERE NOT EXISTS ( SELECT 1 FROM public.master_sub_module WHERE sub_module_name = 'Painting & Renovation' AND module_id = 3 );
+INSERT INTO public.master_sub_module (sub_module_name, module_id)
+ SELECT 'HVAC & Cooling', 3 WHERE NOT EXISTS ( SELECT 1 FROM public.master_sub_module WHERE sub_module_name = 'HVAC & Cooling' AND module_id = 3 );
+INSERT INTO public.master_sub_module (sub_module_name, module_id)
+ SELECT 'Gardening & Outdoor Care', 3 WHERE NOT EXISTS ( SELECT 1 FROM public.master_sub_module WHERE sub_module_name = 'Gardening & Outdoor Care' AND module_id = 3 );
+INSERT INTO public.master_sub_module (sub_module_name, module_id)
+ SELECT 'Handyman/General Repair', 3 WHERE NOT EXISTS ( SELECT 1 FROM public.master_sub_module WHERE sub_module_name = 'Handyman/General Repair' AND module_id = 3 );
+INSERT INTO public.master_sub_module (sub_module_name, module_id)
+ SELECT 'Home Security Services', 3 WHERE NOT EXISTS ( SELECT 1 FROM public.master_sub_module WHERE sub_module_name = 'Home Security Services' AND module_id = 3 );
+INSERT INTO public.master_sub_module (sub_module_name, module_id)
+ SELECT 'House Rental', 4 WHERE NOT EXISTS ( SELECT 1 FROM public.master_sub_module WHERE sub_module_name = 'House Rental' AND module_id = 4 );
+INSERT INTO public.master_sub_module (sub_module_name, module_id)
+ SELECT 'Commercial Rental', 4 WHERE NOT EXISTS ( SELECT 1 FROM public.master_sub_module WHERE sub_module_name = 'Commercial Rental' AND module_id = 4 );
+INSERT INTO public.master_sub_module (sub_module_name, module_id)
+ SELECT 'Buy & Sale Products', 5 WHERE NOT EXISTS ( SELECT 1 FROM public.master_sub_module WHERE sub_module_name = 'Buy & Sale Products' AND module_id = 5 );
+INSERT INTO public.master_sub_module (sub_module_name, module_id)
+ SELECT 'Old Retail Sales', 5 WHERE NOT EXISTS ( SELECT 1 FROM public.master_sub_module WHERE sub_module_name = 'Old Retail Sales' AND module_id = 5 );
+INSERT INTO public.master_sub_module (sub_module_name, module_id)
+ SELECT 'Online Ordering', 5 WHERE NOT EXISTS ( SELECT 1 FROM public.master_sub_module WHERE sub_module_name = 'Online Ordering' AND module_id = 5 );
+INSERT INTO public.master_sub_module (sub_module_name, module_id)
+ SELECT 'Wholesale Buy Near Distribution', 5 WHERE NOT EXISTS ( SELECT 1 FROM public.master_sub_module WHERE sub_module_name = 'Wholesale Buy Near Distribution' AND module_id = 5 );
+INSERT INTO public.master_sub_module (sub_module_name, module_id)
+ SELECT 'Material Supply', 6 WHERE NOT EXISTS ( SELECT 1 FROM public.master_sub_module WHERE sub_module_name = 'Material Supply' AND module_id = 6 );
+INSERT INTO public.master_sub_module (sub_module_name, module_id)
+ SELECT 'Machinery Rental', 6 WHERE NOT EXISTS ( SELECT 1 FROM public.master_sub_module WHERE sub_module_name = 'Machinery Rental' AND module_id = 6 );
+INSERT INTO public.master_sub_module (sub_module_name, module_id)
+ SELECT 'Transportation', 6 WHERE NOT EXISTS ( SELECT 1 FROM public.master_sub_module WHERE sub_module_name = 'Transportation' AND module_id = 6 );
+INSERT INTO public.master_sub_module (sub_module_name, module_id)
+ SELECT 'Bulk Procurement', 6 WHERE NOT EXISTS ( SELECT 1 FROM public.master_sub_module WHERE sub_module_name = 'Bulk Procurement' AND module_id = 6 );
 
