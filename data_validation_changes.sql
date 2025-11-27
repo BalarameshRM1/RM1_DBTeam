@@ -210,3 +210,13 @@ INSERT INTO public.master_sub_module (sub_module_name, module_id)
 INSERT INTO public.master_sub_module (sub_module_name, module_id)
  SELECT 'Bulk Procurement', 6 WHERE NOT EXISTS ( SELECT 1 FROM public.master_sub_module WHERE sub_module_name = 'Bulk Procurement' AND module_id = 6 );
 
+----------modifications on 27-11-2015 sahitha
+alter table if exists user_registration
+alter column role_id drop not null;
+
+alter table if exists user_registration
+alter column state_id drop not null;
+
+alter table if exists user_registration
+alter column district_id drop not null;
+---------------------------------------------------------------------------
