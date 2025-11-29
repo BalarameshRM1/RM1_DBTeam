@@ -414,4 +414,43 @@ INSERT INTO public.master_sub_service (sub_service_name, service_id) SELECT 'Bou
 INSERT INTO public.master_sub_service (sub_service_name, service_id) SELECT 'Luxury Hillside Villa', 84  WHERE NOT EXISTS (SELECT 1 FROM public.master_sub_service WHERE sub_service_name = 'Luxury Hillside Villa' AND service_id = 84  );
 INSERT INTO public.master_sub_service (sub_service_name, service_id) SELECT 'Heritage Bungalow', 84  WHERE NOT EXISTS (SELECT 1 FROM public.master_sub_service WHERE sub_service_name = 'Heritage Bungalow' AND service_id = 84  );
 INSERT INTO public.master_sub_service (sub_service_name, service_id) SELECT 'Corporate Office Tower Floor', 84  WHERE NOT EXISTS (SELECT 1 FROM public.master_sub_service WHERE sub_service_name = 'Corporate Office Tower Floor' AND service_id = 84  );
+--------------------------------
+--Authored by Anand A on 29-11-2025.
 
+alter table if exists user_registration add column if not exists profile_image varchar(500);
+alter table if exists user_registration add column if not exists role_id integer;
+alter table if exists user_registration add column if not exists skill_id integer;
+alter table if exists user_registration add column if not exists experience_summary varchar;
+alter table if exists user_registration add column if not exists experience_doc varchar(500);
+alter table if exists user_registration add column if not exists government_id varchar(500);
+alter table if exists user_registration add column if not exists first_name varchar(255);
+alter table if exists user_registration add column if not exists last_name varchar(255);
+alter table if exists user_registration add column if not exists unique_id varchar(255);
+---
+CREATE TABLE IF NOT EXISTS public.users_pre_profile_history
+(
+    id bigserial  NOT NULL,
+    full_name character varying(255) COLLATE pg_catalog."default",
+    email character varying(100) COLLATE pg_catalog."default",
+    mobile character varying(100) COLLATE pg_catalog."default",
+    password character varying(500) COLLATE pg_catalog."default",
+    gender_id integer,
+    dob date,
+    age integer,
+    role_id integer,
+    state_id integer,
+    district_id integer,
+    created_by bigint,
+    created_date timestamp without time zone,
+    modified_by bigint,
+    modified_date timestamp without time zone  DEFAULT now(),
+    is_active boolean,
+    profile_image character varying(500) COLLATE pg_catalog."default",
+    skill_id integer,
+    experience_summary character varying COLLATE pg_catalog."default",
+    experience_doc character varying(500) COLLATE pg_catalog."default",
+    government_id character varying(500) COLLATE pg_catalog."default",
+    first_name character varying(255) COLLATE pg_catalog."default",
+    last_name character varying(255) COLLATE pg_catalog."default",
+    unique_id character varying(255) COLLATE pg_catalog."default",
+    CONSTRAINT pk_users_pre_profile_history_id PRIMARY KEY (id));
