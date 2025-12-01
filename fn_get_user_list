@@ -1,3 +1,5 @@
+--create get_user_list_function -- 2025-12-01
+
 create or replace function fn_get_user_list(userid bigint,roleid bigint,p_limit int default 100, p_offset int default 0)
 returns table (
     user_id bigint,
