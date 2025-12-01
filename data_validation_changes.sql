@@ -454,3 +454,7 @@ CREATE TABLE IF NOT EXISTS public.users_pre_profile_history
     last_name character varying(255) COLLATE pg_catalog."default",
     unique_id character varying(255) COLLATE pg_catalog."default",
     CONSTRAINT pk_users_pre_profile_history_id PRIMARY KEY (id));
+---------------------------------
+alter table if exists user_registration alter column first_name set not null;
+alter table if exists user_registration alter column last_name set not null;
+alter table if exists user_registration alter column unique_id set not null;
