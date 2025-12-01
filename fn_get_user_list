@@ -1,0 +1,46 @@
+create or replace function fn_get_user_list(userid bigint,roleid bigint,p_limit int default 100, p_offset int default 0)
+returns table (
+    user_id bigint,
+    user_name varchar,
+    email varchar,
+    mobile varchar,
+    password varchar,
+    dob date,
+    age integer,
+    created_by bigint,
+    is_active boolean,
+    profile_image varchar,
+    experience_summary varchar,
+    experience_doc varchar,
+    government_id varchar,
+    unique_id varchar,
+    gender_id integer,
+    gender_name varchar,
+    role_id integer,
+    role_name varchar,
+    state_id integer,
+    state_name varchar,
+    district_id integer,
+    district_name varchar,
+    skill_id integer,
+    skill varchar
+)
+language 'plpgsql'
+as $$
+begin
+    return query
+    select 
+        ur.id as user_id,concat(ur.first_name, ' ', ur.last_name)::varchar as user_name,ur.email,ur.mobile,ur.password,ur.dob,ur.age,
+        ur.created_by,ur.is_active,ur.profile_image,ur.experience_summary,ur.experience_doc,ur.government_id,
+        ur.unique_id,ur.gender_id,g.gender_name,ur.role_id,r.role_name,ur.state_id,s.state_name,ur.district_id,
+        d.district_name,ur.skill_id,sk.skill
+    from user_registration ur
+    left join master_gender g on ur.gender_id = g.id and g.is_active = true
+    left join master_role r on ur.role_id = r.id and r.is_active = true
+    left join master_state s on ur.state_id = s.id and s.is_active = true
+    left join master_district d on ur.district_id = d.id and d.is_active = true
+    left join master_skill sk on ur.skill_id = sk.id and sk.is_active = true
+    where (ur.id = userid or -1=userid) and (ur.role_id = roleid or -1=roleid) and ur.is_active=true
+    limit p_limit offset p_offset;
+end;
+$$;
