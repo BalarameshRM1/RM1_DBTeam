@@ -1,0 +1,55 @@
+CREATE OR REPLACE FUNCTION fn_create_user_list (
+    p_first_name varchar,
+    p_last_name varchar,
+    p_email varchar,
+    p_mobile varchar,
+    p_password varchar,
+    p_gender_id int,
+    p_unique_id varchar,
+    p_dob date DEFAULT NULL,
+    p_age int DEFAULT NULL,
+    p_role_id int DEFAULT NULL,
+    p_state_id int DEFAULT NULL,
+    p_district_id int DEFAULT NULL,
+    p_created_by bigint DEFAULT NULL,
+    p_profile_image varchar DEFAULT NULL,
+    p_skill_id int DEFAULT NULL,
+    p_experience_summary varchar DEFAULT NULL,
+    p_experience_doc varchar DEFAULT NULL,
+    p_government_id varchar DEFAULT NULL
+)
+RETURNS TABLE (user_id bigint, user_email varchar, user_name varchar)
+LANGUAGE plpgsql
+AS $$
+DECLARE
+    new_id bigint;
+    new_email varchar;
+    new_user_name varchar;
+BEGIN
+    -- Combine first and last name
+    new_user_name := CONCAT_WS(' ', p_first_name, p_last_name);
+
+    -- Insert record
+    INSERT INTO user_registration (
+        first_name, last_name, email, mobile, password, gender_id,
+        dob, age, role_id, state_id, district_id, created_by,
+        profile_image, skill_id, experience_summary, experience_doc,
+        government_id, unique_id
+    )
+    VALUES (
+        p_first_name, p_last_name, p_email, p_mobile, p_password, p_gender_id,
+        p_dob, p_age, p_role_id, p_state_id, p_district_id, p_created_by,
+        p_profile_image, p_skill_id, p_experience_summary, p_experience_doc,
+        p_government_id, p_unique_id
+    )
+    RETURNING id, email INTO new_id, new_email;
+
+    IF new_id IS NULL THEN
+        RAISE EXCEPTION 'User insert failed; no ID returned';
+    END IF;
+
+    -- Return result
+    RETURN QUERY
+    SELECT new_id, new_email, new_user_name;
+END;
+$$;
