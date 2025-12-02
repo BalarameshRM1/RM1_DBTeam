@@ -10,3 +10,14 @@ begin
 return 'user deleted successfully';
 END;
 $$;
+
+------ changing parameter email to user_id
+create or replace function fn_user_delete_list(p_user_id int)
+returns text
+language plpgsql as
+$$
+begin
+     delete from user_registration where (id = p_user_id);
+return 'user deleted successfully ';
+end;
+$$;
