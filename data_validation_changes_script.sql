@@ -1310,4 +1310,11 @@ where role_id=4 and created_date::date=current_date;
 
 commit;
 
-
+--Authored by Anand A on 2-12-2025
+--add gender_id column and constraint in service_booking table
+alter table if exists service_booking add column if not exists gender_id bigint;
+alter table if exists service_booking add constraint fk_service_booking_gender_id foreign key(gender_id) references master_gender (id);
+-- alter location_id column drop constraint
+alter table if exists user_registration alter column location_id drop not null;
+-- add address column in user_registration table
+alter table if exists user_registration add column if not exists address varchar;
