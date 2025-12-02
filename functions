@@ -1,0 +1,19 @@
+----create function fn_user_delete_list 
+create or replace function fn_user_delete_list(P_email varchar)
+returns text 
+language plpgsql as
+$$
+begin
+	delete from user_registration where 
+        (p_email is not null and email = p_email);       
+return 'user deleted successfully';
+END;
+$$;
+
+begin;
+select * from fn_user_delete_list('rajashekar@gmail.com')       ----insert into data
+rollback;
+
+select * from user_registration;
+
+SELECT setval('public.user_registration_id_seq', (SELECT MAX(id) + 1 FROM user_registration)); 
