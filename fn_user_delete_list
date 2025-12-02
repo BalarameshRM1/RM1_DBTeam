@@ -1,0 +1,12 @@
+
+--- create user deleted function 02-12-25 -Tharun
+create or replace function fn_user_delete_list(P_email varchar)
+returns text 
+language plpgsql as
+$$
+begin
+	delete from user_registration where 
+        (p_email is not null and email = p_email);       
+return 'user deleted successfully';
+END;
+$$;
