@@ -1,0 +1,12 @@
+create or replace function fn_user_login_list(p_email varchar)
+returns table (user_id bigint,email varchar,password varchar,user_name varchar)
+LANGUAGE 'plpgsql' AS
+$$
+BEGIN
+    RETURN QUERY
+	SELECT ur.id as user_id,ur.email,ur.password,concat_ws(' ',ur.first_name,ur.last_name)::varchar as user_name
+    FROM user_registration ur 
+    WHERE (ur.email = p_email) and (ur.is_active=true) 
+    LIMIT 1;
+END;
+$$;
