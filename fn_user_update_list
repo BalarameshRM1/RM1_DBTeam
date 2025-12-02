@@ -1,0 +1,32 @@
+create or replace function fn_user_update_list(
+    p_email varchar,
+    p_first_name varchar,
+    p_last_name varchar,
+    p_mobile varchar,
+    p_password varchar,
+	p_gender_id integer,
+    p_dob date default null,
+    p_age integer default null,
+    p_profile_image varchar default null,
+    p_experience_summary varchar default null,
+    p_experience_doc varchar default null,
+    p_government_id varchar default null,
+    p_role_id integer default null,
+    p_state_id integer default null,
+    p_district_id integer default null,
+    p_skill_id integer default null,
+	p_created_by bigint default null
+)
+returns text
+language plpgsql
+as $$
+begin
+   update user_registration
+   set first_name = p_first_name,last_name = p_last_name,email = lower(p_email),mobile = p_mobile,
+       password = p_password, dob = p_dob,age = p_age,profile_image = p_profile_image,experience_summary = p_experience_summary,
+       experience_doc = p_experience_doc,government_id = p_government_id,gender_id = p_gender_id,role_id = p_role_id,
+	   state_id = p_state_id,district_id = p_district_id,skill_id = p_skill_id,created_by = p_created_by
+   where lower(email) = lower(p_email);
+   return 'user details updated successfully';
+end;
+$$;
