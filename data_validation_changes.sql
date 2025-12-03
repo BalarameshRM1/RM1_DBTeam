@@ -629,7 +629,7 @@ alter table user_registration add constraint uk_user_registration_unique_id uniq
 alter table user_registration add column address varchar;
 
 ------------------------------- 3-12-2025 - Lavanya
-created master_sub_sub_service table
+---created master_sub_sub_service table
 
 create table if not exists master_sub_sub_service(
 id bigserial not null,
@@ -640,3 +640,55 @@ constraint pk_master_sub_sub_service_id primary key(id),
 constraint uk_master_sub_sub_service_sub_service_id_sub_sub_service_name unique (sub_service_id,sub_sub_service_name),
 constraint fk_master_sub_sub_service_sub_service_id foreign key (sub_service_id) references master_sub_service(id)
 );
+
+-------------------- 03-12-2025 - Tharun
+-------insert data into master_sub_sub_service table
+
+INSERT INTO public.master_sub_sub_service(sub_service_id, sub_sub_service_name) SELECT 1, 'Living Room Cleaning' WHERE NOT EXISTS (SELECT 1 FROM public.master_sub_sub_service WHERE sub_service_id = 1 AND sub_sub_service_name = 'Living Room Cleaning');
+INSERT INTO public.master_sub_sub_service(sub_service_id, sub_sub_service_name) SELECT 1, 'Bedroom Cleaning' WHERE NOT EXISTS (SELECT 1 FROM public.master_sub_sub_service WHERE sub_service_id = 1 AND sub_sub_service_name = 'Bedroom Cleaning');
+INSERT INTO public.master_sub_sub_service(sub_service_id, sub_sub_service_name) SELECT 1, 'Kitchen Cleaning' WHERE NOT EXISTS (SELECT 1 FROM public.master_sub_sub_service WHERE sub_service_id = 1 AND sub_sub_service_name = 'Kitchen Cleaning');
+INSERT INTO public.master_sub_sub_service(sub_service_id, sub_sub_service_name) SELECT 1, 'Bathroom Cleaning' WHERE NOT EXISTS (SELECT 1 FROM public.master_sub_sub_service WHERE sub_service_id = 1 AND sub_sub_service_name = 'Bathroom Cleaning');
+INSERT INTO public.master_sub_sub_service(sub_service_id, sub_sub_service_name) SELECT 2, 'Studio Apartment' WHERE NOT EXISTS (SELECT 1 FROM public.master_sub_sub_service WHERE sub_service_id = 2 AND sub_sub_service_name = 'Studio Apartment');
+INSERT INTO public.master_sub_sub_service(sub_service_id, sub_sub_service_name) SELECT 2, '1 BHK Apartment' WHERE NOT EXISTS (SELECT 1 FROM public.master_sub_sub_service WHERE sub_service_id = 2 AND sub_sub_service_name = '1 BHK Apartment');
+INSERT INTO public.master_sub_sub_service(sub_service_id, sub_sub_service_name) SELECT 2, '2 BHK / 3 BHK Apartment' WHERE NOT EXISTS (SELECT 1 FROM public.master_sub_sub_service WHERE sub_service_id = 2 AND sub_sub_service_name = '2 BHK / 3 BHK Apartment');
+INSERT INTO public.master_sub_sub_service(sub_service_id, sub_sub_service_name) SELECT 3, 'Small Villas' WHERE NOT EXISTS (SELECT 1 FROM public.master_sub_sub_service WHERE sub_service_id = 3 AND sub_sub_service_name = 'Small Villas');
+INSERT INTO public.master_sub_sub_service(sub_service_id, sub_sub_service_name) SELECT 3, 'Duplex Villas' WHERE NOT EXISTS (SELECT 1 FROM public.master_sub_sub_service WHERE sub_service_id = 3 AND sub_sub_service_name = 'Duplex Villas');
+INSERT INTO public.master_sub_sub_service(sub_service_id, sub_sub_service_name) SELECT 3, 'Luxury Villas' WHERE NOT EXISTS (SELECT 1 FROM public.master_sub_sub_service WHERE sub_service_id = 3 AND sub_sub_service_name = 'Luxury Villas');
+INSERT INTO public.master_sub_sub_service(sub_service_id, sub_sub_service_name) SELECT 4, 'Cabin Cleaning' WHERE NOT EXISTS (SELECT 1 FROM public.master_sub_sub_service WHERE sub_service_id = 4 AND sub_sub_service_name = 'Cabin Cleaning');
+INSERT INTO public.master_sub_sub_service(sub_service_id, sub_sub_service_name) SELECT 4, 'Workstation Cleaning' WHERE NOT EXISTS (SELECT 1 FROM public.master_sub_sub_service WHERE sub_service_id = 4 AND sub_sub_service_name = 'Workstation Cleaning');
+INSERT INTO public.master_sub_sub_service(sub_service_id, sub_sub_service_name) SELECT 4, 'Conference Hall Cleaning' WHERE NOT EXISTS (SELECT 1 FROM public.master_sub_sub_service WHERE sub_service_id = 4 AND sub_sub_service_name = 'Conference Hall Cleaning');
+INSERT INTO public.master_sub_sub_service(sub_service_id, sub_sub_service_name) SELECT 5, 'Shop Cleaning' WHERE NOT EXISTS (SELECT 1 FROM public.master_sub_sub_service WHERE sub_service_id = 5 AND sub_sub_service_name = 'Shop Cleaning');
+INSERT INTO public.master_sub_sub_service(sub_service_id, sub_sub_service_name) SELECT 5, 'Mall Cleaning' WHERE NOT EXISTS (SELECT 1 FROM public.master_sub_sub_service WHERE sub_service_id = 5 AND sub_sub_service_name = 'Mall Cleaning');
+INSERT INTO public.master_sub_sub_service(sub_service_id, sub_sub_service_name) SELECT 5, 'Showroom Cleaning' WHERE NOT EXISTS (SELECT 1 FROM public.master_sub_sub_service WHERE sub_service_id = 5 AND sub_sub_service_name = 'Showroom Cleaning');
+INSERT INTO public.master_sub_sub_service(sub_service_id, sub_sub_service_name) SELECT 6, 'Laboratory Cleaning' WHERE NOT EXISTS (SELECT 1 FROM public.master_sub_sub_service WHERE sub_service_id = 6 AND sub_sub_service_name = 'Laboratory Cleaning');
+INSERT INTO public.master_sub_sub_service(sub_service_id, sub_sub_service_name) SELECT 6, 'Clinic Cleaning' WHERE NOT EXISTS (SELECT 1 FROM public.master_sub_sub_service WHERE sub_service_id = 6 AND sub_sub_service_name = 'Clinic Cleaning');
+INSERT INTO public.master_sub_sub_service(sub_service_id, sub_sub_service_name) SELECT 6, 'Diagnostic Centers' WHERE NOT EXISTS (SELECT 1 FROM public.master_sub_sub_service WHERE sub_service_id = 6 AND sub_sub_service_name = 'Diagnostic Centers');
+INSERT INTO public.master_sub_sub_service(sub_service_id, sub_sub_service_name) SELECT 7, 'Classrooms' WHERE NOT EXISTS (SELECT 1 FROM public.master_sub_sub_service WHERE sub_service_id = 7 AND sub_sub_service_name = 'Classrooms');
+INSERT INTO public.master_sub_sub_service(sub_service_id, sub_sub_service_name) SELECT 7, 'Laboratory Cleaning' WHERE NOT EXISTS (SELECT 1 FROM public.master_sub_sub_service WHERE sub_service_id = 7 AND sub_sub_service_name = 'Laboratory Cleaning');
+INSERT INTO public.master_sub_sub_service(sub_service_id, sub_sub_service_name) SELECT 7, 'Library Cleaning' WHERE NOT EXISTS (SELECT 1 FROM public.master_sub_sub_service WHERE sub_service_id = 7 AND sub_sub_service_name = 'Library Cleaning');
+INSERT INTO public.master_sub_sub_service(sub_service_id, sub_sub_service_name) SELECT 8, 'Sofa Cleaning' WHERE NOT EXISTS (SELECT 1 FROM public.master_sub_sub_service WHERE sub_service_id = 8 AND sub_sub_service_name = 'Sofa Cleaning');
+INSERT INTO public.master_sub_sub_service(sub_service_id, sub_sub_service_name) SELECT 8, 'Chair Cleaning' WHERE NOT EXISTS (SELECT 1 FROM public.master_sub_sub_service WHERE sub_service_id = 8 AND sub_sub_service_name = 'Chair Cleaning');
+INSERT INTO public.master_sub_sub_service(sub_service_id, sub_sub_service_name) SELECT 8, 'Wooden Furniture Cleaning' WHERE NOT EXISTS (SELECT 1 FROM public.master_sub_sub_service WHERE sub_service_id = 8 AND sub_sub_service_name = 'Wooden Furniture Cleaning');
+INSERT INTO public.master_sub_sub_service(sub_service_id, sub_sub_service_name) SELECT 9, 'Marble Polishing' WHERE NOT EXISTS (SELECT 1 FROM public.master_sub_sub_service WHERE sub_service_id = 9 AND sub_sub_service_name = 'Marble Polishing');
+INSERT INTO public.master_sub_sub_service(sub_service_id, sub_sub_service_name) SELECT 9, 'Tile Cleaning' WHERE NOT EXISTS (SELECT 1 FROM public.master_sub_sub_service WHERE sub_service_id = 9 AND sub_sub_service_name = 'Tile Cleaning');
+INSERT INTO public.master_sub_sub_service(sub_service_id, sub_sub_service_name) SELECT 9, 'Granite Polishing' WHERE NOT EXISTS (SELECT 1 FROM public.master_sub_sub_service WHERE sub_service_id = 9 AND sub_sub_service_name = 'Granite Polishing');
+INSERT INTO public.master_sub_sub_service(sub_service_id, sub_sub_service_name) SELECT 10, 'Indoor Glass Cleaning' WHERE NOT EXISTS (SELECT 1 FROM public.master_sub_sub_service WHERE sub_service_id = 10 AND sub_sub_service_name = 'Indoor Glass Cleaning');
+INSERT INTO public.master_sub_sub_service(sub_service_id, sub_sub_service_name) SELECT 10, 'Outdoor Glass Cleaning' WHERE NOT EXISTS (SELECT 1 FROM public.master_sub_sub_service WHERE sub_service_id = 10 AND sub_sub_service_name = 'Outdoor Glass Cleaning');
+INSERT INTO public.master_sub_sub_service(sub_service_id, sub_sub_service_name) SELECT 10, 'High-Rise Glass Cleaning' WHERE NOT EXISTS (SELECT 1 FROM public.master_sub_sub_service WHERE sub_service_id = 10 AND sub_sub_service_name = 'High-Rise Glass Cleaning');
+INSERT INTO public.master_sub_sub_service(sub_service_id, sub_sub_service_name) SELECT 10, 'Home Sanitization' WHERE NOT EXISTS (SELECT 1 FROM public.master_sub_sub_service WHERE sub_service_id = 10 AND sub_sub_service_name = 'Home Sanitization');
+INSERT INTO public.master_sub_sub_service(sub_service_id, sub_sub_service_name) SELECT 10, 'Office Sanitization' WHERE NOT EXISTS (SELECT 1 FROM public.master_sub_sub_service WHERE sub_service_id = 10 AND sub_sub_service_name = 'Office Sanitization');
+INSERT INTO public.master_sub_sub_service(sub_service_id, sub_sub_service_name) SELECT 10, 'Commercial Sanitization' WHERE NOT EXISTS (SELECT 1 FROM public.master_sub_sub_service WHERE sub_service_id = 10 AND sub_sub_service_name = 'Commercial Sanitization');
+INSERT INTO public.master_sub_sub_service(sub_service_id, sub_sub_service_name) SELECT 11, 'Assembly Areas Cleaning' WHERE NOT EXISTS (SELECT 1 FROM public.master_sub_sub_service WHERE sub_service_id = 11 AND sub_sub_service_name = 'Assembly Areas Cleaning');
+INSERT INTO public.master_sub_sub_service(sub_service_id, sub_sub_service_name) SELECT 11, 'Production Line Cleaning' WHERE NOT EXISTS (SELECT 1 FROM public.master_sub_sub_service WHERE sub_service_id = 11 AND sub_sub_service_name = 'Production Line Cleaning');
+INSERT INTO public.master_sub_sub_service(sub_service_id, sub_sub_service_name) SELECT 12, 'Warehouse Rack Cleaning' WHERE NOT EXISTS (SELECT 1 FROM public.master_sub_sub_service WHERE sub_service_id = 12 AND sub_sub_service_name = 'Warehouse Rack Cleaning');
+INSERT INTO public.master_sub_sub_service(sub_service_id, sub_sub_service_name) SELECT 12, 'Warehouse Floor Cleaning' WHERE NOT EXISTS (SELECT 1 FROM public.master_sub_sub_service WHERE sub_service_id = 12 AND sub_sub_service_name = 'Warehouse Floor Cleaning');
+INSERT INTO public.master_sub_sub_service(sub_service_id, sub_sub_service_name) SELECT 13, 'Heavy Equipment Cleaning' WHERE NOT EXISTS (SELECT 1 FROM public.master_sub_sub_service WHERE sub_service_id = 13 AND sub_sub_service_name = 'Heavy Equipment Cleaning');
+INSERT INTO public.master_sub_sub_service(sub_service_id, sub_sub_service_name) SELECT 13, 'Precision Tools Cleaning' WHERE NOT EXISTS (SELECT 1 FROM public.master_sub_sub_service WHERE sub_service_id = 13 AND sub_sub_service_name = 'Precision Tools Cleaning');
+INSERT INTO public.master_sub_sub_service(sub_service_id, sub_sub_service_name) SELECT 13, 'Chemical Waste Handling' WHERE NOT EXISTS (SELECT 1 FROM public.master_sub_sub_service WHERE sub_service_id = 13 AND sub_sub_service_name = 'Chemical Waste Handling');
+INSERT INTO public.master_sub_sub_service(sub_service_id, sub_sub_service_name) SELECT 13, 'Solid Waste Handling' WHERE NOT EXISTS (SELECT 1 FROM public.master_sub_sub_service WHERE sub_service_id = 13 AND sub_sub_service_name = 'Solid Waste Handling');
+INSERT INTO public.master_sub_sub_service(sub_service_id, sub_sub_service_name) SELECT 14, 'Marble Polishing' WHERE NOT EXISTS (SELECT 1 FROM public.master_sub_sub_service WHERE sub_service_id = 14 AND sub_sub_service_name = 'Marble Polishing');
+INSERT INTO public.master_sub_sub_service(sub_service_id, sub_sub_service_name) SELECT 14, 'Granite Polishing' WHERE NOT EXISTS (SELECT 1 FROM public.master_sub_sub_service WHERE sub_service_id = 14 AND sub_sub_service_name = 'Granite Polishing');
+INSERT INTO public.master_sub_sub_service(sub_service_id, sub_sub_service_name) SELECT 15, 'Indoor Dust Removal' WHERE NOT EXISTS (SELECT 1 FROM public.master_sub_sub_service WHERE sub_service_id = 15 AND sub_sub_service_name = 'Indoor Dust Removal');
+INSERT INTO public.master_sub_sub_service(sub_service_id, sub_sub_service_name) SELECT 15, 'Outdoor Dust Removal' WHERE NOT EXISTS (SELECT 1 FROM public.master_sub_sub_service WHERE sub_service_id = 15 AND sub_sub_service_name = 'Outdoor Dust Removal');
+INSERT INTO public.master_sub_sub_service(sub_service_id, sub_sub_service_name) SELECT 16, 'Paint Stain from Tiles' WHERE NOT EXISTS (SELECT 1 FROM public.master_sub_sub_service WHERE sub_service_id = 16 AND sub_sub_service_name = 'Paint Stain from Tiles');
+INSERT INTO public.master_sub_sub_service(sub_service_id, sub_sub_service_name) SELECT 16, 'Paint Stain From Windows' WHERE NOT EXISTS (SELECT 1 FROM public.master_sub_sub_service WHERE sub_service_id = 16 AND sub_sub_service_name = 'Paint Stain From Windows');
