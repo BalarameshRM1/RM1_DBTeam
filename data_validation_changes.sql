@@ -627,3 +627,16 @@ INSERT INTO public.master_sub_service (sub_service_name,service_id) SELECT  'Her
 -----
 alter table user_registration add constraint uk_user_registration_unique_id unique (unique_id);
 alter table user_registration add column address varchar;
+
+------------------------------- 3-12-2025 - Lavanya
+created master_sub_sub_service table
+
+create table if not exists master_sub_sub_service(
+id bigserial not null,
+sub_service_id integer not null,
+sub_sub_service_name varchar(255) not null,
+is_active boolean default true,
+constraint pk_master_sub_sub_service_id primary key(id),
+constraint uk_master_sub_sub_service_sub_service_id_sub_sub_service_name unique (sub_service_id,sub_sub_service_name),
+constraint fk_master_sub_sub_service_sub_service_id foreign key (sub_service_id) references master_sub_service(id)
+);
