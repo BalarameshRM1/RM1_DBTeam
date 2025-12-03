@@ -692,3 +692,16 @@ INSERT INTO public.master_sub_sub_service(sub_service_id, sub_sub_service_name) 
 INSERT INTO public.master_sub_sub_service(sub_service_id, sub_sub_service_name) SELECT 15, 'Outdoor Dust Removal' WHERE NOT EXISTS (SELECT 1 FROM public.master_sub_sub_service WHERE sub_service_id = 15 AND sub_sub_service_name = 'Outdoor Dust Removal');
 INSERT INTO public.master_sub_sub_service(sub_service_id, sub_sub_service_name) SELECT 16, 'Paint Stain from Tiles' WHERE NOT EXISTS (SELECT 1 FROM public.master_sub_sub_service WHERE sub_service_id = 16 AND sub_sub_service_name = 'Paint Stain from Tiles');
 INSERT INTO public.master_sub_sub_service(sub_service_id, sub_sub_service_name) SELECT 16, 'Paint Stain From Windows' WHERE NOT EXISTS (SELECT 1 FROM public.master_sub_sub_service WHERE sub_service_id = 16 AND sub_sub_service_name = 'Paint Stain From Windows');
+
+------------------------3-12-2025 - Lavanya
+--- modified master_sub_sub_service table to master_sub_group table
+
+create table if not exists master_sub_group(
+id bigserial not null,
+sub_service_id integer not null,
+sub_group_name varchar(255) not null,
+is_active boolean default true,
+constraint pk_master_sub_group_id primary key(id),
+constraint uk_master_sub_group_sub_service_id_sub_group_name unique (sub_service_id,sub_group_name),
+constraint fk_master_sub_group_sub_service_id foreign key (sub_service_id) references master_sub_service(id)
+);
