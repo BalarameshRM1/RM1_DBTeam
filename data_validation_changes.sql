@@ -756,3 +756,23 @@ INSERT INTO public.master_sub_group(sub_service_id, sub_group_name) SELECT 15, '
 INSERT INTO public.master_sub_group(sub_service_id, sub_group_name) SELECT 15, 'Outdoor Dust Removal' WHERE NOT EXISTS (SELECT 1 FROM public.master_sub_group WHERE sub_service_id = 15 AND sub_group_name = 'Outdoor Dust Removal');
 INSERT INTO public.master_sub_group(sub_service_id, sub_group_name) SELECT 16, 'Paint Stain from Tiles' WHERE NOT EXISTS (SELECT 1 FROM public.master_sub_group WHERE sub_service_id = 16 AND sub_group_name = 'Paint Stain from Tiles');
 INSERT INTO public.master_sub_group(sub_service_id, sub_group_name) SELECT 16, 'Paint Stain From Windows' WHERE NOT EXISTS (SELECT 1 FROM public.master_sub_group WHERE sub_service_id = 16 AND sub_group_name = 'Paint Stain From Windows');
+
+
+--------------05-12-2025 ---Tharun
+-----------created table employee_geo_tracking 
+create table if not exists employee_geo_tracking(
+id bigserial not null,
+user_id bigint not null,
+latitude varchar(100) not null, 
+longitude varchar(100) not null,
+tracking_time timestamp not null,
+created_by bigint,
+created_date timestamp default now(),
+modified_by bigint,
+modified_date timestamp,
+is_active boolean default true,
+constraint pk_employee_geo_tracking_id primary key (id),
+constraint fk_employee_geo_tracking_user_id foreign key (user_id) references user_registration (id),
+constraint fk_employee_geo_tracking_created_by foreign key (created_by) references user_registration (id),
+constraint fk_employee_geo_tracking_modified_by foreign key (modified_by) references user_registration (id)
+);
