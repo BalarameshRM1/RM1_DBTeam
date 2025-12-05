@@ -776,3 +776,22 @@ constraint fk_employee_geo_tracking_user_id foreign key (user_id) references use
 constraint fk_employee_geo_tracking_created_by foreign key (created_by) references user_registration (id),
 constraint fk_employee_geo_tracking_modified_by foreign key (modified_by) references user_registration (id)
 );
+
+---- 5-dec-2025 - dhanusha 
+-- created user_role table
+create table if not exists user_role (
+ 	id bigserial not null,
+ 	user_id bigint not null,
+ 	role_id bigint not null,
+ 	created_by bigint,
+	created_date timestamp default now(),
+	modified_by bigint,
+	modified_date timestamp,
+	is_active boolean default true,
+	constraint pk_user_role_id primary key(id),
+	constraint fk_user_role_user_id foreign key (user_id) references user_registration(id),
+	constraint fk_user_role_role_id foreign key (role_id) references master_role(id),
+	constraint uk_user_role_user_id_role_id unique (user_id,role_id),
+	constraint fk_user_role_created_by foreign key (created_by) references user_registration(id),
+	constraint fk_user_role_modified_by foreign key (modified_by) references user_registration(id)
+);
