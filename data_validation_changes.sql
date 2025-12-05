@@ -795,3 +795,17 @@ create table if not exists user_role (
 	constraint fk_user_role_created_by foreign key (created_by) references user_registration(id),
 	constraint fk_user_role_modified_by foreign key (modified_by) references user_registration(id)
 );
+
+--------- 5-12-2025 - Lavanya
+-- created master_status table
+Create table if not exists  master_status(
+id serial not null,
+status_name varchar(255) not null,
+is_active boolean default true,
+constraint pk_master_status_id primary key(id));
+
+---
+alter table if exists user_registration add column status_id bigint; 
+
+alter table if exists user_registration
+add constraint fk_user_registration_status_id foreign key (status_id) references master_status(id);
