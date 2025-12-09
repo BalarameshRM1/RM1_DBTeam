@@ -908,3 +908,373 @@ constraint fk_interview_scheduled_stage_id foreign key(stage_id) references mast
 constraint fk_interview_scheduled_status_id foreign key(status_id) references master_status(id),
 constraint fk_interview_scheduled_created_by foreign key(created_by) references users(id),
 constraint fk_interview_scheduled_modified_by foreign key(modified_by) references users(id));
+
+--------- 09-12-2025 Dhanusha
+-- created home_service table and related master tables
+create table if not exists home_service(
+	id bigserial not null,
+	module_id int not null,
+	sub_module_id int not null,
+	service_id bigint not null,
+	sub_service_id int ,
+	sub_group_id bigint ,
+	full_name varchar(255) not null,
+	email varchar(150) not null,
+	mobile varchar(255) not null,
+	address varchar(500) not null,
+	service_type_id int ,
+	issue_id bigint,
+	problem_Description varchar(500),
+	property_size_sqft varchar(150),
+	add_on_id int,
+	preferred_date date,
+	time_slot_id int,
+	special_instructions varchar(500),
+	payment_type_id int,
+	created_by bigint,
+	created_date timestamp default now(),
+	modified_by bigint,
+	modified_date timestamp,
+	is_active boolean default true,
+	constraint pk_home_service_id primary key (id),
+	constraint fk_home_service_module_id foreign key (module_id) references master_module (id),
+	constraint fk_home_service_sub_module_id foreign key (sub_module_id) references master_sub_module (id),
+	constraint fk_home_service_service_id foreign key (service_id) references master_service (id),
+	constraint fk_home_service_sub_service_id foreign key (sub_service_id) references master_sub_service (id),
+	constraint fk_home_service_sub_group_id foreign key (sub_group_id) references master_sub_group (id),
+	constraint fk_home_service_service_type_id foreign key (service_type_id) references master_service_type (id),
+	constraint fk_home_service_issue_id foreign key (issue_id) references master_issue (id),
+	constraint fk_home_service_add_on_id foreign key (add_on_id) references master_add_on (id),
+	constraint fk_home_service_time_slot_id foreign key (time_slot_id) references master_time_slot (id),
+	constraint fk_home_service_payment_type_id foreign key (payment_type_id) references master_payment_type (id),
+	constraint fk_home_service_created_by foreign key (created_by) references user_registration(id),
+	constraint fk_home_service_modified_by foreign key (modified_by) references user_registration(id)
+
+);
+
+	
+
+
+-------
+select * from master_service_type;
+Create table if not exists  master_service_type(
+id serial not null,
+service_type varchar(255) not null,
+is_active boolean default true,
+constraint pk_master_service_type_id primary key(id),
+constraint uk_master_service_type_service_type unique (service_type));
+
+INSERT INTO master_service_type (service_type)SELECT 'Regular Cleaning'WHERE NOT EXISTS (SELECT 1 FROM master_service_type WHERE service_type = 'Regular Cleaning');
+INSERT INTO master_service_type (service_type)SELECT 'Deep Cleaning'WHERE NOT EXISTS (SELECT 1 FROM master_service_type WHERE service_type = 'Deep Cleaning');
+INSERT INTO master_service_type (service_type)SELECT 'Move-in/Move-out Cleaning'WHERE NOT EXISTS (SELECT 1 FROM master_service_type WHERE service_type = 'Move-in/Move-out Cleaning');
+INSERT INTO master_service_type (service_type)SELECT 'Grease Removal'WHERE NOT EXISTS (SELECT 1 FROM master_service_type WHERE service_type = 'Grease Removal');
+
+------
+
+create table master_add_on(
+	id serial not null,
+	add_on varchar(255) not null,
+	price numeric(10,2) not null,
+	is_active boolean default true,
+	constraint pk_master_add_on_id primary key (id),
+	constraint uk_master_add_on_add_on unique (add_on)
+);
+
+INSERT INTO master_add_on (add_on, price) SELECT 'Kitchen Deep Clean', 199 WHERE NOT EXISTS (SELECT 1 FROM master_add_on WHERE add_on = 'Kitchen Deep Clean' AND price = 199);
+INSERT INTO master_add_on (add_on, price) SELECT 'Balcony wash', 149 WHERE NOT EXISTS (SELECT 1 FROM master_add_on WHERE add_on = 'Balcony wash' AND price = 149);
+INSERT INTO master_add_on (add_on, price) SELECT 'Sofa shampooing', 299 WHERE NOT EXISTS (SELECT 1 FROM master_add_on WHERE add_on = 'Sofa shampooing' AND price = 299);
+INSERT INTO master_add_on (add_on, price) SELECT 'Window Cleaning', 150 WHERE NOT EXISTS (SELECT 1 FROM master_add_on WHERE add_on = 'Window Cleaning' AND price = 150);
+INSERT INTO master_add_on (add_on, price) SELECT 'Balcony Cleaning', 150 WHERE NOT EXISTS (SELECT 1 FROM master_add_on WHERE add_on = 'Balcony Cleaning' AND price = 150);
+INSERT INTO master_add_on (add_on, price) SELECT 'Carpet Shampooing', 200 WHERE NOT EXISTS (SELECT 1 FROM master_add_on WHERE add_on = 'Carpet Shampooing' AND price = 200);
+INSERT INTO master_add_on (add_on, price) SELECT 'Oven Deep Clean', 300 WHERE NOT EXISTS (SELECT 1 FROM master_add_on WHERE add_on = 'Oven Deep Clean' AND price = 300);
+
+----------
+
+
+create table if not exists master_payment_type(
+id serial not null,
+payment_name varchar(255) not null,
+is_active boolean default true,
+constraint pk_master_payment_type_id primary key (id),
+constraint uk_master_payment_type_payment_name unique (payment_name)
+);
+
+INSERT INTO master_payment_type (payment_name) SELECT 'Full Payment' WHERE NOT EXISTS (SELECT 1 FROM master_payment_type WHERE payment_name = 'Full Payment');
+INSERT INTO master_payment_type (payment_name) SELECT 'Partial Payment (Advance)' WHERE NOT EXISTS (SELECT 1 FROM master_payment_type WHERE payment_name = 'Partial Payment (Advance)');
+
+--------
+
+create table if not exists master_time_slot(
+id serial not null,
+time_slot varchar(255),
+is_active boolean default true,
+constraint pk_master_time_slot_id primary key (id),
+constraint uk_master_time_slot_time_slot unique (time_slot)
+); 
+
+INSERT INTO master_time_slot (time_slot)SELECT '9:00 AM - 11:00 AM' WHERE NOT EXISTS (SELECT 1 FROM master_time_slot WHERE time_slot = '9:00 AM - 11:00 AM');
+INSERT INTO master_time_slot (time_slot)SELECT '11:00 AM - 1:00 PM' WHERE NOT EXISTS (SELECT 1 FROM master_time_slot WHERE time_slot = '11:00 AM - 1:00 PM');
+INSERT INTO master_time_slot (time_slot)SELECT '1:00 PM - 3:00 PM' WHERE NOT EXISTS (SELECT 1 FROM master_time_slot WHERE time_slot = '1:00 PM - 3:00 PM');
+INSERT INTO master_time_slot (time_slot)SELECT '3:00 PM - 5:00 PM'WHERE NOT EXISTS (SELECT 1 FROM master_time_slot WHERE time_slot = '3:00 PM - 5:00 PM');
+INSERT INTO master_time_slot (time_slot)SELECT '5:00 PM - 7:00 PM'WHERE NOT EXISTS (SELECT 1 FROM master_time_slot WHERE time_slot = '5:00 PM - 7:00 PM');
+
+-------
+
+create table if not exists master_bedroom (
+	id serial not null,
+	bedroom_count varchar(255) not null,
+	is_active boolean default true,
+	constraint pk_master_bedroom_id primary key (id)	
+);
+
+INSERT INTO master_bedroom (bedroom_count) SELECT '1' WHERE NOT EXISTS (SELECT 1 FROM master_bedroom WHERE bedroom_count = '1');
+INSERT INTO master_bedroom (bedroom_count) SELECT '2' WHERE NOT EXISTS (SELECT 1 FROM master_bedroom WHERE bedroom_count = '2');
+INSERT INTO master_bedroom (bedroom_count) SELECT '3' WHERE NOT EXISTS (SELECT 1 FROM master_bedroom WHERE bedroom_count = '3');
+INSERT INTO master_bedroom (bedroom_count) SELECT '4+' WHERE NOT EXISTS (SELECT 1 FROM master_bedroom WHERE bedroom_count = '4+');
+
+-----
+create table if not exists master_bathroom (
+	id serial not null,
+	bathroom_count varchar(255) not null,
+	is_active boolean default true,
+	constraint pk_master_bathroom_id primary key (id)	
+);
+
+INSERT INTO master_bathroom (bathroom_count) SELECT '1' WHERE NOT EXISTS (SELECT 1 FROM master_bathroom WHERE bathroom_count = '1');
+INSERT INTO master_bathroom (bathroom_count) SELECT '2' WHERE NOT EXISTS (SELECT 1 FROM master_bathroom WHERE bathroom_count = '2');
+INSERT INTO master_bathroom (bathroom_count) SELECT '3+' WHERE NOT EXISTS (SELECT 1 FROM master_bathroom WHERE bathroom_count = '3+');
+
+------
+
+create table if not exists master_issue(
+id bigserial not null, 
+issue_type varchar(255) not null,
+is_active boolean default true,
+constraint pk_master_issue_id primary key(id));
+alter sequence public.master_issue_id_seq restart with 1;
+
+insert into master_issue (issue_type) select 'Wiring Issue' WHERE NOT EXISTS (SELECT 1 FROM master_issue WHERE  issue_type ='Wiring Issue');
+insert into master_issue (issue_type) select 'Bulb Not Working' WHERE NOT EXISTS (SELECT 1 FROM master_issue WHERE  issue_type ='Bulb Not Working');
+insert into master_issue (issue_type) select 'Short Circuit' WHERE NOT EXISTS (SELECT 1 FROM master_issue WHERE  issue_type ='Short Circuit');
+insert into master_issue (issue_type) select 'Switch Issue' WHERE NOT EXISTS (SELECT 1 FROM master_issue WHERE  issue_type ='Switch Issue');
+insert into master_issue (issue_type) select 'Loose Connections' WHERE NOT EXISTS (SELECT 1 FROM master_issue WHERE  issue_type ='Loose Connections');
+insert into master_issue (issue_type) select 'Fan Not Rotating' WHERE NOT EXISTS (SELECT 1 FROM master_issue WHERE  issue_type ='Fan Not Rotating');
+insert into master_issue (issue_type) select 'Fan Making Noise' WHERE NOT EXISTS (SELECT 1 FROM master_issue WHERE  issue_type ='Fan Making Noise');
+insert into master_issue (issue_type) select 'Fan Not Starting' WHERE NOT EXISTS (SELECT 1 FROM master_issue WHERE  issue_type ='Fan Not Starting');
+insert into master_issue (issue_type) select 'Regulator Issue' WHERE NOT EXISTS (SELECT 1 FROM master_issue WHERE  issue_type ='Regulator Issue');
+insert into master_issue (issue_type) select 'Low Fan Speed' WHERE NOT EXISTS (SELECT 1 FROM master_issue WHERE  issue_type ='Low Fan Speed');
+insert into master_issue (issue_type) select 'Breaker Tripping' WHERE NOT EXISTS (SELECT 1 FROM master_issue WHERE  issue_type ='Breaker Tripping');
+insert into master_issue (issue_type) select 'Overload Issues' WHERE NOT EXISTS (SELECT 1 FROM master_issue WHERE  issue_type ='Overload Issues');
+insert into master_issue (issue_type) select 'Loose Switches' WHERE NOT EXISTS (SELECT 1 FROM master_issue WHERE  issue_type ='Loose Switches');
+insert into master_issue (issue_type) select 'Socket Not Working' WHERE NOT EXISTS (SELECT 1 FROM master_issue WHERE  issue_type ='Socket Not Working');
+insert into master_issue (issue_type) select 'Sparking Problem' WHERE NOT EXISTS (SELECT 1 FROM master_issue WHERE  issue_type ='Sparking Problem');
+insert into master_issue (issue_type) select 'Device Not Pairing' WHERE NOT EXISTS (SELECT 1 FROM master_issue WHERE  issue_type ='Device Not Pairing');
+insert into master_issue (issue_type) select 'Connectivty Issue' WHERE NOT EXISTS (SELECT 1 FROM master_issue WHERE  issue_type ='Connectivty Issue');
+insert into master_issue (issue_type) select 'Incorrect Setup' WHERE NOT EXISTS (SELECT 1 FROM master_issue WHERE  issue_type ='Incorrect Setup');
+insert into master_issue (issue_type) select 'App Integration Problem' WHERE NOT EXISTS (SELECT 1 FROM master_issue WHERE  issue_type ='App Integration Problem');
+insert into master_issue (issue_type) select 'Power Supply Issue' WHERE NOT EXISTS (SELECT 1 FROM master_issue WHERE  issue_type ='Power Supply Issue');
+insert into master_issue (issue_type) select 'Tap Leakage' WHERE NOT EXISTS (SELECT 1 FROM master_issue WHERE  issue_type ='Tap Leakage');
+insert into master_issue (issue_type) select 'Pipe Leakage' WHERE NOT EXISTS (SELECT 1 FROM master_issue WHERE  issue_type ='Pipe Leakage');
+insert into master_issue (issue_type) select 'Water Dripping' WHERE NOT EXISTS (SELECT 1 FROM master_issue WHERE  issue_type ='Water Dripping');
+insert into master_issue (issue_type) select 'Joint Loose' WHERE NOT EXISTS (SELECT 1 FROM master_issue WHERE  issue_type ='Joint Loose');
+insert into master_issue (issue_type) select 'Moisture Patches' WHERE NOT EXISTS (SELECT 1 FROM master_issue WHERE  issue_type ='Moisture Patches');
+insert into master_issue (issue_type) select 'Loose Pipe Joints' WHERE NOT EXISTS (SELECT 1 FROM master_issue WHERE  issue_type ='Loose Pipe Joints');
+insert into master_issue (issue_type) select 'Pipe Replacement Needed' WHERE NOT EXISTS (SELECT 1 FROM master_issue WHERE  issue_type ='Pipe Replacement Needed');
+insert into master_issue (issue_type) select 'Low Water Flow' WHERE NOT EXISTS (SELECT 1 FROM master_issue WHERE  issue_type ='Low Water Flow');
+insert into master_issue (issue_type) select 'Pipe Cracks' WHERE NOT EXISTS (SELECT 1 FROM master_issue WHERE  issue_type ='Pipe Cracks');
+insert into master_issue (issue_type) select 'Improper Fitting' WHERE NOT EXISTS (SELECT 1 FROM master_issue WHERE  issue_type ='Improper Fitting');
+insert into master_issue (issue_type) select 'Geyser Not Heating' WHERE NOT EXISTS (SELECT 1 FROM master_issue WHERE  issue_type ='Geyser Not Heating');
+insert into master_issue (issue_type) select 'Water Leakage' WHERE NOT EXISTS (SELECT 1 FROM master_issue WHERE  issue_type ='Water Leakage');
+insert into master_issue (issue_type) select 'Incorrect Installation' WHERE NOT EXISTS (SELECT 1 FROM master_issue WHERE  issue_type ='Incorrect Installation');
+insert into master_issue (issue_type) select 'Pipe Fitting Issue' WHERE NOT EXISTS (SELECT 1 FROM master_issue WHERE  issue_type ='Pipe Fitting Issue');
+insert into master_issue (issue_type) select 'Pressure Problems' WHERE NOT EXISTS (SELECT 1 FROM master_issue WHERE  issue_type ='Pressure Problems');
+insert into master_issue (issue_type) select 'Tap Loose' WHERE NOT EXISTS (SELECT 1 FROM master_issue WHERE  issue_type ='Tap Loose');
+insert into master_issue (issue_type) select 'Shower Leakage' WHERE NOT EXISTS (SELECT 1 FROM master_issue WHERE  issue_type ='Shower Leakage');
+insert into master_issue (issue_type) select 'Broken Fitting' WHERE NOT EXISTS (SELECT 1 FROM master_issue WHERE  issue_type ='Broken Fitting');
+insert into master_issue (issue_type) select 'Low Water Pressure' WHERE NOT EXISTS (SELECT 1 FROM master_issue WHERE  issue_type ='Low Water Pressure');
+insert into master_issue (issue_type) select 'Improper Installation' WHERE NOT EXISTS (SELECT 1 FROM master_issue WHERE  issue_type ='Improper Installation');
+insert into master_issue (issue_type) select 'Dirty Water' WHERE NOT EXISTS (SELECT 1 FROM master_issue WHERE  issue_type ='Dirty Water');
+insert into master_issue (issue_type) select 'Foul Smell' WHERE NOT EXISTS (SELECT 1 FROM master_issue WHERE  issue_type ='Foul Smell');
+insert into master_issue (issue_type) select 'Algae Build-Up' WHERE NOT EXISTS (SELECT 1 FROM master_issue WHERE  issue_type ='Algae Build-Up');
+insert into master_issue (issue_type) select 'Sediment Accumulation' WHERE NOT EXISTS (SELECT 1 FROM master_issue WHERE  issue_type ='Sediment Accumulation');
+insert into master_issue (issue_type) select 'Overflow Issue' WHERE NOT EXISTS (SELECT 1 FROM master_issue WHERE  issue_type ='Overflow Issue');
+insert into master_issue (issue_type) select 'Drain Blockage' WHERE NOT EXISTS (SELECT 1 FROM master_issue WHERE  issue_type ='Drain Blockage');
+insert into master_issue (issue_type) select 'Slow Water Flow' WHERE NOT EXISTS (SELECT 1 FROM master_issue WHERE  issue_type ='Slow Water Flow');
+insert into master_issue (issue_type) select 'Bad Drain Smell' WHERE NOT EXISTS (SELECT 1 FROM master_issue WHERE  issue_type ='Bad Drain Smell');
+insert into master_issue (issue_type) select 'Grease Buildup' WHERE NOT EXISTS (SELECT 1 FROM master_issue WHERE  issue_type ='Grease Buildup');
+insert into master_issue (issue_type) select 'Hair Clogging' WHERE NOT EXISTS (SELECT 1 FROM master_issue WHERE  issue_type ='Hair Clogging');
+insert into master_issue (issue_type) select 'AC Not Cooling' WHERE NOT EXISTS (SELECT 1 FROM master_issue WHERE  issue_type ='AC Not Cooling');
+insert into master_issue (issue_type) select 'Water Leakage' WHERE NOT EXISTS (SELECT 1 FROM master_issue WHERE  issue_type ='Water Leakage');
+insert into master_issue (issue_type) select 'Bad Smell' WHERE NOT EXISTS (SELECT 1 FROM master_issue WHERE  issue_type ='Bad Smell');
+insert into master_issue (issue_type) select 'Low Airflow' WHERE NOT EXISTS (SELECT 1 FROM master_issue WHERE  issue_type ='Low Airflow');
+insert into master_issue (issue_type) select 'Compressor Issue' WHERE NOT EXISTS (SELECT 1 FROM master_issue WHERE  issue_type ='Compressor Issue');
+insert into master_issue (issue_type) select 'Not Cooling' WHERE NOT EXISTS (SELECT 1 FROM master_issue WHERE  issue_type ='Not Cooling');
+insert into master_issue (issue_type) select 'Water Leakage' WHERE NOT EXISTS (SELECT 1 FROM master_issue WHERE  issue_type ='Water Leakage');
+insert into master_issue (issue_type) select 'Freezer Over-Icing' WHERE NOT EXISTS (SELECT 1 FROM master_issue WHERE  issue_type ='Freezer Over-Icing');
+insert into master_issue (issue_type) select 'Noise From Compressor' WHERE NOT EXISTS (SELECT 1 FROM master_issue WHERE  issue_type ='Noise From Compressor');
+insert into master_issue (issue_type) select 'Door Not Sealing' WHERE NOT EXISTS (SELECT 1 FROM master_issue WHERE  issue_type ='Door Not Sealing');
+insert into master_issue (issue_type) select 'Machine Not Spinning' WHERE NOT EXISTS (SELECT 1 FROM master_issue WHERE  issue_type ='Machine Not Spinning');
+insert into master_issue (issue_type) select 'Water Not Draining' WHERE NOT EXISTS (SELECT 1 FROM master_issue WHERE  issue_type ='Water Not Draining');
+insert into master_issue (issue_type) select 'Motor Noise' WHERE NOT EXISTS (SELECT 1 FROM master_issue WHERE  issue_type ='Motor Noise');
+insert into master_issue (issue_type) select 'Vibration Issues' WHERE NOT EXISTS (SELECT 1 FROM master_issue WHERE  issue_type ='Vibration Issues');
+insert into master_issue (issue_type) select 'Door Not Locking' WHERE NOT EXISTS (SELECT 1 FROM master_issue WHERE  issue_type ='Door Not Locking');
+insert into master_issue (issue_type) select 'Not Heating' WHERE NOT EXISTS (SELECT 1 FROM master_issue WHERE  issue_type ='Not Heating');
+insert into master_issue (issue_type) select 'Plate Not Rotating' WHERE NOT EXISTS (SELECT 1 FROM master_issue WHERE  issue_type ='Plate Not Rotating');
+insert into master_issue (issue_type) select 'Sparking Inside' WHERE NOT EXISTS (SELECT 1 FROM master_issue WHERE  issue_type ='Sparking Inside');
+insert into master_issue (issue_type) select 'Burning Smell' WHERE NOT EXISTS (SELECT 1 FROM master_issue WHERE  issue_type ='Burning Smell');
+insert into master_issue (issue_type) select 'Button Malfunction' WHERE NOT EXISTS (SELECT 1 FROM master_issue WHERE  issue_type ='Button Malfunction');
+insert into master_issue (issue_type) select 'No Display' WHERE NOT EXISTS (SELECT 1 FROM master_issue WHERE  issue_type ='No Display');
+insert into master_issue (issue_type) select 'No Sound' WHERE NOT EXISTS (SELECT 1 FROM master_issue WHERE  issue_type ='No Sound');
+insert into master_issue (issue_type) select 'Lines on Screen' WHERE NOT EXISTS (SELECT 1 FROM master_issue WHERE  issue_type ='Lines on Screen');
+insert into master_issue (issue_type) select 'Port Not Working' WHERE NOT EXISTS (SELECT 1 FROM master_issue WHERE  issue_type ='Port Not Working');
+insert into master_issue (issue_type) select 'Remote Not Responding' WHERE NOT EXISTS (SELECT 1 FROM master_issue WHERE  issue_type ='Remote Not Responding');
+insert into master_issue (issue_type) select 'Low Performance' WHERE NOT EXISTS (SELECT 1 FROM master_issue WHERE  issue_type ='Low Performance');
+insert into master_issue (issue_type) select 'Overheating Issue' WHERE NOT EXISTS (SELECT 1 FROM master_issue WHERE  issue_type ='Overheating Issue');
+insert into master_issue (issue_type) select 'Noise From Appliance' WHERE NOT EXISTS (SELECT 1 FROM master_issue WHERE  issue_type ='Noise From Appliance');
+insert into master_issue (issue_type) select 'Irregular Functioning' WHERE NOT EXISTS (SELECT 1 FROM master_issue WHERE  issue_type ='Irregular Functioning');
+insert into master_issue (issue_type) select 'Wear and Tear' WHERE NOT EXISTS (SELECT 1 FROM master_issue WHERE  issue_type ='Wear and Tear');
+insert into master_issue (issue_type) select 'Broken Components' WHERE NOT EXISTS (SELECT 1 FROM master_issue WHERE  issue_type ='Broken Components');
+insert into master_issue (issue_type) select 'Damaged Wiring' WHERE NOT EXISTS (SELECT 1 FROM master_issue WHERE  issue_type ='Damaged Wiring');
+insert into master_issue (issue_type) select 'Worn-Out Parts' WHERE NOT EXISTS (SELECT 1 FROM master_issue WHERE  issue_type ='Worn-Out Parts');
+insert into master_issue (issue_type) select 'Non-Functional Buttons' WHERE NOT EXISTS (SELECT 1 FROM master_issue WHERE  issue_type ='Non-Functional Buttons');
+insert into master_issue (issue_type) select 'Motor or Compressor Faults' WHERE NOT EXISTS (SELECT 1 FROM master_issue WHERE  issue_type ='Motor or Compressor Faults');
+insert into master_issue (issue_type) select 'New Furniture Requirement' WHERE NOT EXISTS (SELECT 1 FROM master_issue WHERE  issue_type ='New Furniture Requirement');
+insert into master_issue (issue_type) select 'Custom Size Needed' WHERE NOT EXISTS (SELECT 1 FROM master_issue WHERE  issue_type ='Custom Size Needed');
+insert into master_issue (issue_type) select 'Design Modification ' WHERE NOT EXISTS (SELECT 1 FROM master_issue WHERE  issue_type ='Design Modification ');
+insert into master_issue (issue_type) select 'Material Selection Help' WHERE NOT EXISTS (SELECT 1 FROM master_issue WHERE  issue_type ='Material Selection Help');
+insert into master_issue (issue_type) select 'Loose Structure Concerns' WHERE NOT EXISTS (SELECT 1 FROM master_issue WHERE  issue_type ='Loose Structure Concerns');
+insert into master_issue (issue_type) select 'Broken Furniture' WHERE NOT EXISTS (SELECT 1 FROM master_issue WHERE  issue_type ='Broken Furniture');
+insert into master_issue (issue_type) select 'Loose Joins' WHERE NOT EXISTS (SELECT 1 FROM master_issue WHERE  issue_type ='Loose Joins');
+insert into master_issue (issue_type) select 'Scratches & Dents' WHERE NOT EXISTS (SELECT 1 FROM master_issue WHERE  issue_type ='Scratches & Dents');
+insert into master_issue (issue_type) select 'Damaged Hinges' WHERE NOT EXISTS (SELECT 1 FROM master_issue WHERE  issue_type ='Damaged Hinges');
+insert into master_issue (issue_type) select 'Home Service' WHERE NOT EXISTS (SELECT 1 FROM master_issue WHERE  issue_type ='Home Service');
+insert into master_issue (issue_type) select 'Door Not Closing' WHERE NOT EXISTS (SELECT 1 FROM master_issue WHERE  issue_type ='Door Not Closing');
+insert into master_issue (issue_type) select 'Window Jammed' WHERE NOT EXISTS (SELECT 1 FROM master_issue WHERE  issue_type ='Window Jammed');
+insert into master_issue (issue_type) select 'Loose Hinges' WHERE NOT EXISTS (SELECT 1 FROM master_issue WHERE  issue_type ='Loose Hinges');
+insert into master_issue (issue_type) select 'Lock Not Working' WHERE NOT EXISTS (SELECT 1 FROM master_issue WHERE  issue_type ='Lock Not Working');
+insert into master_issue (issue_type) select 'Frame Misalignment' WHERE NOT EXISTS (SELECT 1 FROM master_issue WHERE  issue_type ='Frame Misalignment');
+insert into master_issue (issue_type) select 'Cabinet Misalignment' WHERE NOT EXISTS (SELECT 1 FROM master_issue WHERE  issue_type ='Cabinet Misalignment');
+insert into master_issue (issue_type) select 'Broken hinges' WHERE NOT EXISTS (SELECT 1 FROM master_issue WHERE  issue_type ='Broken hinges');
+insert into master_issue (issue_type) select 'Loose Shelves' WHERE NOT EXISTS (SELECT 1 FROM master_issue WHERE  issue_type ='Loose Shelves');
+insert into master_issue (issue_type) select 'Sliding Not Smooth' WHERE NOT EXISTS (SELECT 1 FROM master_issue WHERE  issue_type ='Sliding Not Smooth');
+insert into master_issue (issue_type) select 'New Installation Required' WHERE NOT EXISTS (SELECT 1 FROM master_issue WHERE  issue_type ='New Installation Required');
+insert into master_issue (issue_type) select 'Wall Discoloration' WHERE NOT EXISTS (SELECT 1 FROM master_issue WHERE  issue_type ='Wall Discoloration');
+insert into master_issue (issue_type) select 'Peeling Paint' WHERE NOT EXISTS (SELECT 1 FROM master_issue WHERE  issue_type ='Peeling Paint');
+insert into master_issue (issue_type) select 'Cracks on Walls' WHERE NOT EXISTS (SELECT 1 FROM master_issue WHERE  issue_type ='Cracks on Walls');
+insert into master_issue (issue_type) select 'Faded Colors' WHERE NOT EXISTS (SELECT 1 FROM master_issue WHERE  issue_type ='Faded Colors');
+insert into master_issue (issue_type) select 'Moisture Patches' WHERE NOT EXISTS (SELECT 1 FROM master_issue WHERE  issue_type ='Moisture Patches');
+insert into master_issue (issue_type) select 'Paint Fading' WHERE NOT EXISTS (SELECT 1 FROM master_issue WHERE  issue_type ='Paint Fading');
+insert into master_issue (issue_type) select 'Exterior Cracks' WHERE NOT EXISTS (SELECT 1 FROM master_issue WHERE  issue_type ='Exterior Cracks');
+insert into master_issue (issue_type) select 'Water Damage Cracks' WHERE NOT EXISTS (SELECT 1 FROM master_issue WHERE  issue_type ='Water Damage Cracks');
+insert into master_issue (issue_type) select 'Wall Roughness' WHERE NOT EXISTS (SELECT 1 FROM master_issue WHERE  issue_type ='Wall Roughness');
+insert into master_issue (issue_type) select 'Peeling Layers' WHERE NOT EXISTS (SELECT 1 FROM master_issue WHERE  issue_type ='Peeling Layers');
+insert into master_issue (issue_type) select 'Wallpaper Peeling' WHERE NOT EXISTS (SELECT 1 FROM master_issue WHERE  issue_type ='Wallpaper Peeling');
+insert into master_issue (issue_type) select 'Wall Bubbles' WHERE NOT EXISTS (SELECT 1 FROM master_issue WHERE  issue_type ='Wall Bubbles');
+insert into master_issue (issue_type) select 'Misalignment Issues' WHERE NOT EXISTS (SELECT 1 FROM master_issue WHERE  issue_type ='Misalignment Issues');
+insert into master_issue (issue_type) select 'Minor Cracks' WHERE NOT EXISTS (SELECT 1 FROM master_issue WHERE  issue_type ='Minor Cracks');
+insert into master_issue (issue_type) select 'Paint Scratches' WHERE NOT EXISTS (SELECT 1 FROM master_issue WHERE  issue_type ='Paint Scratches');
+insert into master_issue (issue_type) select 'Wall Seepage' WHERE NOT EXISTS (SELECT 1 FROM master_issue WHERE  issue_type ='Wall Seepage');
+insert into master_issue (issue_type) select 'Water Leakage' WHERE NOT EXISTS (SELECT 1 FROM master_issue WHERE  issue_type ='Water Leakage');
+insert into master_issue (issue_type) select 'Damp Patches' WHERE NOT EXISTS (SELECT 1 FROM master_issue WHERE  issue_type ='Damp Patches');
+insert into master_issue (issue_type) select 'Ceiling Moisture' WHERE NOT EXISTS (SELECT 1 FROM master_issue WHERE  issue_type ='Ceiling Moisture');
+insert into master_issue (issue_type) select 'Crack Water Flow' WHERE NOT EXISTS (SELECT 1 FROM master_issue WHERE  issue_type ='Crack Water Flow');
+insert into master_issue (issue_type) select 'Wall Cracks' WHERE NOT EXISTS (SELECT 1 FROM master_issue WHERE  issue_type ='Wall Cracks');
+insert into master_issue (issue_type) select 'Holes in Wall' WHERE NOT EXISTS (SELECT 1 FROM master_issue WHERE  issue_type ='Holes in Wall');
+insert into master_issue (issue_type) select 'Uneven Surface' WHERE NOT EXISTS (SELECT 1 FROM master_issue WHERE  issue_type ='Uneven Surface');
+insert into master_issue (issue_type) select 'Chipped Plaster' WHERE NOT EXISTS (SELECT 1 FROM master_issue WHERE  issue_type ='Chipped Plaster');
+insert into master_issue (issue_type) select 'Damaged Corners' WHERE NOT EXISTS (SELECT 1 FROM master_issue WHERE  issue_type ='Damaged Corners');
+insert into master_issue (issue_type) select 'Water Leakage' WHERE NOT EXISTS (SELECT 1 FROM master_issue WHERE  issue_type ='Water Leakage');
+insert into master_issue (issue_type) select 'Improper Cooling' WHERE NOT EXISTS (SELECT 1 FROM master_issue WHERE  issue_type ='Improper Cooling');
+insert into master_issue (issue_type) select 'Vibration issues' WHERE NOT EXISTS (SELECT 1 FROM master_issue WHERE  issue_type ='Vibration issues');
+insert into master_issue (issue_type) select 'Loose Mounting' WHERE NOT EXISTS (SELECT 1 FROM master_issue WHERE  issue_type ='Loose Mounting');
+insert into master_issue (issue_type) select 'High Noise' WHERE NOT EXISTS (SELECT 1 FROM master_issue WHERE  issue_type ='High Noise');
+insert into master_issue (issue_type) select 'Low Cooling' WHERE NOT EXISTS (SELECT 1 FROM master_issue WHERE  issue_type ='Low Cooling');
+insert into master_issue (issue_type) select 'Bad Smell' WHERE NOT EXISTS (SELECT 1 FROM master_issue WHERE  issue_type ='Bad Smell');
+insert into master_issue (issue_type) select 'Water Dripping' WHERE NOT EXISTS (SELECT 1 FROM master_issue WHERE  issue_type ='Water Dripping');
+insert into master_issue (issue_type) select 'Dirty Filters' WHERE NOT EXISTS (SELECT 1 FROM master_issue WHERE  issue_type ='Dirty Filters');
+insert into master_issue (issue_type) select 'High Power Usage' WHERE NOT EXISTS (SELECT 1 FROM master_issue WHERE  issue_type ='High Power Usage');
+insert into master_issue (issue_type) select 'Dust In Vents' WHERE NOT EXISTS (SELECT 1 FROM master_issue WHERE  issue_type ='Dust In Vents');
+insert into master_issue (issue_type) select 'Low Airflow' WHERE NOT EXISTS (SELECT 1 FROM master_issue WHERE  issue_type ='Low Airflow');
+insert into master_issue (issue_type) select 'Bad Odor' WHERE NOT EXISTS (SELECT 1 FROM master_issue WHERE  issue_type ='Bad Odor');
+insert into master_issue (issue_type) select 'Allergy Triggers' WHERE NOT EXISTS (SELECT 1 FROM master_issue WHERE  issue_type ='Allergy Triggers');
+insert into master_issue (issue_type) select 'Clogged Ducts' WHERE NOT EXISTS (SELECT 1 FROM master_issue WHERE  issue_type ='Clogged Ducts');
+insert into master_issue (issue_type) select 'Dirty Filters' WHERE NOT EXISTS (SELECT 1 FROM master_issue WHERE  issue_type ='Dirty Filters');
+insert into master_issue (issue_type) select 'Weak Cooling' WHERE NOT EXISTS (SELECT 1 FROM master_issue WHERE  issue_type ='Weak Cooling');
+insert into master_issue (issue_type) select 'Bad Airflow' WHERE NOT EXISTS (SELECT 1 FROM master_issue WHERE  issue_type ='Bad Airflow');
+insert into master_issue (issue_type) select 'High Noise' WHERE NOT EXISTS (SELECT 1 FROM master_issue WHERE  issue_type ='High Noise');
+insert into master_issue (issue_type) select 'Odor Issue' WHERE NOT EXISTS (SELECT 1 FROM master_issue WHERE  issue_type ='Odor Issue');
+insert into master_issue (issue_type) select 'Frequent Breakdowns' WHERE NOT EXISTS (SELECT 1 FROM master_issue WHERE  issue_type ='Frequent Breakdowns');
+insert into master_issue (issue_type) select 'Cooling Delay' WHERE NOT EXISTS (SELECT 1 FROM master_issue WHERE  issue_type ='Cooling Delay');
+insert into master_issue (issue_type) select 'Thermostat Issue' WHERE NOT EXISTS (SELECT 1 FROM master_issue WHERE  issue_type ='Thermostat Issue');
+insert into master_issue (issue_type) select 'Gas Leakage' WHERE NOT EXISTS (SELECT 1 FROM master_issue WHERE  issue_type ='Gas Leakage');
+insert into master_issue (issue_type) select 'Over Heating' WHERE NOT EXISTS (SELECT 1 FROM master_issue WHERE  issue_type ='Over Heating');
+insert into master_issue (issue_type) select 'Overgrown Grass' WHERE NOT EXISTS (SELECT 1 FROM master_issue WHERE  issue_type ='Overgrown Grass');
+insert into master_issue (issue_type) select 'Weed Spread' WHERE NOT EXISTS (SELECT 1 FROM master_issue WHERE  issue_type ='Weed Spread');
+insert into master_issue (issue_type) select 'Uneven Edges' WHERE NOT EXISTS (SELECT 1 FROM master_issue WHERE  issue_type ='Uneven Edges');
+insert into master_issue (issue_type) select 'Dry Patches' WHERE NOT EXISTS (SELECT 1 FROM master_issue WHERE  issue_type ='Dry Patches');
+insert into master_issue (issue_type) select 'Insect Damage' WHERE NOT EXISTS (SELECT 1 FROM master_issue WHERE  issue_type ='Insect Damage');
+insert into master_issue (issue_type) select 'Poor Layout' WHERE NOT EXISTS (SELECT 1 FROM master_issue WHERE  issue_type ='Poor Layout');
+insert into master_issue (issue_type) select 'Unhealthy Plants' WHERE NOT EXISTS (SELECT 1 FROM master_issue WHERE  issue_type ='Unhealthy Plants');
+insert into master_issue (issue_type) select 'Soil Imbalance' WHERE NOT EXISTS (SELECT 1 FROM master_issue WHERE  issue_type ='Soil Imbalance');
+insert into master_issue (issue_type) select 'Patchy Design' WHERE NOT EXISTS (SELECT 1 FROM master_issue WHERE  issue_type ='Patchy Design');
+insert into master_issue (issue_type) select 'Water Drainage Issue' WHERE NOT EXISTS (SELECT 1 FROM master_issue WHERE  issue_type ='Water Drainage Issue');
+insert into master_issue (issue_type) select 'Dirty Pathways' WHERE NOT EXISTS (SELECT 1 FROM master_issue WHERE  issue_type ='Dirty Pathways');
+insert into master_issue (issue_type) select 'Excess Leaves' WHERE NOT EXISTS (SELECT 1 FROM master_issue WHERE  issue_type ='Excess Leaves');
+insert into master_issue (issue_type) select 'Moss Buildup' WHERE NOT EXISTS (SELECT 1 FROM master_issue WHERE  issue_type ='Moss Buildup');
+insert into master_issue (issue_type) select 'Outdoor Stains' WHERE NOT EXISTS (SELECT 1 FROM master_issue WHERE  issue_type ='Outdoor Stains');
+insert into master_issue (issue_type) select 'Garbage Accumulation' WHERE NOT EXISTS (SELECT 1 FROM master_issue WHERE  issue_type ='Garbage Accumulation');
+insert into master_issue (issue_type) select 'Plant Pests' WHERE NOT EXISTS (SELECT 1 FROM master_issue WHERE  issue_type ='Plant Pests');
+insert into master_issue (issue_type) select 'Leaf Damage' WHERE NOT EXISTS (SELECT 1 FROM master_issue WHERE  issue_type ='Leaf Damage');
+insert into master_issue (issue_type) select 'Soil Insects' WHERE NOT EXISTS (SELECT 1 FROM master_issue WHERE  issue_type ='Soil Insects');
+insert into master_issue (issue_type) select 'Fungal Infection' WHERE NOT EXISTS (SELECT 1 FROM master_issue WHERE  issue_type ='Fungal Infection');
+insert into master_issue (issue_type) select 'Plant Wilting' WHERE NOT EXISTS (SELECT 1 FROM master_issue WHERE  issue_type ='Plant Wilting');
+insert into master_issue (issue_type) select 'Loose Tv Mount' WHERE NOT EXISTS (SELECT 1 FROM master_issue WHERE  issue_type ='Loose Tv Mount');
+insert into master_issue (issue_type) select 'Tilt Not Working' WHERE NOT EXISTS (SELECT 1 FROM master_issue WHERE  issue_type ='Tilt Not Working');
+insert into master_issue (issue_type) select 'Wall Alignment Issue' WHERE NOT EXISTS (SELECT 1 FROM master_issue WHERE  issue_type ='Wall Alignment Issue');
+insert into master_issue (issue_type) select 'Bracket Replacement Needed' WHERE NOT EXISTS (SELECT 1 FROM master_issue WHERE  issue_type ='Bracket Replacement Needed');
+insert into master_issue (issue_type) select 'Drilling Support Required' WHERE NOT EXISTS (SELECT 1 FROM master_issue WHERE  issue_type ='Drilling Support Required');
+insert into master_issue (issue_type) select 'Shelf Not Working' WHERE NOT EXISTS (SELECT 1 FROM master_issue WHERE  issue_type ='Shelf Not Working');
+insert into master_issue (issue_type) select 'Loose Screws' WHERE NOT EXISTS (SELECT 1 FROM master_issue WHERE  issue_type ='Loose Screws');
+insert into master_issue (issue_type) select 'Wall Cracks' WHERE NOT EXISTS (SELECT 1 FROM master_issue WHERE  issue_type ='Wall Cracks');
+insert into master_issue (issue_type) select 'Incorrect Placement' WHERE NOT EXISTS (SELECT 1 FROM master_issue WHERE  issue_type ='Incorrect Placement');
+insert into master_issue (issue_type) select 'Heavy Load Concerns' WHERE NOT EXISTS (SELECT 1 FROM master_issue WHERE  issue_type ='Heavy Load Concerns');
+insert into master_issue (issue_type) select 'Loose Handles' WHERE NOT EXISTS (SELECT 1 FROM master_issue WHERE  issue_type ='Loose Handles');
+insert into master_issue (issue_type) select 'Broken Hinges' WHERE NOT EXISTS (SELECT 1 FROM master_issue WHERE  issue_type ='Broken Hinges');
+insert into master_issue (issue_type) select 'Damaged Fixtures' WHERE NOT EXISTS (SELECT 1 FROM master_issue WHERE  issue_type ='Damaged Fixtures');
+insert into master_issue (issue_type) select 'Misalignment' WHERE NOT EXISTS (SELECT 1 FROM master_issue WHERE  issue_type ='Misalignment');
+insert into master_issue (issue_type) select 'Wear And Tear' WHERE NOT EXISTS (SELECT 1 FROM master_issue WHERE  issue_type ='Wear And Tear');
+insert into master_issue (issue_type) select 'Loose Joints' WHERE NOT EXISTS (SELECT 1 FROM master_issue WHERE  issue_type ='Loose Joints');
+insert into master_issue (issue_type) select 'Wobbling Chair' WHERE NOT EXISTS (SELECT 1 FROM master_issue WHERE  issue_type ='Wobbling Chair');
+insert into master_issue (issue_type) select 'Broken Drawer' WHERE NOT EXISTS (SELECT 1 FROM master_issue WHERE  issue_type ='Broken Drawer');
+insert into master_issue (issue_type) select 'Cracked Wood' WHERE NOT EXISTS (SELECT 1 FROM master_issue WHERE  issue_type ='Cracked Wood');
+insert into master_issue (issue_type) select 'Damaged Hinges' WHERE NOT EXISTS (SELECT 1 FROM master_issue WHERE  issue_type ='Damaged Hinges');
+insert into master_issue (issue_type) select 'Loose Fittings' WHERE NOT EXISTS (SELECT 1 FROM master_issue WHERE  issue_type ='Loose Fittings');
+insert into master_issue (issue_type) select 'Wall Damage' WHERE NOT EXISTS (SELECT 1 FROM master_issue WHERE  issue_type ='Wall Damage');
+insert into master_issue (issue_type) select 'Small Cracks' WHERE NOT EXISTS (SELECT 1 FROM master_issue WHERE  issue_type ='Small Cracks');
+insert into master_issue (issue_type) select 'Stuck Doors' WHERE NOT EXISTS (SELECT 1 FROM master_issue WHERE  issue_type ='Stuck Doors');
+insert into master_issue (issue_type) select 'Minor Wear Issues' WHERE NOT EXISTS (SELECT 1 FROM master_issue WHERE  issue_type ='Minor Wear Issues');
+insert into master_issue (issue_type) select 'Camera Not Recording' WHERE NOT EXISTS (SELECT 1 FROM master_issue WHERE  issue_type ='Camera Not Recording');
+insert into master_issue (issue_type) select 'Blurry Video Feed' WHERE NOT EXISTS (SELECT 1 FROM master_issue WHERE  issue_type ='Blurry Video Feed');
+insert into master_issue (issue_type) select 'App Not Connecting' WHERE NOT EXISTS (SELECT 1 FROM master_issue WHERE  issue_type ='App Not Connecting');
+insert into master_issue (issue_type) select 'Cable Damage' WHERE NOT EXISTS (SELECT 1 FROM master_issue WHERE  issue_type ='Cable Damage');
+insert into master_issue (issue_type) select 'DVR Storage Issues' WHERE NOT EXISTS (SELECT 1 FROM master_issue WHERE  issue_type ='DVR Storage Issues');
+insert into master_issue (issue_type) select 'Loose Lock' WHERE NOT EXISTS (SELECT 1 FROM master_issue WHERE  issue_type ='Loose Lock');
+insert into master_issue (issue_type) select 'Key Not Turning' WHERE NOT EXISTS (SELECT 1 FROM master_issue WHERE  issue_type ='Key Not Turning');
+insert into master_issue (issue_type) select 'Broken Latch' WHERE NOT EXISTS (SELECT 1 FROM master_issue WHERE  issue_type ='Broken Latch');
+insert into master_issue (issue_type) select 'Door Misalignment' WHERE NOT EXISTS (SELECT 1 FROM master_issue WHERE  issue_type ='Door Misalignment');
+insert into master_issue (issue_type) select 'Lock Replacement Needed' WHERE NOT EXISTS (SELECT 1 FROM master_issue WHERE  issue_type ='Lock Replacement Needed');
+insert into master_issue (issue_type) select 'No Alarm Sound' WHERE NOT EXISTS (SELECT 1 FROM master_issue WHERE  issue_type ='No Alarm Sound');
+insert into master_issue (issue_type) select 'Sensor Not Detecting' WHERE NOT EXISTS (SELECT 1 FROM master_issue WHERE  issue_type ='Sensor Not Detecting');
+insert into master_issue (issue_type) select 'Mobile Alters Not Working' WHERE NOT EXISTS (SELECT 1 FROM master_issue WHERE  issue_type ='Mobile Alters Not Working');
+insert into master_issue (issue_type) select 'Wiring Fault' WHERE NOT EXISTS (SELECT 1 FROM master_issue WHERE  issue_type ='Wiring Fault');
+insert into master_issue (issue_type) select 'Low Battery Issues' WHERE NOT EXISTS (SELECT 1 FROM master_issue WHERE  issue_type ='Low Battery Issues');
+insert into master_issue (issue_type) select 'Sensor Not Triggering' WHERE NOT EXISTS (SELECT 1 FROM master_issue WHERE  issue_type ='Sensor Not Triggering');
+insert into master_issue (issue_type) select 'False Alerts' WHERE NOT EXISTS (SELECT 1 FROM master_issue WHERE  issue_type ='False Alerts');
+insert into master_issue (issue_type) select 'Low Range' WHERE NOT EXISTS (SELECT 1 FROM master_issue WHERE  issue_type ='Low Range');
+insert into master_issue (issue_type) select 'Connectivity Issues' WHERE NOT EXISTS (SELECT 1 FROM master_issue WHERE  issue_type ='Connectivity Issues');
+insert into master_issue (issue_type) select 'Power Supply Fault' WHERE NOT EXISTS (SELECT 1 FROM master_issue WHERE  issue_type ='Power Supply Fault');
+insert into master_issue (issue_type) select 'Device Not Pairing' WHERE NOT EXISTS (SELECT 1 FROM master_issue WHERE  issue_type ='Device Not Pairing');
+insert into master_issue (issue_type) select 'App - Sync Issues' WHERE NOT EXISTS (SELECT 1 FROM master_issue WHERE  issue_type ='App - Sync Issues');
+insert into master_issue (issue_type) select 'Smart Hub Offline' WHERE NOT EXISTS (SELECT 1 FROM master_issue WHERE  issue_type ='Smart Hub Offline');
+insert into master_issue (issue_type) select 'Voice Assistant Errors' WHERE NOT EXISTS (SELECT 1 FROM master_issue WHERE  issue_type ='Voice Assistant Errors');
+insert into master_issue (issue_type) select 'Battery Or Power Issue' WHERE NOT EXISTS (SELECT 1 FROM master_issue WHERE  issue_type ='Battery Or Power Issue');
