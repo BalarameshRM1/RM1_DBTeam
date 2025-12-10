@@ -258,3 +258,11 @@ values
 ('Good Friday', '2025-04-18'),
 ('May Day', '2025-05-01'),
 ('Ganesh Chaturthi', '2025-08-27');
+
+-------------------------10-12-2025 -----Authored by Anand A 
+alter table if exists leave_request alter column from_date_session type integer using from_date_session::integer;
+alter table if exists leave_request alter column to_date_session type integer using from_date_session::integer;
+alter table if exists leave_request drop constraint ck_leave_request_from_date_session;
+alter table if exists leave_request drop constraint ck_leave_request_to_date_session;
+alter table if exists leave_request add constraint ck_leave_request_from_date_session check (from_date_session in (1,2));
+alter table if exists leave_request add constraint ck_leave_request_to_date_session check (to_date_session in (1,2));
