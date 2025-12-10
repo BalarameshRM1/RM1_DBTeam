@@ -235,3 +235,26 @@ constraint fk_interview_scheduled_stage_id foreign key(stage_id) references mast
 constraint fk_interview_scheduled_status_id foreign key(status_id) references master_status(id),
 constraint fk_interview_scheduled_created_by foreign key(created_by) references users(id),
 constraint fk_interview_scheduled_modified_by foreign key(modified_by) references users(id));
+
+-----------------------------------09/12/2025 - tharun
+create table if not exists holiday_calendar(
+id bigserial not null,
+holiday_name varchar(255) not null,
+holiday_date date not null,
+created_by bigint,
+created_date timestamp default now(),
+modified_by bigint,
+modified_date timestamp,
+is_active boolean default true,
+constraint pk_holiday_calendar_id primary key(id),
+constraint uq_holiday_name_date unique (holiday_name,holiday_date)
+);
+insert into holiday_calendar (holiday_name, holiday_date)
+values
+('New Year', '2025-01-01'),
+('Makara Sankranti', '2025-01-14'),
+('Holi', '2025-03-14'),
+('Eid-Ul-Fitr', '2025-03-31'),
+('Good Friday', '2025-04-18'),
+('May Day', '2025-05-01'),
+('Ganesh Chaturthi', '2025-08-27');
