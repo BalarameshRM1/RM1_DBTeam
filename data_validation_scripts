@@ -1,0 +1,13 @@
+-----10/12/2025 lavanya
+----- to fetch complete master table hierarchy for all modules
+SELECT 
+    mm.id AS module_id,mm.module_name AS module_name,
+    msm.id AS sub_module_id,msm.sub_module_name AS sub_module_name,
+	ms.id AS service_id,ms.service_name AS service_name,
+	mss.id AS sub_service_id,mss.sub_service_name AS sub_service_name,
+    msg.id AS sub_group_id,msg.sub_group_name AS sub_group_name
+FROM master_module mm
+LEFT JOIN master_sub_module msm ON msm.module_id = mm.id
+LEFT JOIN master_service ms ON ms.sub_module_id = msm.id
+LEFT JOIN master_sub_service mss ON mss.service_id = ms.id
+LEFT JOIN master_sub_group msg ON msg.sub_service_id = mss.id;
