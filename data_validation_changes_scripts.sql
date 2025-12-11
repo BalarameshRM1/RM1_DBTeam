@@ -136,3 +136,14 @@ INSERT INTO public.master_holiday (occassion,holiday_date,holiday_day,is_occassi
 SELECT 'New Year`s Day','2025-01-01','Wednesday','Yes' WHERE NOT EXISTS (SELECT 1 FROM public.master_holiday WHERE occassion='New Year`s Day' and holiday_date='2025-01-01' and holiday_day='Wednesday' and is_occassional='Yes');
 INSERT INTO public.master_holiday (occassion,holiday_date,holiday_day,is_occassional)
 SELECT 'Makar Sankranthi','2025-01-14','Tuesday','Yes' WHERE NOT EXISTS (SELECT 1 FROM public.master_holiday WHERE occassion='Makar Sankranthi' and holiday_date='2025-01-14' and holiday_day='Tuesday' and is_occassional='Yes');
+
+
+------------- 11-dec-2025--- dhanusha
+----- insert data into master_status table
+
+INSERT INTO public.master_status (name) SELECT 'In-Progress' WHERE NOT EXISTS (SELECT 1 FROM public.master_status WHERE name = 'In-Progress');
+INSERT INTO public.master_status (name) SELECT 'Hired' WHERE NOT EXISTS (SELECT 1 FROM public.master_status WHERE name = 'Hired');
+INSERT INTO public.master_status (name) SELECT 'Rejected' WHERE NOT EXISTS (SELECT 1 FROM public.master_status WHERE name = 'Rejected');
+INSERT INTO public.master_status (name) SELECT 'Open' WHERE NOT EXISTS (SELECT 1 FROM public.master_status WHERE name = 'Open');
+INSERT INTO public.master_status (name) SELECT 'Closed' WHERE NOT EXISTS (SELECT 1 FROM public.master_status WHERE name = 'Closed');
+INSERT INTO public.master_status (name) SELECT 'Selected' WHERE NOT EXISTS (SELECT 1 FROM public.master_status WHERE name = 'Selected');
