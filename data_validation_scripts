@@ -11,3 +11,20 @@ LEFT JOIN master_sub_module msm ON msm.module_id = mm.id
 LEFT JOIN master_service ms ON ms.sub_module_id = msm.id
 LEFT JOIN master_sub_service mss ON mss.service_id = ms.id
 LEFT JOIN master_sub_group msg ON msg.sub_service_id = mss.id;
+
+----------16/12/2025 lavanya
+------home_service transaction data
+select
+    hs.id ,hs.module_id, m.module_name,hs.sub_module_id,sm.sub_module_name,hs.service_id,
+    s.service_name, hs.sub_service_id,ss.sub_service_name,hs.service_type_id,st.service_name,hs.payment_type_id,
+    pt.payment_name,hs.full_name,hs.email,hs.mobile,hs.address,hs.preferred_date,hs.time_slot_id,
+    ts.time_slot,hs.created_date,hs.is_active
+from home_service hs
+left join master_module m on hs.module_id = m.id
+left join master_sub_module sm on hs.sub_module_id = sm.id
+left join master_service s on hs.service_id = s.id
+left join master_sub_service ss on hs.sub_service_id = ss.id
+left join master_service st on hs.service_type_id = st.id
+left join master_payment_type pt on hs.payment_type_id = pt.id
+left join master_time_slot ts on hs.time_slot_id = ts.id
+order by hs.created_date desc;
