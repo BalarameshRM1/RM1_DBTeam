@@ -124,18 +124,6 @@ constraint pk_leave_application_id primary key(id),
 constraint fk_leave_application_leave_type_id foreign key(leave_type_id) references public.master_leavetype(id));
 
 ---
-create table public.master_holiday(id serial not null,occassion varchar(255) not null,holiday_date date not null,holiday_day varchar(255) not  null,
-is_active boolean default true,
-constraint pk_master_holiday_id primary key(id));
---
-ALTER TABLE public.master_holiday add is_occassional varchar(100);
-
-ALTER TABLE public.master_holiday add constraint ck_master_holiday_is_occassional check (is_occassional in ('Optional','Yes'));
-
-INSERT INTO public.master_holiday (occassion,holiday_date,holiday_day,is_occassional)
-SELECT 'New Year`s Day','2025-01-01','Wednesday','Yes' WHERE NOT EXISTS (SELECT 1 FROM public.master_holiday WHERE occassion='New Year`s Day' and holiday_date='2025-01-01' and holiday_day='Wednesday' and is_occassional='Yes');
-INSERT INTO public.master_holiday (occassion,holiday_date,holiday_day,is_occassional)
-SELECT 'Makar Sankranthi','2025-01-14','Tuesday','Yes' WHERE NOT EXISTS (SELECT 1 FROM public.master_holiday WHERE occassion='Makar Sankranthi' and holiday_date='2025-01-14' and holiday_day='Tuesday' and is_occassional='Yes');
 
 -----------09-12-2025 -----Authored by Anand A 
 select * from master_position;
