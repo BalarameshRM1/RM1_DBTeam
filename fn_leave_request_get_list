@@ -1,17 +1,29 @@
 create or replace function fn_leave_request_get_list(p_emp_id bigint,p_limit integer ,p_offset integer)
-returns table (leave_request_id bigint,emp_id bigint,emp_name varchar,leavetype_id int,start_date date,end_date date,total_days int,reason varchar,
-approval_status_id int,approver_id bigint,remarks varchar,reporting_manager_id bigint,from_date_session int,to_date_session int,mobile varchar,upload_file varchar,
-cc_to_id bigint
+returns table (leave_request_id bigint,emp_id bigint,emp_name varchar,leavetype_id int,leave_type varchar,start_date date,end_date date,total_days int,reason varchar,
+approval_status_id int,approval_status varchar,approver_id bigint,approver_name varchar,remarks varchar,reporting_manager_id bigint,reporting_manager_name varchar,from_date_session int,to_date_session int,mobile varchar,upload_file varchar,
+cc_to_id bigint,cc_name varchar
 )
 language plpgsql 
 as $$
 begin 
 return query 
-select lr.id as leave_request_id,lr.emp_id,concat(er.first_name, ' ', er.last_name)::varchar as emp_name,lr.leavetype_id,lr.start_date,lr.end_date,lr.total_days,lr.reason,
-lr.approval_status_id,lr.approver_id,lr.remarks,lr.reporting_manager_id,lr.from_date_session,lr.to_date_session,lr.mobile,lr.upload_file,lrc.cc_to_id
+
+with emp as(select er.id as emp_id,concat(er.first_name, ' ', er.last_name)::varchar as emp_name 
+from employee_registration er 
+where er.is_active=true)
+
+select lr.id,lr.emp_id,er.emp_name,lr.leavetype_id,ml.leave_type,lr.start_date,lr.end_date,lr.total_days,lr.reason,
+lr.approval_status_id,ma.approval_status,lr.approver_id,er1.emp_name as approver_name,lr.remarks,
+lr.reporting_manager_id,er2.emp_name as reporting_manager_name,
+lr.from_date_session,lr.to_date_session,lr.mobile,lr.upload_file,lrc.cc_to_id,er3.emp_name as cc_name
 from leave_request lr
 left join leave_request_cc lrc on lrc.leave_request_id = lr.id AND lrc.is_active = true and lr.is_active = true
-left join employee_registration er on lr.emp_id = er.id and er.is_active = true 
+left join master_leavetype ml on ml.id = lr.leavetype_id and ml.is_active = true
+left join master_approval_status ma on ma.id = lr.approval_status_id  and ma.is_active = true
+left join emp er on lr.emp_id = er.emp_id
+left join emp er1 on er1.emp_id = lr.approver_id
+left join emp er2 on er2.emp_id = lr.reporting_manager_id
+left join emp er3 on er3.emp_id = lrc.cc_to_id
 where (lr.emp_id = p_emp_id or -1 = p_emp_id)
 limit p_limit offset p_offset;
 end;
