@@ -1,0 +1,18 @@
+create or replace function fn_leave_request_get_list(p_emp_id bigint,p_limit integer ,p_offset integer)
+returns table (leave_request_id bigint,emp_id bigint,emp_name varchar,leavetype_id int,start_date date,end_date date,total_days int,reason varchar,
+approval_status_id int,approver_id bigint,remarks varchar,reporting_manager_id bigint,from_date_session int,to_date_session int,mobile varchar,upload_file varchar,
+cc_to_id bigint
+)
+language plpgsql 
+as $$
+begin 
+return query 
+select lr.id as leave_request_id,lr.emp_id,concat(er.first_name, ' ', er.last_name)::varchar as emp_name,lr.leavetype_id,lr.start_date,lr.end_date,lr.total_days,lr.reason,
+lr.approval_status_id,lr.approver_id,lr.remarks,lr.reporting_manager_id,lr.from_date_session,lr.to_date_session,lr.mobile,lr.upload_file,lrc.cc_to_id
+from leave_request lr
+left join leave_request_cc lrc on lrc.leave_request_id = lr.id AND lrc.is_active = true and lr.is_active = true
+left join employee_registration er on lr.emp_id = er.id and er.is_active = true 
+where (lr.emp_id = p_emp_id or -1 = p_emp_id)
+limit p_limit offset p_offset;
+end;
+$$;
