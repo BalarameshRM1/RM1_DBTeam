@@ -1179,3 +1179,19 @@ insert into master_issue (issue_type) select 'App - Sync Issues' WHERE NOT EXIST
 insert into master_issue (issue_type) select 'Smart Hub Offline' WHERE NOT EXISTS (SELECT 1 FROM master_issue WHERE  issue_type ='Smart Hub Offline');
 insert into master_issue (issue_type) select 'Voice Assistant Errors' WHERE NOT EXISTS (SELECT 1 FROM master_issue WHERE  issue_type ='Voice Assistant Errors');
 insert into master_issue (issue_type) select 'Battery Or Power Issue' WHERE NOT EXISTS (SELECT 1 FROM master_issue WHERE  issue_type ='Battery Or Power Issue');
+
+-----------17-12-2025 - Lavanya
+-- created hs_add_on table
+
+create table if not exists hs_add_on(
+    id serial not null,
+    home_service_id int not null,
+    add_on_id int not null,
+    created_by bigint,
+    created_date timestamp default now(),
+    modified_by bigint,
+    modified_date timestamp,
+    is_active boolean default true,
+    constraint pk_hs_add_on_id primary key (id),
+    constraint fk_hs_add_on_home_service_id foreign key (home_service_id) references home_service (id),
+	constraint fk_hs_add_on_add_on_id foreign key (add_on_id) references master_add_on (id));
