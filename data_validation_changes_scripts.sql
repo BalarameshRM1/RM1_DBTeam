@@ -264,3 +264,114 @@ INSERT INTO public.master_status (name) SELECT 'Rejected' WHERE NOT EXISTS (SELE
 INSERT INTO public.master_status (name) SELECT 'Open' WHERE NOT EXISTS (SELECT 1 FROM public.master_status WHERE name = 'Open');
 INSERT INTO public.master_status (name) SELECT 'Closed' WHERE NOT EXISTS (SELECT 1 FROM public.master_status WHERE name = 'Closed');
 INSERT INTO public.master_status (name) SELECT 'Selected' WHERE NOT EXISTS (SELECT 1 FROM public.master_status WHERE name = 'Selected');
+
+----- 17-dec-2025-- Lavanya
+--- insert required data into master_department table
+
+INSERT INTO public.master_department (department)SELECT 'Business & Operations'WHERE NOT EXISTS (SELECT 1 FROM public.master_department WHERE department = 'Business & Operations');
+INSERT INTO public.master_department (department)SELECT 'Media & Communication'WHERE NOT EXISTS (SELECT 1 FROM public.master_department WHERE department = 'Media & Communication');
+INSERT INTO public.master_department (department) SELECT 'People & Support' WHERE NOT EXISTS (SELECT 1 FROM public.master_department WHERE department = 'People & Support');
+INSERT INTO public.master_department (department)SELECT 'Legal, Risk & Compliance'WHERE NOT EXISTS (SELECT 1 FROM public.master_department WHERE department = 'Legal, Risk & Compliance');
+INSERT INTO public.master_department (department)SELECT 'Supply Chain & Procurement'WHERE NOT EXISTS (SELECT 1 FROM public.master_department WHERE department = 'Supply Chain & Procurement');
+INSERT INTO public.master_department (department)SELECT 'Management & Strategy'WHERE NOT EXISTS (SELECT 1 FROM public.master_department WHERE department = 'Management & Strategy');
+INSERT INTO public.master_department (department)SELECT 'Technology & Engineering'WHERE NOT EXISTS (SELECT 1 FROM master_department WHERE department = 'Technology & Engineering');
+INSERT INTO public.master_department (department)SELECT 'Information Technology'WHERE NOT EXISTS (SELECT 1 FROM master_department WHERE department = 'Information Technology');
+INSERT INTO public.master_department (department)SELECT 'Software Development'WHERE NOT EXISTS (SELECT 1 FROM master_department WHERE department = 'Software Development');
+INSERT INTO public.master_department (department)SELECT 'DevOps & Cloud'WHERE NOT EXISTS (SELECT 1 FROM master_department WHERE department = 'DevOps & Cloud');
+INSERT INTO public.master_department (department)SELECT 'Quality Assurance'WHERE NOT EXISTS (SELECT 1 FROM master_department WHERE department = 'Quality Assurance');
+INSERT INTO public.master_department (department)SELECT 'Cyber Security'WHERE NOT EXISTS (SELECT 1 FROM master_department WHERE department = 'Cyber Security');
+INSERT INTO public.master_department (department)SELECT 'Data & Analytics'WHERE NOT EXISTS (SELECT 1 FROM master_department WHERE department = 'Data & Analytics');
+
+
+--- insert required data into master_position table
+
+INSERT INTO public.master_position (position, dept_id)SELECT 'Operations Manager', 1 WHERE NOT EXISTS (SELECT 1 FROM public.master_position WHERE position = 'Operations Manager');
+INSERT INTO public.master_position (position, dept_id)SELECT 'Business Analyst', 1 WHERE NOT EXISTS (SELECT 1 FROM public.master_position WHERE position = 'Business Analyst');
+INSERT INTO public.master_position (position, dept_id)SELECT 'Content Manager', 2 WHERE NOT EXISTS (SELECT 1 FROM public.master_position WHERE position = 'Content Manager');
+INSERT INTO public.master_position (position, dept_id)SELECT 'Digital Marketing Executive', 2 WHERE NOT EXISTS (SELECT 1 FROM public.master_position WHERE position = 'Digital Marketing Executive');
+INSERT INTO public.master_position (position, dept_id)SELECT 'HR Executive', 3 WHERE NOT EXISTS (SELECT 1 FROM public.master_position WHERE position = 'HR Executive');
+INSERT INTO public.master_position (position, dept_id)SELECT 'Talent Acquisition Specialist', 3 WHERE NOT EXISTS (SELECT 1 FROM public.master_position WHERE position = 'Talent Acquisition Specialist');
+INSERT INTO public.master_position (position, dept_id)SELECT 'Legal Officer', 4 WHERE NOT EXISTS (SELECT 1 FROM public.master_position WHERE position = 'Legal Officer');
+INSERT INTO public.master_position (position, dept_id)SELECT 'Compliance Manager', 4 WHERE NOT EXISTS (SELECT 1 FROM public.master_position WHERE position = 'Compliance Manager');
+INSERT INTO public.master_position (position, dept_id)SELECT 'Procurement Executive', 5 WHERE NOT EXISTS (SELECT 1 FROM public.master_position WHERE position = 'Procurement Executive');
+INSERT INTO public.master_position (position, dept_id)SELECT 'Logistics Coordinator', 5 WHERE NOT EXISTS (SELECT 1 FROM public.master_position WHERE position = 'Logistics Coordinator');
+INSERT INTO public.master_position (position, dept_id)SELECT 'Project Manager', 6 WHERE NOT EXISTS (SELECT 1 FROM public.master_position WHERE position = 'Project Manager');
+INSERT INTO public.master_position (position, dept_id)SELECT 'Strategy Analyst', 6 WHERE NOT EXISTS (SELECT 1 FROM public.master_position WHERE position = 'Strategy Analyst');
+INSERT INTO public.master_position (position, dept_id)SELECT 'Technology Lead', 7 WHERE NOT EXISTS (SELECT 1 FROM public.master_position WHERE position = 'Technology Lead');
+INSERT INTO public.master_position (position, dept_id)SELECT 'IT Support Engineer', 8WHERE NOT EXISTS (SELECT 1 FROM public.master_position WHERE position = 'IT Support Engineer');
+INSERT INTO public.master_position (position, dept_id)SELECT 'Software Engineer', 9 WHERE NOT EXISTS (SELECT 1 FROM public.master_position WHERE position = 'Software Engineer');
+INSERT INTO public.master_position (position, dept_id)SELECT 'DevOps Engineer', 10 WHERE NOT EXISTS (SELECT 1 FROM public.master_position WHERE position = 'DevOps Engineer');
+INSERT INTO public.master_position (position, dept_id)SELECT 'QA Engineer', 11 WHERE NOT EXISTS (SELECT 1 FROM public.master_position WHERE position = 'QA Engineer');
+INSERT INTO public.master_position (position, dept_id)SELECT 'Security Analyst', 12 WHERE NOT EXISTS (SELECT 1 FROM public.master_position WHERE position = 'Security Analyst');
+INSERT INTO public.master_position (position, dept_id)SELECT 'Data Analyst', 13 WHERE NOT EXISTS (SELECT 1 FROM public.master_position WHERE position = 'Data Analyst');
+
+----
+Create table if not exists  master_blood_group(
+id serial not null,
+blood_group varchar(255) not null,
+is_active boolean default true,
+constraint pk_master_blood_group_id primary key(id));
+
+
+INSERT INTO public.master_blood_group (id, blood_group) SELECT 1, 'A+' WHERE NOT EXISTS (SELECT 1 FROM public.master_blood_group WHERE id = 1 AND blood_group = 'A+');
+INSERT INTO public.master_blood_group (id, blood_group) SELECT 2, 'A-' WHERE NOT EXISTS (SELECT 1 FROM public.master_blood_group WHERE id = 2 AND blood_group = 'A-');
+INSERT INTO public.master_blood_group (id, blood_group) SELECT 3, 'B+' WHERE NOT EXISTS (SELECT 1 FROM public.master_blood_group WHERE id = 3 AND blood_group = 'B+');
+INSERT INTO public.master_blood_group (id, blood_group) SELECT 4, 'B-' WHERE NOT EXISTS (SELECT 1 FROM public.master_blood_group WHERE id = 4 AND blood_group = 'B-');
+INSERT INTO public.master_blood_group (id, blood_group) SELECT 5, 'AB+' WHERE NOT EXISTS (SELECT 1 FROM public.master_blood_group WHERE id = 5 AND blood_group = 'AB+');
+INSERT INTO public.master_blood_group (id, blood_group) SELECT 6, 'AB-' WHERE NOT EXISTS (SELECT 1 FROM public.master_blood_group WHERE id = 6 AND blood_group = 'AB-');
+INSERT INTO public.master_blood_group (id, blood_group) SELECT 7, 'O+' WHERE NOT EXISTS (SELECT 1 FROM public.master_blood_group WHERE id = 7 AND blood_group = 'O+');
+
+-----
+Create table if not exists  master_occupation(
+id serial not null,
+occupation_name varchar(255) not null,
+is_active boolean default true,
+constraint pk_master_occupation_id primary key(id));
+
+INSERT INTO public.master_occupation(id, occupation_name) SELECT 1, 'Government Employee' WHERE NOT EXISTS (SELECT 1 FROM public.master_occupation WHERE id = 1 AND occupation_name = 'Government Employee');
+INSERT INTO public.master_occupation(id, occupation_name) SELECT 2, 'Private Employee' WHERE NOT EXISTS (SELECT 1 FROM public.master_occupation WHERE id = 2 AND occupation_name = 'Private Employee');
+INSERT INTO public.master_occupation(id, occupation_name) SELECT 3, 'Business' WHERE NOT EXISTS (SELECT 1 FROM public.master_occupation WHERE id = 3 AND occupation_name = 'Business');
+INSERT INTO public.master_occupation(id, occupation_name) SELECT 4, 'Farmer' WHERE NOT EXISTS (SELECT 1 FROM public.master_occupation WHERE id = 4 AND occupation_name = 'Farmer');
+INSERT INTO public.master_occupation(id, occupation_name) SELECT 5, 'Self Employed' WHERE NOT EXISTS (SELECT 1 FROM public.master_occupation WHERE id = 5 AND occupation_name = 'Self Employed');
+INSERT INTO public.master_occupation(id, occupation_name) SELECT 6, 'Labourer' WHERE NOT EXISTS (SELECT 1 FROM public.master_occupation WHERE id = 6 AND occupation_name = 'Labourer');
+INSERT INTO public.master_occupation(id, occupation_name) SELECT 7, 'Teacher' WHERE NOT EXISTS (SELECT 1 FROM public.master_occupation WHERE id = 7 AND occupation_name = 'Teacher');
+INSERT INTO public.master_occupation(id, occupation_name) SELECT 8, 'Driver' WHERE NOT EXISTS (SELECT 1 FROM public.master_occupation WHERE id = 8 AND occupation_name = 'Driver');
+INSERT INTO public.master_occupation(id, occupation_name) SELECT 9, 'Home Maker' WHERE NOT EXISTS (SELECT 1 FROM public.master_occupation WHERE id = 9 AND occupation_name = 'Home Maker');
+INSERT INTO public.master_occupation(id, occupation_name) SELECT 10, 'Retired' WHERE NOT EXISTS (SELECT 1 FROM public.master_occupation WHERE id = 10 AND occupation_name = 'Retired');
+
+----
+
+Create table if not exists  master_work_location(
+id serial not null,
+work_location varchar(255) not null,
+is_active boolean default true,
+constraint pk_master_work_location_id primary key(id));
+
+INSERT INTO public.master_work_location (work_location) SELECT 'Hyderabad' WHERE NOT EXISTS (SELECT 1 FROM public.master_work_location WHERE  work_location = 'Hyderabad');
+INSERT INTO public.master_work_location (work_location) SELECT 'Bangalore' WHERE NOT EXISTS (SELECT 1 FROM public.master_work_location WHERE  work_location = 'Bangalore');
+INSERT INTO public.master_work_location (work_location) SELECT 'Chennai' WHERE NOT EXISTS (SELECT 1 FROM public.master_work_location WHERE  work_location = 'Chennai');
+
+-----
+
+Create table if not exists  master_shift(
+id serial not null,
+shift_type varchar(255) not null,
+is_active boolean default true,
+constraint pk_master_shift_id primary key(id));
+
+INSERT INTO public.master_shift (shift_type) SELECT  'Day' WHERE NOT EXISTS (SELECT 1 FROM public.master_shift WHERE  shift_type = 'Day');
+INSERT INTO public.master_shift (shift_type) SELECT  'Night' WHERE NOT EXISTS (SELECT 1 FROM public.master_shift WHERE  shift_type = 'Night');
+INSERT INTO public.master_shift (shift_type) SELECT  'Flexible' WHERE NOT EXISTS (SELECT 1 FROM public.master_shift WHERE  shift_type = 'Flexible');
+------
+Create table if not exists  master_relation(
+id serial not null,
+relation_type varchar(255) not null,
+is_active boolean default true,
+constraint pk_master_relation_id primary key(id));
+
+INSERT INTO public.master_relation (relation_type) SELECT  'Father' WHERE NOT EXISTS (SELECT 1 FROM public.master_relation WHERE   relation_type = 'Father');
+INSERT INTO public.master_relation (relation_type) SELECT  'Mother' WHERE NOT EXISTS (SELECT 1 FROM public.master_relation WHERE   relation_type = 'Mother');
+INSERT INTO public.master_relation (relation_type) SELECT  'Spouse' WHERE NOT EXISTS (SELECT 1 FROM public.master_relation WHERE   relation_type = 'Spouse');
+INSERT INTO public.master_relation (relation_type) SELECT  'Son' WHERE NOT EXISTS (SELECT 1 FROM public.master_relation WHERE   relation_type = 'Son');
+INSERT INTO public.master_relation (relation_type) SELECT  'Daughter' WHERE NOT EXISTS (SELECT 1 FROM public.master_relation WHERE   relation_type = 'Daughter');
+
