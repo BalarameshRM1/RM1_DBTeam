@@ -163,3 +163,8 @@ constraint fk_user_registration_created_by foreign key(created_by) references us
 constraint fk_user_registration_modified_by foreign key(modified_by) references user_registration(id),
 constraint uk_user_registration_email unique(email),
 constraint uk_user_registration_mobile unique(mobile));
+
+----- Dhanusha 18-Dec
+
+alter table master_area add constraint uk_master_area_city_id_area_name unique(city_id,area_name);
+alter table master_city add constraint uk_master_city_city_name unique (city_name);
