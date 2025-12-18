@@ -375,3 +375,78 @@ INSERT INTO public.master_relation (relation_type) SELECT  'Spouse' WHERE NOT EX
 INSERT INTO public.master_relation (relation_type) SELECT  'Son' WHERE NOT EXISTS (SELECT 1 FROM public.master_relation WHERE   relation_type = 'Son');
 INSERT INTO public.master_relation (relation_type) SELECT  'Daughter' WHERE NOT EXISTS (SELECT 1 FROM public.master_relation WHERE   relation_type = 'Daughter');
 
+-----------------------17/12/2025 ----tharun
+alter table if exists employee_registration add column if not exists father_name varchar(255);
+alter table if exists employee_registration add column if not exists blood_group_id int;
+alter table employee_registration add constraint fk_employee_registration_blood_group_id foreign key (blood_group_id) references master_blood_group(id);
+
+alter table master_civil_status rename to master_marital_status
+alter table employee_registration rename column civil_status_id to marital_status_id
+alter table master_marital_status rename constraint pk_master_civil_status_id to pk_master_marital_status_id;
+alter sequence master_civil_status_id_seq rename to master_marital_status_id_seq;
+
+
+alter table employee_registration rename column address to present_address
+
+alter table if exists employee_registration add column if not exists permanent_address varchar(255);
+
+alter table if exists employee_registration add column if not exists role_id int;
+alter table employee_registration add constraint fk_employee_registration_role_id foreign key (role_id) references master_role(id);
+
+alter table master_position rename to master_designation
+alter table employee_registration rename column position_id to designation_id
+alter table master_designation rename column "position" to designation_name;
+
+
+alter table master_designation rename constraint pk_master_position_id to pk_master_designation_id;
+alter sequence master_position_id_seq rename to master_designation_id_seq;
+
+
+alter table master_workstatus rename to master_employee_type
+alter table  employee_registration rename column work_status_id to employee_type_id
+alter table master_employee_type rename constraint pk_master_workstatus_id to pk_master_employee_type_id;
+alter sequence master_workstatus_id_seq rename to master_employee_type_id_seq;
+alter table master_employee_type rename column workstatus to employee_type
+
+insert into master_employee_type(employee_type)values('Intern')
+
+alter table if exists employee_registration add column if not exists work_location_id int;
+alter table if exists employee_registration add column if not exists shift_id int;
+
+alter table if exists employee_registration add column if not exists probation_end_date date;
+
+insert into master_status(name)values('Active'),('On leave'),('Resigned');
+
+alter table if exists employee_registration add column if not exists aadhaar varchar(15);
+alter table if exists employee_registration add column if not exists ctc numeric(10,2);
+alter table if exists employee_registration add column if not exists reference_mobile varchar(15);
+
+------------------------
+create table if not exists employee_family_member(
+id bigserial not null,
+emp_id int not null,
+relation_id int not null,
+first_name varchar(255) not null,
+last_name varchar(255) not null,
+date_of_birth date not null,
+occuupation_id int not null,
+phone varchar(255) ,
+email varchar(150) ,
+present_addresss varchar(255) not null,
+perminent_address varchar(255) not null,
+bank_account varchar(255) ,
+ifsc_code varchar(255) ,
+pan varchar(255),
+aadhar varchar(255) not null,
+created_by bigint,
+created_date timestamp default now(),
+modified_by bigint,
+modified_date timestamp,  	
+is_active boolean default true,
+constraint pk_employee_family_member_id primary key (id),
+constraint fk_employee_family_member_emp_id foreign key (emp_id) references employee_registration(id),
+constraint fk_employee_family_member_relation_id foreign key (relation_id) references master_relation (id),
+constraint fk_employee_family_member_occuupation_id foreign key (occuupation_id) references master_occupation (id),
+constraint uk_employee_family_member_email unique (email));
+
+select * from employee_family_member;
