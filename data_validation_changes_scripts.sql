@@ -8530,3 +8530,8 @@ commit;
 
 ------------------------------------------------------------------------------------------------------------------------------------------------
 
+--- 18-12-2025 lavanya
+alter table master_district add constraint uk_master_district_district_name_state_id unique (district_name,state_id);
+alter table master_product_status add constraint uk_master_product_status_product_status unique (product_status);
+alter table master_status add constraint uk_master_status_status unique (status);
+alter table master_sub_district add constraint uk_master_sub_district_sub_district_name_district_id unique (sub_district_name,district_id);
