@@ -1195,3 +1195,11 @@ create table if not exists hs_add_on(
     constraint pk_hs_add_on_id primary key (id),
     constraint fk_hs_add_on_home_service_id foreign key (home_service_id) references home_service (id),
 	constraint fk_hs_add_on_add_on_id foreign key (add_on_id) references master_add_on (id));
+----------18-12-2025 - Lavanya
+alter table master_bedroom add constraint uk_master_bedroom_bedroom_count unique(bedroom_count);
+alter table master_issue add constraint uk_master_issue_issue_type unique(issue_type); 
+alter table master_role add constraint uk_master_role_role_name unique(role_name);
+alter table master_skill add constraint uk_master_skill_skill unique(skill);
+alter table master_status add constraint uk_master_status_status_name unique(status_name);
+---
+alter table home_service add column service_price numeric(10,2);
