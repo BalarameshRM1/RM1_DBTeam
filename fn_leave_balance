@@ -1,0 +1,35 @@
+create or replace function fn_leave_balance(p_emp_id bigint,p_year int,p_limit integer ,p_offset integer)
+returns table (leave_type_id int,leave_type varchar,granted int, consumed int, balance int)
+LANGUAGE plpgsql
+AS $$
+BEGIN
+    RETURN QUERY
+    SELECT
+        ml.id AS leave_type_id,
+        ml.leave_type,
+        ml.granted,
+
+        COUNT(lr.id) FILTER (
+            WHERE lr.emp_id = p_emp_id
+              AND lr.is_active = true
+              AND EXTRACT(YEAR FROM lr.start_date) = p_year
+        )::INT AS consumed,
+
+        ml.granted
+        - COUNT(lr.id) FILTER (
+            WHERE lr.emp_id = p_emp_id
+              AND lr.is_active = true
+              AND EXTRACT(YEAR FROM lr.start_date) = p_year
+        )::INT AS balance
+
+    FROM master_leavetype ml
+    LEFT JOIN leave_request lr
+        ON lr.leavetype_id = ml.id
+    WHERE ml.is_active = true
+	group by ml.id,ml.leave_type,ml.granted
+    LIMIT p_limit OFFSET p_offset;
+END;
+$$;
+
+select * from fn_leave_balance(p_emp_id,p_year,p_limit ,p_offset)
+select * from fn_leave_balance(101, 2025, 10, 0);
