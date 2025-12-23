@@ -33,3 +33,64 @@ $$;
 
 select * from fn_leave_balance(p_emp_id,p_year,p_limit ,p_offset)
 select * from fn_leave_balance(101, 2025, 10, 0);
+--------------------------------------------------------------
+--ReAuthored by Anand A on 23-12-2025.
+-- =============================================================================
+-- Function Name : fn_leave_balance
+-- Author        : Anand A
+-- Created On    : 23-12-2025
+--
+-- Description:
+--   Calculates leave balance per leave type for a given employee and year.
+--   The consumed leave is derived by summing the pre-calculated `total_days`
+--   column, which is maintained by a BEFORE trigger on leave_request.
+--
+--   This function:
+--     • Uses stored `total_days` (supports half-day logic)
+--     • Filters approved and active leave requests only
+--     • Considers leave records whose start and end dates fall within the
+--       specified calendar year
+--     • Returns granted, consumed, and remaining balance per leave type
+--     • Supports pagination via LIMIT and OFFSET
+--
+-- Notes:
+--   • Leave day calculation is NOT performed here.
+--   • Date-based logic exists only for year filtering.
+--   • Status_id = 10 represents 'Approved' status.
+--
+-- =============================================================================
+-- DROP FUNCTION IF EXISTS public.fn_leave_balance(bigint, integer, integer, integer);
+
+CREATE OR REPLACE FUNCTION public.fn_leave_balance(
+	p_emp_id bigint,
+	p_year integer,
+	p_limit integer,
+	p_offset integer)
+    RETURNS TABLE(leave_type_id integer, leave_type character varying, granted integer, consumed integer, balance integer) 
+    LANGUAGE 'plpgsql'
+    COST 100
+    VOLATILE PARALLEL UNSAFE
+    ROWS 1000
+
+AS $BODY$
+BEGIN
+RETURN QUERY
+--Authored by Anand A on 23-12-2025.
+WITH leave_consumed AS (SELECT
+                        lr.leavetype_id,
+                        SUM(lr.total_days)::numeric(5,1) AS consumed
+                        FROM leave_request lr
+                        WHERE lr.emp_id = p_emp_id AND lr.is_active = true AND lr.status_id = 10 AND (EXTRACT(YEAR FROM start_date) = p_year AND EXTRACT(YEAR FROM end_date) = p_year) 
+                        GROUP BY lr.leavetype_id)
+
+SELECT
+ml.id AS leave_type_id,ml.leave_type,ml.granted,COALESCE(lc.consumed, 0) AS consumed,
+(ml.granted - COALESCE(lc.consumed, 0))::numeric(5,1) AS balance
+FROM master_leavetype ml
+LEFT JOIN leave_consumed lc ON lc.leavetype_id = ml.id
+WHERE ml.is_active = true
+ORDER BY ml.id
+LIMIT p_limit OFFSET p_offset;
+
+END;
+$BODY$;
