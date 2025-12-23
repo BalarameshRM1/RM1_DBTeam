@@ -66,7 +66,7 @@ CREATE OR REPLACE FUNCTION public.fn_leave_balance(
 	p_year integer,
 	p_limit integer,
 	p_offset integer)
-    RETURNS TABLE(leave_type_id integer, leave_type character varying, granted integer, consumed integer, balance integer) 
+    RETURNS TABLE(leave_type_id integer, leave_type character varying, granted numeric, consumed numeric, balance numeric) 
     LANGUAGE 'plpgsql'
     COST 100
     VOLATILE PARALLEL UNSAFE
@@ -84,8 +84,8 @@ WITH leave_consumed AS (SELECT
                         GROUP BY lr.leavetype_id)
 
 SELECT
-ml.id AS leave_type_id,ml.leave_type,ml.granted,COALESCE(lc.consumed, 0) AS consumed,
-(ml.granted - COALESCE(lc.consumed, 0))::numeric(5,1) AS balance
+ml.id AS leave_type_id,ml.leave_type,COALESCE(ml.granted,0)::NUMERIC(5,1),COALESCE(lc.consumed, 0) AS consumed,
+(COALESCE(ml.granted,0)::NUMERIC(5,1) - COALESCE(lc.consumed, 0))::numeric(5,1) AS balance
 FROM master_leavetype ml
 LEFT JOIN leave_consumed lc ON lc.leavetype_id = ml.id
 WHERE ml.is_active = true
