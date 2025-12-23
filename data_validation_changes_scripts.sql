@@ -450,3 +450,10 @@ constraint fk_employee_family_member_occuupation_id foreign key (occuupation_id)
 constraint uk_employee_family_member_email unique (email));
 
 select * from employee_family_member;
+--------------------------------23/12/2025 
+insert into master_status (name) select 'Approved' where not exists (select 1 from master_status where name='Approved');
+insert into master_status (name) select 'Pending' where not exists (select 1 from master_status where name='Pending');
+alter table if exists leave_request drop constraint fk_leave_request_approval_status_id;
+alter table if exists leave_request rename column approval_status_id to status_id;
+alter table if exists leave_request add constraint fk_leave_request_status_id foreign key (status_id) references master_status(id);
+drop table if exists master_approval_status;
