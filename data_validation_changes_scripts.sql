@@ -458,3 +458,23 @@ alter table if exists leave_request rename column approval_status_id to status_i
 alter table if exists leave_request add constraint fk_leave_request_status_id foreign key (status_id) references master_status(id);
 drop table if exists master_approval_status;
 
+-------
+create table if not exists public.master_session (
+id serial not null,
+session_name varchar(255) not null,
+is_active boolean default true,
+constraint pk_master_session_id primary key (id),
+constraint uk_master_session_session_name unique(session_name));
+
+
+INSERT INTO public.master_session (session_name) SELECT  'First Half' WHERE NOT EXISTS (SELECT 1 FROM public.master_session WHERE  session_name = 'First Half');
+INSERT INTO public.master_session (session_name)  SELECT 'Second Half' WHERE NOT EXISTS (SELECT 1 FROM public.master_session WHERE  session_name = 'Second Half');
+INSERT INTO public.master_session (session_name)  SELECT 'Full Day' WHERE NOT EXISTS (SELECT 1 FROM public.master_session WHERE  session_name = 'Full Day');
+
+alter sequence master_session_id_seq restart with 1;
+
+alter table leave_request rename to_date_session to  to_date_session_id;
+alter table leave_request rename from_date_session to from_date_session_id;
+
+alter table leave_request add constraint fk_leave_request_to_date_session_id foreign key (to_date_session_id) references master_session(id);
+alter table leave_request add constraint fk_leave_request_from_date_session_id foreign key (from_date_session_id) references master_session(id);
