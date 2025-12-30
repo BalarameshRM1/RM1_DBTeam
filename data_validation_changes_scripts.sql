@@ -487,3 +487,8 @@ SELECT setval('master_designation_id_seq', (SELECT MAX(id) +1 FROM master_design
 
 cluster master_department using pk_master_department_id;
 cluster master_designation using pk_master_designation_id;
+
+
+---30-dec-2025 -- dhanusha
+alter table leave_request drop constraint ck_leave_request_from_date_session;
+alter table leave_request drop constraint ck_leave_request_to_date_session
