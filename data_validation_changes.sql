@@ -1203,3 +1203,8 @@ alter table master_skill add constraint uk_master_skill_skill unique(skill);
 alter table master_status add constraint uk_master_status_status_name unique(status_name);
 ---
 alter table home_service add column service_price numeric(10,2);
+
+
+---- 29-dec-2025 -- danusha
+INSERT INTO public.master_status (status_name) SELECT 'Assigned' WHERE NOT EXISTS (SELECT 1 FROM public.master_status WHERE status_name = 'Assigned');
+INSERT INTO public.master_status (status_name) SELECT 'Not Assigned' WHERE NOT EXISTS (SELECT 1 FROM public.master_status WHERE status_name = 'Not Assigned');
