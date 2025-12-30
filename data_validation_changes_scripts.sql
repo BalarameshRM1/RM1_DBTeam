@@ -88,3 +88,15 @@ constraint pk_inv_config_id primary key(id),
 constraint fk_inv_config_plan_type_id foreign key (plan_type_id) references master_plan_type(id),
 constraint uk_inv_config_uk_inv_id unique (uk_inv_id)
 );
+
+
+---29-dec-2025 -- dhanusha
+
+alter table inv_config add column maturity_date date not null;
+alter table inv_config add column upload_file varchar(500);
+delete from user_registration;
+alter sequence user_registration_id_seq restart with 1;
+
+--- 30-dec-2025 -- dhanusha
+
+alter table user_registration add column is_verified boolean ;
