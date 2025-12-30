@@ -458,3 +458,32 @@ alter table if exists leave_request rename column approval_status_id to status_i
 alter table if exists leave_request add constraint fk_leave_request_status_id foreign key (status_id) references master_status(id);
 drop table if exists master_approval_status;
 
+------------------------30/12/2025 ---Tharun
+
+delete from candidate_applied where designation_id in 
+(select id  from master_designation where dept_id in
+(select id from master_department where id between 15 and 36));
+
+delete from job_openings where designation_id in 
+(select id  from master_designation where dept_id in
+(select id from master_department where id between 15 and 36));
+
+delete from job_openings where department_id in 
+(select id from master_department where id between 15 and 36);
+
+
+delete from master_designation where dept_id in
+(select id from master_department where id between 15 and 36);
+
+delete from public.master_department where id between 15 and 36;
+
+delete from master_designation where id in (23,24)
+
+update  master_department set is_active ='true';
+update master_designation set is_active = 'true';
+update job_openings set is_active = 'true';
+SELECT setval('master_department_id_seq', (SELECT MAX(id) +1 FROM master_department));
+SELECT setval('master_designation_id_seq', (SELECT MAX(id) +1 FROM master_designation));
+
+cluster master_department using pk_master_department_id;
+cluster master_designation using pk_master_designation_id;
