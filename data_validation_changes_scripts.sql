@@ -458,8 +458,3 @@ alter table if exists leave_request rename column approval_status_id to status_i
 alter table if exists leave_request add constraint fk_leave_request_status_id foreign key (status_id) references master_status(id);
 drop table if exists master_approval_status;
 
-
------  30-dec-2025 -- dhanusha
-
-alter table leave_request drop constraint ck_leave_request_from_date_session;
-alter table leave_request drop constraint ck_leave_request_to_date_session
