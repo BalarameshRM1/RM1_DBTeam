@@ -514,3 +514,32 @@ alter table leave_request rename from_date_session to from_date_session_id;
 
 alter table leave_request add constraint fk_leave_request_to_date_session_id foreign key (to_date_session_id) references master_session(id);
 alter table leave_request add constraint fk_leave_request_from_date_session_id foreign key (from_date_session_id) references master_session(id);
+
+--------------------31/12/2025 ---Tharun
+
+alter table payslips add column perc_cal_id int
+alter table payslips add constraint fk_payslips_perc_cal_id foreign key (perc_cal_id) references perc_cal_id(id)
+
+create table if not exists perc_cal_id(
+id  serial not null,
+basic_perc numeric(10,2) not null,
+conveyance_perc numeric(10,2) not null,
+hra_perc numeric(10,2),
+medical_allowance_perc numeric(10,2) not null,
+special_allowance_perc numeric(10,2) not null,
+arrears_perc numeric(10,2) not null,
+total_earnings_perc numeric(10,2) not null,
+pf_perc numeric(10,2) not null,
+esic_perc numeric(10,2) not null,
+pt_perc numeric(10,2) not null,
+tds_perc numeric(10,2) not null,
+other_deductions_perc numeric(10,2) not null,
+total_deductions_perc numeric(10,2) not null,
+gross_earning_perc numeric(10,2) not null,
+deduction_perc numeric(10,2) not null,
+net_pay_perc numeric(10,2) not null,
+net_pay_in_words_perc numeric(10,2) not null,
+is_active boolean default true,
+constraint pk_master_perc_calc_id primary key (id)
+);
+
