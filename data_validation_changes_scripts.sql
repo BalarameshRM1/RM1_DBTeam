@@ -100,3 +100,39 @@ alter sequence user_registration_id_seq restart with 1;
 --- 30-dec-2025 -- dhanusha
 
 alter table user_registration add column is_verified boolean ;
+
+
+---31st-dec-2025 --dhanusha
+
+INSERT INTO master_role (role_name) SELECT 'Investor' WHERE NOT EXISTS (SELECT 1 FROM master_role WHERE role_name = 'Investor');
+INSERT INTO master_role (role_name) SELECT 'Vendor' WHERE NOT EXISTS (SELECT 1 FROM master_role WHERE role_name = 'Vendor');
+
+update master_role set role_name = 'Super Admin' where id =1;
+update master_role set role_name = 'Admin' where id =2;
+
+alter table user_registration add column bank_id int;
+alter table user_registration add constraint fk_user_registration_bank_id foreign key (bank_id) references master_bank(id);
+alter table user_registration add column bank_account_no int;
+alter table user_registration add column ifsc_code varchar(100);
+
+--- created table
+create table if not exists master_bank(
+id serial not null,
+bank_name varchar(255) not null,
+is_active boolean default true,
+constraint pk_master_bank_id primary key (id),
+constraint uk_master_bank_bank_name unique (bank_name)
+);
+
+
+INSERT INTO public.master_bank (bank_name)SELECT 'State Bank of India' WHERE NOT EXISTS (SELECT 1 FROM public.master_bank WHERE bank_name = 'State Bank of India');
+INSERT INTO public.master_bank (bank_name)SELECT 'HDFC Bank' WHERE NOT EXISTS (SELECT 1 FROM public.master_bank WHERE bank_name = 'HDFC Bank');
+INSERT INTO public.master_bank (bank_name)SELECT 'ICICI Bank' WHERE NOT EXISTS (SELECT 1 FROM public.master_bank WHERE bank_name = 'ICICI Bank');
+INSERT INTO public.master_bank (bank_name)SELECT 'Axis Bank' WHERE NOT EXISTS (SELECT 1 FROM public.master_bank WHERE bank_name = 'Axis Bank');
+INSERT INTO public.master_bank (bank_name)SELECT 'Punjab National Bank' WHERE NOT EXISTS (SELECT 1 FROM public.master_bank WHERE bank_name = 'Punjab National Bank');
+INSERT INTO public.master_bank (bank_name)SELECT 'Bank of Baroda' WHERE NOT EXISTS (SELECT 1 FROM public.master_bank WHERE bank_name = 'Bank of Baroda');
+INSERT INTO public.master_bank (bank_name)SELECT 'Canara Bank' WHERE NOT EXISTS (SELECT 1 FROM public.master_bank WHERE bank_name = 'Canara Bank');
+INSERT INTO public.master_bank (bank_name)SELECT 'Union Bank of India' WHERE NOT EXISTS (SELECT 1 FROM public.master_bank WHERE bank_name = 'Union Bank of India');
+INSERT INTO public.master_bank (bank_name)SELECT 'IDFC First Bank' WHERE NOT EXISTS (SELECT 1 FROM public.master_bank WHERE bank_name = 'IDFC First Bank');
+INSERT INTO public.master_bank (bank_name)SELECT 'Kotak Mahindra Bank' WHERE NOT EXISTS (SELECT 1 FROM public.master_bank WHERE bank_name = 'Kotak Mahindra Bank');
+
