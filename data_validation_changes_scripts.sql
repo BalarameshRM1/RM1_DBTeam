@@ -539,7 +539,12 @@ gross_earning_perc numeric(10,2) not null,
 deduction_perc numeric(10,2) not null,
 net_pay_perc numeric(10,2) not null,
 net_pay_in_words_perc numeric(10,2) not null,
+created_by bigint,
+created_date timestamp default now(),
+modified_by bigint,
+modified_date timestamp,
 is_active boolean default true,
 constraint pk_master_perc_calc_id primary key (id)
 );
-
+-----
+drop function  fn_leave_request_before_save() CASCADE;
