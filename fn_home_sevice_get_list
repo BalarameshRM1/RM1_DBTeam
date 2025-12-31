@@ -1,0 +1,64 @@
+---31st dec dhanusha
+
+CREATE OR REPLACE FUNCTION public.fn_home_service_get_list(
+	p_module_id int,
+	p_sub_module_id int,
+	p_service_id bigint,
+	p_sub_service_id int,
+	p_sub_group_id bigint,
+	p_limit integer DEFAULT 100,
+	p_offset integer DEFAULT 0)
+	
+	RETURNS TABLE (id bigint,module_id int,module_name varchar,sub_module_id int,sub_module_name varchar,
+    service_id bigint,service_name varchar,sub_service_id int,sub_service_name varchar,sub_group_id bigint,
+    sub_group_name varchar,full_name varchar,email varchar,mobile varchar,address varchar,service_type_id int,
+    service_type varchar,issue_id bigint,issue_type varchar,problem_description varchar,property_size_sqft varchar,
+    preferred_date date,time_slot_id int,time_slot varchar,special_instructions varchar,payment_type_id int,
+    payment_name varchar,created_by bigint,created_date timestamp,modified_by bigint,modified_date timestamp,
+    is_active boolean,service_price numeric,payment_done boolean,assigned_to bigint,status_id int,status_name varchar
+)
+
+    LANGUAGE 'plpgsql'
+    COST 100
+    VOLATILE PARALLEL UNSAFE
+    ROWS 1000
+
+AS $BODY$
+begin
+    return query
+
+select hs.id,hs.module_id,mm.module_name,hs.sub_module_id,msm.sub_module_name,hs.service_id,ms.service_name,
+hs.sub_service_id,mss.sub_service_name,hs.sub_group_id,msg.sub_group_name,hs.full_name,hs.email,hs.mobile,hs.address,
+hs.service_type_id,mst.service_type,hs.issue_id,mi.issue_type,hs.problem_description,hs.property_size_sqft,
+hs.preferred_date,hs.time_slot_id,mts.time_slot,hs.special_instructions,hs.payment_type_id,mpt.payment_name,hs.created_by,
+hs.created_date,hs.modified_by,hs.modified_date,hs.is_active,hs.service_price,hs.payment_done,hs.assigned_to,
+hs.status_id,s.status_name
+
+from home_service hs
+left join master_module mm on hs.module_id = mm.id and mm.is_active =true
+left join master_sub_module msm on hs.sub_module_id = msm.id and msm.is_active =true
+left join master_service ms on hs.service_id = ms.id and ms.is_active =true
+left join master_sub_service mss on hs.sub_service_id = mss.id and mss.is_active =true
+left join master_sub_group msg on hs.sub_group_id = msg.id and msg.is_active =true
+left join master_service_type mst on hs.service_type_id = mst.id and mst.is_active =true
+left join master_issue mi on hs.issue_id = mi.id and mi.is_active =true
+left join master_time_slot mts on hs.time_slot_id = mts.id and mts.is_active =true
+left join master_payment_type mpt on hs.payment_type_id = mpt.id and mpt.is_active =true
+left join master_status s on hs.status_id = s.id and s.is_active =true
+
+		where (hs.module_id = p_module_id OR p_module_id = -1)
+        AND (hs.sub_module_id = p_sub_module_id OR p_sub_module_id = -1)
+        AND (hs.service_id = p_service_id OR p_service_id = -1)
+        AND (hs.sub_service_id = p_sub_service_id OR p_sub_service_id = -1)
+        AND (hs.sub_group_id = p_sub_group_id OR p_sub_group_id = -1)
+        AND hs.is_active = true
+
+order by 1 desc
+limit p_limit offset p_offset;	
+end;
+$BODY$;
+
+--select * from fn_home_service_get_list(-1,-1,-1,-1,-1,100,0)
+
+
+

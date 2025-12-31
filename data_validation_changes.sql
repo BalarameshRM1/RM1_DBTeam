@@ -1208,3 +1208,9 @@ alter table home_service add column service_price numeric(10,2);
 ---- 29-dec-2025 -- danusha
 INSERT INTO public.master_status (status_name) SELECT 'Assigned' WHERE NOT EXISTS (SELECT 1 FROM public.master_status WHERE status_name = 'Assigned');
 INSERT INTO public.master_status (status_name) SELECT 'Not Assigned' WHERE NOT EXISTS (SELECT 1 FROM public.master_status WHERE status_name = 'Not Assigned');
+
+
+--- 31st - dec-2025 --dhanusha
+
+SELECT setval('public.master_status_id_seq', (SELECT COALESCE(MAX(id),0)+1 FROM public.master_status), false);
+INSERT INTO master_status (status_name) SELECT 'Completed' WHERE NOT EXISTS (SELECT 1 FROM master_status WHERE status_name = 'Completed');
