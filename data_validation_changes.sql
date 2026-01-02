@@ -1214,3 +1214,21 @@ INSERT INTO public.master_status (status_name) SELECT 'Not Assigned' WHERE NOT E
 
 SELECT setval('public.master_status_id_seq', (SELECT COALESCE(MAX(id),0)+1 FROM public.master_status), false);
 INSERT INTO master_status (status_name) SELECT 'Completed' WHERE NOT EXISTS (SELECT 1 FROM master_status WHERE status_name = 'Completed');
+
+----2/1/2026 --lavanya
+----created master table
+Create table if not exists master_work_status(
+id serial not null,
+work_status_name varchar(255) not null,
+is_active boolean default true,
+constraint pk_master_work_status_id primary key(id),
+constraint uk_master_work_status_work_status_name unique (work_status_name));
+---
+INSERT INTO public.master_work_status (work_status_name)SELECT 'On The Way' WHERE NOT EXISTS (SELECT 1 FROM public.master_work_status WHERE work_status_name = 'On The Way');
+INSERT INTO public.master_work_status (work_status_name)SELECT 'Reached Location' WHERE NOT EXISTS (SELECT 1 FROM public.master_work_status WHERE work_status_name = 'Reached Location');
+INSERT INTO public.master_work_status (work_status_name)SELECT 'Job Started' WHERE NOT EXISTS (SELECT 1 FROM public.master_work_status WHERE work_status_name = 'Job Started');
+INSERT INTO public.master_work_status (work_status_name)SELECT 'Job Completed' WHERE NOT EXISTS (SELECT 1 FROM public.master_work_status WHERE work_status_name = 'Job Completed');
+
+-----
+update master_role set role_name = 'Freelancer' where id = 4;
+cluster master_role using pk_master_role_id;
