@@ -591,3 +591,10 @@ alter sequence master_occupation_id_seq restart with 1;
 SELECT setval('master_relation_id_seq', (SELECT MAX(id) FROM master_relation));
 INSERT INTO public.master_relation(relation_type) SELECT 'Husband' WHERE NOT EXISTS (SELECT 1 FROM public.master_relation WHERE relation_type = 'Husband');
 
+------------- insert into to ctc column constraint null to not null
+
+update employee_registration set ctc = 320000 where id between 1 and 8;
+update employee_registration set ctc = 420000 where id = 20;
+update employee_registration set ctc = 420000 where id = 90;
+alter table employee_registration alter column ctc set not null;
+
