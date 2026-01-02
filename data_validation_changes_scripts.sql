@@ -518,9 +518,9 @@ alter table leave_request add constraint fk_leave_request_from_date_session_id f
 --------------------31/12/2025 ---Tharun
 
 alter table payslips add column perc_cal_id int
-alter table payslips add constraint fk_payslips_perc_cal_id foreign key (perc_cal_id) references perc_cal_id(id)
+alter table payslips add constraint fk_payslips_perc_cal_id foreign key (perc_cal_id) references master_perc_cal_id(id)
 
-create table if not exists perc_cal_id(
+create table if not exists master_perc_cal_id(
 id  serial not null,
 basic_perc numeric(10,2) not null,
 conveyance_perc numeric(10,2) not null,
@@ -539,10 +539,6 @@ gross_earning_perc numeric(10,2) not null,
 deduction_perc numeric(10,2) not null,
 net_pay_perc numeric(10,2) not null,
 net_pay_in_words_perc numeric(10,2) not null,
-created_by bigint,
-created_date timestamp default now(),
-modified_by bigint,
-modified_date timestamp,
 is_active boolean default true,
 constraint pk_master_perc_calc_id primary key (id)
 );
@@ -552,3 +548,26 @@ drop function  fn_leave_request_before_save() CASCADE;
 delete from master_session where id = 3;
 update master_session set session_name ='Session 1' where id = 1;
 update master_session set session_name ='Session 2' where id = 2;
+
+-------- Tharun ---02/01/2026
+
+INSERT INTO public.master_perc_cal_id (basic_perc, conveyance_perc, hra_perc, medical_allowance_perc, special_allowance_perc, arrears_perc, total_earnings_perc, pf_perc, esic_perc, pt_perc, tds_perc, other_deductions_perc, total_deductions_perc, gross_earning_perc, deduction_perc, net_pay_perc, net_pay_in_words_perc)
+SELECT 40.00, 10.00, 20.00, 5.00, 15.00, 0.00, 90.00, 12.00, 0.75, 2.00, 5.00, 1.25, 21.00, 90.00, 21.00, 69.00, 69.00
+WHERE NOT EXISTS (SELECT 1 FROM public.master_perc_cal_id m WHERE m.basic_perc = 40.00 AND m.conveyance_perc = 10.00 AND m.hra_perc = 20.00
+      AND m.medical_allowance_perc = 5.00
+      AND m.special_allowance_perc = 15.00
+      AND m.arrears_perc = 0.00
+      AND m.total_earnings_perc = 90.00
+      AND m.pf_perc = 12.00
+      AND m.esic_perc = 0.75
+      AND m.pt_perc = 2.00
+      AND m.tds_perc = 5.00
+      AND m.other_deductions_perc = 1.25
+      AND m.total_deductions_perc = 21.00
+      AND m.gross_earning_perc = 90.00
+      AND m.deduction_perc = 21.00
+      AND m.net_pay_perc = 69.00
+      AND m.net_pay_in_words_perc = 69.00
+);
+--------
+update payslips set perc_cal_id = 1;
