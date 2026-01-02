@@ -136,3 +136,28 @@ INSERT INTO public.master_bank (bank_name)SELECT 'Union Bank of India' WHERE NOT
 INSERT INTO public.master_bank (bank_name)SELECT 'IDFC First Bank' WHERE NOT EXISTS (SELECT 1 FROM public.master_bank WHERE bank_name = 'IDFC First Bank');
 INSERT INTO public.master_bank (bank_name)SELECT 'Kotak Mahindra Bank' WHERE NOT EXISTS (SELECT 1 FROM public.master_bank WHERE bank_name = 'Kotak Mahindra Bank');
 
+--------------------1st-jan-2026 --dhanusha
+ALTER TABLE user_registration ALTER COLUMN bank_account_no TYPE VARCHAR(20);
+
+alter table master_plan_type rename returns_in_days to duration
+
+update master_plan_type set plan_type ='Short-Term Starter' where id =1;
+update master_plan_type set plan_type ='Quaterly Builder' where id =2;
+update master_plan_type set plan_type ='Growth Accelerate' where id =3;
+update master_plan_type set plan_type ='Wealth Multiplier' where id =4;
+
+
+update master_plan_type set duration ='1 Month' where id =1;
+update master_plan_type set duration ='3 Months' where id =2;
+update master_plan_type set duration ='6 Months' where id =3;
+update master_plan_type set duration ='12 Months' where id =4;
+
+alter table master_plan_type add column description varchar(255);
+
+
+delete from master_plan_type where id between 5 and 8;
+
+update master_plan_type set description ='Perfect for testing the platform with a 1-month plan' where id =1;
+update master_plan_type set description ='Steady growth for your 3-months goals' where id =2;
+update master_plan_type set description ='Competitive returns for a 6-months tenure' where id =3;
+update master_plan_type set description ='Maximize your wealth with our premium yearly plan' where id =4;
