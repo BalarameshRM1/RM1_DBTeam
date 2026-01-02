@@ -598,3 +598,10 @@ update employee_registration set ctc = 420000 where id = 20;
 update employee_registration set ctc = 420000 where id = 90;
 alter table employee_registration alter column ctc set not null;
 
+---------------
+delete from leave_request_cc where leave_request_id in 
+(select id from public.leave_request where status_id in 
+(select id from master_status where name ='Approved'));
+
+delete from public.leave_request where status_id in 
+(select id from master_status where name ='Approved');
