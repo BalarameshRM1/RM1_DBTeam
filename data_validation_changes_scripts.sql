@@ -548,3 +548,7 @@ constraint pk_master_perc_calc_id primary key (id)
 );
 -----
 drop function  fn_leave_request_before_save() CASCADE;
+------
+delete from master_session where id = 3;
+update master_session set session_name ='Session 1' where id = 1;
+update master_session set session_name ='Session 2' where id = 2;
