@@ -571,3 +571,23 @@ WHERE NOT EXISTS (SELECT 1 FROM public.master_perc_cal_id m WHERE m.basic_perc =
 );
 --------
 update payslips set perc_cal_id = 1;
+------- insert into master_occupation 
+INSERT INTO public.master_occupation(occupation_name) SELECT 'Government Employee' WHERE NOT EXISTS (SELECT 1 FROM public.master_occupation WHERE occupation_name = 'Government Employee');
+INSERT INTO public.master_occupation(occupation_name) SELECT 'Private Employee' WHERE NOT EXISTS (SELECT 1 FROM public.master_occupation WHERE occupation_name = 'Private Employee');
+INSERT INTO public.master_occupation(occupation_name) SELECT 'Business' WHERE NOT EXISTS (SELECT 1 FROM public.master_occupation WHERE occupation_name = 'Business');
+INSERT INTO public.master_occupation(occupation_name) SELECT 'Farmer' WHERE NOT EXISTS (SELECT 1 FROM public.master_occupation WHERE occupation_name = 'Farmer');
+INSERT INTO public.master_occupation(occupation_name) SELECT 'Self Employed' WHERE NOT EXISTS (SELECT 1 FROM public.master_occupation WHERE occupation_name = 'Self Employed');
+INSERT INTO public.master_occupation(occupation_name) SELECT 'Labourer' WHERE NOT EXISTS (SELECT 1 FROM public.master_occupation WHERE occupation_name = 'Labourer');
+INSERT INTO public.master_occupation(occupation_name) SELECT 'Teacher' WHERE NOT EXISTS (SELECT 1 FROM public.master_occupation WHERE occupation_name = 'Teacher');
+INSERT INTO public.master_occupation(occupation_name) SELECT 'Driver' WHERE NOT EXISTS (SELECT 1 FROM public.master_occupation WHERE occupation_name = 'Driver');
+INSERT INTO public.master_occupation(occupation_name) SELECT 'Home Maker' WHERE NOT EXISTS (SELECT 1 FROM public.master_occupation WHERE occupation_name = 'Home Maker');
+INSERT INTO public.master_occupation(occupation_name) SELECT 'Retired' WHERE NOT EXISTS (SELECT 1 FROM public.master_occupation WHERE occupation_name = 'Retired');
+INSERT INTO public.master_occupation(occupation_name) SELECT 'N/A' WHERE NOT EXISTS (SELECT 1 FROM public.master_occupation WHERE occupation_name = 'N/A');
+
+alter sequence master_occupation_id_seq restart with 1;
+
+--------------insert into master_relation 
+
+SELECT setval('master_relation_id_seq', (SELECT MAX(id) FROM master_relation));
+INSERT INTO public.master_relation(relation_type) SELECT 'Husband' WHERE NOT EXISTS (SELECT 1 FROM public.master_relation WHERE relation_type = 'Husband');
+
