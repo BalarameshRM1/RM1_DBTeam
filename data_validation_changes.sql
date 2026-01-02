@@ -1232,3 +1232,29 @@ INSERT INTO public.master_work_status (work_status_name)SELECT 'Job Completed' W
 -----
 update master_role set role_name = 'Freelancer' where id = 4;
 cluster master_role using pk_master_role_id;
+
+-----------2nd-jan-2026 -dhanusha
+
+INSERT INTO public.master_skill (skill) SELECT 'Gardening' WHERE NOT EXISTS (SELECT 1 FROM public.master_skill WHERE skill = 'Gardening');
+INSERT INTO public.master_skill (skill) SELECT 'Home Mainteance' WHERE NOT EXISTS (SELECT 1 FROM public.master_skill WHERE skill = 'Home Mainteance');
+INSERT INTO public.master_skill (skill) SELECT 'Interior Design' WHERE NOT EXISTS (SELECT 1 FROM public.master_skill WHERE skill = 'Interior Design');
+
+
+--------------------
+
+create table if not exists freelancer_task_history (
+	id bigserial not null,
+	home_service_id bigint not null,
+	freelancer_id bigint not null,
+	work_status_id bigint not null,
+	upload_img varchar(500),
+	created_by bigint, 
+	created_date timestamp default now(),
+  	modified_by bigint, 
+  	modified_date timestamp, 
+	is_active boolean default true,
+	constraint pk_freelancer_task_history_id primary key(id),
+	constraint fk_freelancer_task_history_home_service_id foreign key (home_service_id) references home_service(id),
+	constraint fk_freelancer_task_history_home_freelancer_id foreign key (freelancer_id) references master_role(id),
+	constraint fk_freelancer_task_history_home_work_status_id foreign key (work_status_id) references master_work_status(id)
+);
