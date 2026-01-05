@@ -606,3 +606,9 @@ delete from leave_request_cc where leave_request_id in
 delete from public.leave_request where status_id in 
 (select id from master_status where name ='Approved');
     
+-------- dhanusha --5th-jan-2026
+
+alter table employee_registration rename constraint  fk_employee_registration_position_id to fk_employee_registration_designation_id
+
+alter table employee_registration add constraint fk_employee_registration_bank_id foreign key (bank_id) references master_bank(id);
+
