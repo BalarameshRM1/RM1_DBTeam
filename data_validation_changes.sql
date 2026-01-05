@@ -1264,3 +1264,8 @@ create table if not exists freelancer_task_history (
 
 INSERT INTO public.master_status (status_name) SELECT 'Assigned' WHERE NOT EXISTS (SELECT 1 FROM public.master_status WHERE status_name = 'Assigned');
 INSERT INTO public.master_status (status_name) SELECT 'Not Assigned' WHERE NOT EXISTS (SELECT 1 FROM public.master_status WHERE status_name = 'Not Assigned');
+
+-------5/2/2026 lavanya
+alter table user_registration add column reg_payment_done boolean;
+alter table user_registration add column reg_fee numeric(10,2);
+alter table user_registration add constraint fk_user_registration_skill_id foreign key (skill_id) references master_skill(id);
