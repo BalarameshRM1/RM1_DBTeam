@@ -1,0 +1,31 @@
+CREATE OR REPLACE FUNCTION public.fn_payslips_generate(
+	empid bigint,
+	month_id integer,
+	year_id integer)
+    RETURNS TABLE(payslip_id bigint, emp_id bigint, employee_name character varying, emp_code character varying, department_id integer, department character varying, position_id integer, designation character varying, join_date date, bank_ac_no character varying, bank_id bigint, bank_name character varying, total_days integer, paid_days integer, lop_days integer, uan character varying, esic_no character varying, pan character varying, basic numeric, conveyance numeric, hra numeric, medical_allowance numeric, special_allowance numeric, arrears numeric, total_earnings numeric, pf numeric, esic numeric, pt numeric, tds numeric, other_deductions numeric, total_deductions numeric, gross_earning numeric, deduction numeric, net_pay numeric, net_pay_in_words character varying) 
+    LANGUAGE 'plpgsql'
+    COST 100
+    VOLATILE PARALLEL UNSAFE
+    ROWS 1000
+
+AS $BODY$
+
+BEGIN 
+RETURN QUERY
+select p.id as payslip_id,p.emp_id,concat_ws(' ',er.first_name,er.last_name)::varchar as employee_name,
+er.emp_code,er.department_id,md.department,er.designation_id,er.join_date,
+er.bank_ac_no,er.bank_id,mb.bank_name,p.total_days,p.paid_days,p.lop_days,
+er.uan,er.esic as esic_no,er.pan,p.basic,p.conveyance,p.hra,p.medical_allowance,p.special_allowance,p.arrears,p.total_earnings,
+p.pf,p.esic,p.pt,p.tds,p.other_deductions,p.total_deductions,p.gross_earning,p.deduction,p.net_pay,p.net_pay_in_words
+from payslips p
+join employee_registration er on er.id = p.emp_id and er.is_active=true and p.is_active=true
+left join master_department md on md.id = er.department_id and md.is_active=true
+left join master_designation mdg on mdg.id = er.designation_id and mdg.is_active=true 
+left join master_bank mb on mb.id = er.bank_id and mb.is_active=true
+left join master_month mm on mm.id = p.month_id and mm.is_active=true
+left join master_year my on my.id = p.year_id and my.is_active=true
+where (p.emp_id = empid or -1 = empid) and (p.month_id = monthid or -1=monthid)
+and (p.year_id = yearid or -1 =yearid);
+
+END;
+$BODY$;
