@@ -429,11 +429,11 @@ relation_id int not null,
 first_name varchar(255) not null,
 last_name varchar(255) not null,
 date_of_birth date not null,
-occuupation_id int not null,
+occupation_id int not null,
 phone varchar(255) ,
 email varchar(150) ,
-present_addresss varchar(255) not null,
-perminent_address varchar(255) not null,
+present_address varchar(255) not null,
+permanent_address varchar(255) not null,
 bank_account varchar(255) ,
 ifsc_code varchar(255) ,
 pan varchar(255),
@@ -605,3 +605,4 @@ delete from leave_request_cc where leave_request_id in
 
 delete from public.leave_request where status_id in 
 (select id from master_status where name ='Approved');
+    
