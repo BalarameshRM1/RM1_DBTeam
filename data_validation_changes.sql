@@ -1258,3 +1258,9 @@ create table if not exists freelancer_task_history (
 	constraint fk_freelancer_task_history_home_freelancer_id foreign key (freelancer_id) references master_role(id),
 	constraint fk_freelancer_task_history_home_work_status_id foreign key (work_status_id) references master_work_status(id)
 );
+
+
+--------------- dhanusha--5th-dec-2026
+
+INSERT INTO public.master_status (status_name) SELECT 'Assigned' WHERE NOT EXISTS (SELECT 1 FROM public.master_status WHERE status_name = 'Assigned');
+INSERT INTO public.master_status (status_name) SELECT 'Not Assigned' WHERE NOT EXISTS (SELECT 1 FROM public.master_status WHERE status_name = 'Not Assigned');
