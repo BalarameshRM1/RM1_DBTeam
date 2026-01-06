@@ -161,3 +161,25 @@ update master_plan_type set description ='Perfect for testing the platform with 
 update master_plan_type set description ='Steady growth for your 3-months goals' where id =2;
 update master_plan_type set description ='Competitive returns for a 6-months tenure' where id =3;
 update master_plan_type set description ='Maximize your wealth with our premium yearly plan' where id =4;
+
+
+----dhanusha --- 6-jan-2026
+update master_role set role_name = 'Investor' where id = 1;
+update master_role set role_name = 'Super Admin' where id = 2;
+update master_role set role_name = 'Admin' where id = 3;
+
+alter table master_role add constraint uk_master_role_role_name unique (role_name);
+
+delete from public.inv_config where id between 1 and 29;
+
+alter table public.user_registration alter column inv_reg_id drop not null;
+
+ALTER TABLE user_registration
+ADD CONSTRAINT ck_master_role_inv_reg_id
+CHECK (
+    (role_id IN (2,3) AND inv_reg_id IS NULL)
+    OR
+    (role_id NOT IN (2,3) AND inv_reg_id IS NOT NULL)
+);
+
+update user_registration set inv_reg_id = null where role_id = 3
