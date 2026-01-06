@@ -612,3 +612,89 @@ alter table employee_registration rename constraint  fk_employee_registration_po
 
 alter table employee_registration add constraint fk_employee_registration_bank_id foreign key (bank_id) references master_bank(id);
 
+--------------06/01/2026  ----Tharun
+
+alter table employee_registration drop column paymethod_id;
+----------
+create table if not exists master_module(
+id serial not null,
+module_name varchar(255) not null,
+fa_fa_icon varchar(500),
+routes varchar(255),
+order_by int,
+is_active boolean DEFAULT true,
+constraint pk_master_module_id primary key (id)
+);
+
+INSERT INTO master_module (module_name) SELECT 'Dashboard' WHERE NOT EXISTS (SELECT 1 FROM master_module WHERE module_name = 'Dashboard');
+
+INSERT INTO master_module (module_name) SELECT 'Employees' WHERE NOT EXISTS (SELECT 1 FROM master_module WHERE module_name = 'Employees');
+
+INSERT INTO master_module (module_name) SELECT 'Attendance Management' WHERE NOT EXISTS (SELECT 1 FROM master_module WHERE module_name = 'Attendance Management');
+
+INSERT INTO master_module (module_name) SELECT 'Task Management' WHERE NOT EXISTS (SELECT 1 FROM master_module WHERE module_name = 'Task Management');
+
+INSERT INTO master_module (module_name) SELECT 'Leave Management' WHERE NOT EXISTS (SELECT 1 FROM master_module WHERE module_name = 'Leave Management');
+
+INSERT INTO master_module (module_name) SELECT 'Payroll' WHERE NOT EXISTS (SELECT 1 FROM master_module WHERE module_name = 'Payroll');
+
+INSERT INTO master_module (module_name) SELECT 'Performance' WHERE NOT EXISTS (SELECT 1 FROM master_module WHERE module_name = 'Performance');
+
+INSERT INTO master_module (module_name) SELECT 'Recruitment' WHERE NOT EXISTS (SELECT 1 FROM master_module WHERE module_name = 'Recruitment');
+
+INSERT INTO master_module (module_name) SELECT 'Reports' WHERE NOT EXISTS (SELECT 1 FROM master_module WHERE module_name = 'Reports');
+
+INSERT INTO master_module (module_name) SELECT 'Analytics' WHERE NOT EXISTS (SELECT 1 FROM master_module WHERE module_name = 'Analytics');
+
+INSERT INTO master_module (module_name) SELECT 'Access Management' WHERE NOT EXISTS (SELECT 1 FROM master_module WHERE module_name = 'Access Management');
+
+INSERT INTO master_module (module_name) SELECT 'Settings' WHERE NOT EXISTS (SELECT 1 FROM master_module WHERE module_name = 'Settings');
+
+select * from master_module;
+
+---------
+
+create table if not exists master_screen(
+id serial not null,
+screen_name varchar(255) not null,
+module_id int,
+screen_label varchar(255),
+fa_fa_icon varchar(500),
+routes varchar(255),
+order_by int,
+is_active boolean DEFAULT true,
+constraint pk_master_screen_id primary key(id),
+constraint fk_master_screen_module_id foreign key (module_id) references master_module(id)
+);
+
+INSERT INTO master_screen (screen_name) SELECT 'Leave Apply' WHERE NOT EXISTS ( SELECT 1 FROM master_screen WHERE screen_name = 'Leave Apply');
+
+INSERT INTO master_screen (screen_name) SELECT 'Leave Balance' WHERE NOT EXISTS (SELECT 1 FROM master_screen WHERE screen_name = 'Leave Balance');
+
+INSERT INTO master_screen (screen_name) SELECT 'Leave Calendar' WHERE NOT EXISTS (SELECT 1 FROM master_screen WHERE screen_name = 'Leave Calendar');
+
+INSERT INTO master_screen (screen_name) SELECT 'Holiday Calendar' WHERE NOT EXISTS (SELECT 1 FROM master_screen WHERE screen_name = 'Holiday Calendar');
+
+select * from master_screen;
+-----------
+
+create table if not exists master_screen_permission(
+id serial not null,
+module_id int,
+screen_id int,
+role_id int,
+can_view  boolean,
+can_edit boolean,
+can_delete boolean,
+can_access boolean,
+can_update boolean,
+is_active boolean DEFAULT true,
+constraint pk_master_screen_permission_id primary key (id),
+constraint fk_master_screen_permission_module_id foreign key (module_id) references master_module(id),
+constraint fk_master_screen_permission_screen_id foreign key (screen_id) references master_screen(id),
+constraint fk_master_screen_permission_role_id foreign key (role_id) references master_role(id)
+);
+
+select * from master_screen_permission;
+
+---------
