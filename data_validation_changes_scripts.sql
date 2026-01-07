@@ -697,4 +697,45 @@ constraint fk_master_screen_permission_role_id foreign key (role_id) references 
 
 select * from master_screen_permission;
 
----------
+-----------------07/01/2026  ----Tharun
+
+CREATE TABLE IF NOT EXISTS public.employee_rating
+(
+    id bigint NOT NULL ,
+    emp_id int NOT NULL,
+    designation_id int NOT NULL,
+    rating numeric(2,1) NOT NULL,
+    reviewer_id int NOT NULL,
+    created_by bigint,
+    created_date timestamp without time zone DEFAULT now(),
+    modified_by bigint,
+    modified_date timestamp without time zone,
+    is_active boolean DEFAULT true,
+    CONSTRAINT pk_employee_rating_id PRIMARY KEY (id),
+    CONSTRAINT fk_employee_rating_designation_id FOREIGN KEY (designation_id) REFERENCES public.master_designation (id),
+    CONSTRAINT fk_employee_rating_emp_id FOREIGN KEY (emp_id) REFERENCES public.employee_registration (id),
+    CONSTRAINT fk_employee_rating_reviewer_id FOREIGN KEY (reviewer_id) REFERENCES public.employee_registration (id)
+);
+
+-----------------
+
+create or replace view vw_performance_rating as
+with perf_rating as (
+select e.id as emp_id,concat_ws(' ',e.first_name,e.last_name)::varchar as employee_name
+from employee_registration e where e.is_active = true)
+
+select er.id,
+    er.emp_id,
+    pr.employee_name,
+    er.designation_id,
+    d.designation_name,
+    er.rating,
+    er.reviewer_id as reviewer_id,
+    pr1.employee_name as reviewer_name,
+    er.created_date
+from employee_rating er
+left join perf_rating pr on pr.emp_id = er.emp_id
+left join perf_rating pr1 on pr1.emp_id = er.reviewer_id
+left join master_designation d on d.id = er.designation_id and d.is_active = true
+where er.is_active = true
+order by 1 desc;
