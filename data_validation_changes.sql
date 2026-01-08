@@ -1265,7 +1265,120 @@ create table if not exists freelancer_task_history (
 INSERT INTO public.master_status (status_name) SELECT 'Assigned' WHERE NOT EXISTS (SELECT 1 FROM public.master_status WHERE status_name = 'Assigned');
 INSERT INTO public.master_status (status_name) SELECT 'Not Assigned' WHERE NOT EXISTS (SELECT 1 FROM public.master_status WHERE status_name = 'Not Assigned');
 
--------5/2/2026 lavanya
+-------5/1/2026 lavanya
+
 alter table user_registration add column reg_payment_done boolean;
 alter table user_registration add column reg_fee numeric(10,2);
 alter table user_registration add constraint fk_user_registration_skill_id foreign key (skill_id) references master_skill(id);
+
+------7/1/2026 lavanya
+
+alter table home_service add column rating int;
+alter table home_service add constraint ck_home_service_rating check (rating between 1 and 5);
+alter table freelancer_task_history add column rating int;
+alter table freelancer_task_history add constraint ck_freelancer_task_history_rating check (rating between 1 and 5);
+alter table user_registration alter column government_id type json using government_id::json;
+
+
+-----8/1/2026 lavanya
+
+create table if not exists user_services(
+	id bigserial not null,
+	module_id int not null,
+	user_id int not null,
+	created_by bigint,
+	created_date timestamp default now(),
+	modified_by bigint,
+	modified_date timestamp,
+	is_active boolean default true,
+	constraint pk_user_services_id primary key (id),
+	constraint fk_user_services_module_id foreign key (module_id) references master_module (id),
+	constraint fk_user_services_user_id foreign key (user_id) references user_registration (id)
+	);
+
+
+-----
+
+create table if not exists user_skill(
+	id bigserial not null,
+	skill_id int not null,
+	user_id int not null,
+	created_by bigint,
+	created_date timestamp default now(),
+	modified_by bigint,
+	modified_date timestamp,
+	is_active boolean default true,
+	constraint pk_user_skill_id primary key (id),
+	constraint fk_user_skill_skill_id foreign key (skill_id) references master_skill (id),
+	constraint fk_user_skill_user_id foreign key (user_id) references user_registration (id)
+	);
+
+	----
+create table if not exists student_qualification(
+	id bigserial not null,
+	user_id int not null,
+	degree varchar(255) not null,
+	institute varchar(255) not null,
+	percentage varchar(255) not null,
+	created_by bigint,
+	created_date timestamp default now(),
+	modified_by bigint,
+	modified_date timestamp,
+	is_active boolean default true,
+	constraint pk_student_qualification_id primary key (id),
+	constraint fk_student_qualification_user_id foreign key (user_id) references user_registration (id)
+	);
+	
+	----
+	
+create table if not exists student_certificate(
+	id bigserial not null,
+    user_id int not null,
+	certificate_name varchar(255) not null,
+	issued_by varchar(255) not null,
+	year int not null,
+	upload_certificate varchar(500) not null,
+	created_by bigint,
+	created_date timestamp default now(),
+	modified_by bigint,
+	modified_date timestamp,
+	is_active boolean default true,
+	constraint pk_student_certificate_id primary key (id),
+    constraint fk_student_certificate_user_id foreign key (user_id) references user_registration (id)
+);
+---
+alter table if exists user_registration add column user_services_id int;
+alter table if exists user_registration add column user_skill_id int;
+alter table if exists user_registration add column student_qualification_id int;
+alter table if exists user_registration add column student_certificate_id int;
+---
+alter table if exists user_registration add constraint fk_user_registration_user_services_id foreign key(user_services_id) references user_services(id);
+alter table if exists user_registration add constraint fk_user_registration_user_skill_id foreign key(user_skill_id) references user_skill(id);
+alter table if exists user_registration add constraint fk_user_registration_student_qualification_id foreign key(student_qualification_id) references student_qualification(id);
+alter table if exists user_registration add constraint fk_user_registration_student_certificate_id foreign key(student_certificate_id) references student_certificate(id);
+
+alter table user_registration drop column skill_id;
+alter table user_registration add column experience_in_years ;
+
+------
+create table if not exists master_duration(
+id serial not null,
+duration varchar(255) not null,
+is_active boolean default true,
+constraint pk_master_duration_id primary key(id),
+constraint uk_master_duration_duration unique(duration));
+
+insert into master_duration(duration) select '1 hour' where not exists(select 1 from master_duration where duration = '1 hour');
+insert into master_duration(duration) select '2 hours' where not exists(select 1 from master_duration where duration = '2 hours');
+insert into master_duration(duration) select '3 hours' where not exists(select 1 from master_duration where duration = '3 hours');
+insert into master_duration(duration) select '4 hours' where not exists(select 1 from master_duration where duration = '4 hours');
+insert into master_duration(duration) select '5 hours' where not exists(select 1 from master_duration where duration = '5 hours');
+insert into master_duration(duration) select '6 hours' where not exists(select 1 from master_duration where duration = '6 hours');
+insert into master_duration(duration) select '7 hours' where not exists(select 1 from master_duration where duration = '7 hours');
+insert into master_duration(duration) select '8 hours' where not exists(select 1 from master_duration where duration = '8 hours');
+insert into master_duration(duration) select '9 hours' where not exists(select 1 from master_duration where duration = '9 hours');
+
+alter table if exists home_service add column if not exists duration_id integer;
+alter table if exists hs_add_on add column if not exists duration_id integer;
+alter table if exists home_service add constraint fk_home_service_duration_id foreign key(duration_id) references master_duration(id);
+alter table if exists hs_add_on add constraint fk_hs_add_on_duration_id foreign key(duration_id) references master_duration(id);
