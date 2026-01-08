@@ -739,3 +739,76 @@ left join perf_rating pr1 on pr1.emp_id = er.reviewer_id
 left join master_designation d on d.id = er.designation_id and d.is_active = true
 where er.is_active = true
 order by 1 desc;
+
+--------------- Tharun ---08/01/2026
+
+INSERT INTO master_module (module_name) SELECT 'Dashboard' WHERE NOT EXISTS (SELECT 1 FROM master_module WHERE module_name = 'Dashboard');
+
+INSERT INTO master_module (module_name) SELECT 'Employees' WHERE NOT EXISTS (SELECT 1 FROM master_module WHERE module_name = 'Employees');
+
+INSERT INTO master_module (module_name) SELECT 'Attendance Management' WHERE NOT EXISTS (SELECT 1 FROM master_module WHERE module_name = 'Attendance Management');
+
+INSERT INTO master_module (module_name) SELECT 'Task Management' WHERE NOT EXISTS (SELECT 1 FROM master_module WHERE module_name = 'Task Management');
+
+INSERT INTO master_module (module_name) SELECT 'Leave Management' WHERE NOT EXISTS (SELECT 1 FROM master_module WHERE module_name = 'Leave Management');
+
+INSERT INTO master_module (module_name) SELECT 'Payroll management' WHERE NOT EXISTS (SELECT 1 FROM master_module WHERE module_name = 'Payroll management');
+
+INSERT INTO master_module (module_name) SELECT 'Salary' WHERE NOT EXISTS (SELECT 1 FROM master_module WHERE module_name = 'Salary');
+
+INSERT INTO master_module (module_name) SELECT 'Performance' WHERE NOT EXISTS (SELECT 1 FROM master_module WHERE module_name = 'Performance');
+
+INSERT INTO master_module (module_name) SELECT 'Recruitment' WHERE NOT EXISTS (SELECT 1 FROM master_module WHERE module_name = 'Recruitment');
+
+INSERT INTO master_module (module_name) SELECT 'Reports' WHERE NOT EXISTS (SELECT 1 FROM master_module WHERE module_name = 'Reports');
+
+INSERT INTO master_module (module_name) SELECT 'Analytics' WHERE NOT EXISTS (SELECT 1 FROM master_module WHERE module_name = 'Analytics');
+
+INSERT INTO master_module (module_name) SELECT 'Access' WHERE NOT EXISTS (SELECT 1 FROM master_module WHERE module_name = 'Access');
+
+INSERT INTO master_module (module_name) SELECT 'Access Management' WHERE NOT EXISTS (SELECT 1 FROM master_module WHERE module_name = 'Access Management');
+
+INSERT INTO master_module (module_name) SELECT 'Settings' WHERE NOT EXISTS (SELECT 1 FROM master_module WHERE module_name = 'Settings');
+
+
+
+begin;
+delete from master_module;
+rollback;
+commit;
+
+ALTER SEQUENCE master_module_id_seq RESTART WITH 1;
+
+---------------
+select * from master_screen;
+
+
+delete from master_screen;
+ALTER SEQUENCE master_screen_id_seq RESTART WITH 1;
+
+INSERT INTO master_screen (screen_name, module_id) SELECT 'Leave Apply', 5 WHERE NOT EXISTS (SELECT 1 FROM master_screen WHERE screen_name = 'Leave Apply' AND module_id = 5);
+
+INSERT INTO master_screen (screen_name, module_id) SELECT 'Leave Balance', 5 WHERE NOT EXISTS (SELECT 1 FROM master_screen WHERE screen_name = 'Leave Balance' AND module_id = 5);
+
+INSERT INTO master_screen (screen_name, module_id) SELECT 'Leave Calendar', 5 WHERE NOT EXISTS (SELECT 1 FROM master_screen WHERE screen_name = 'Leave Calendar' AND module_id = 5);
+
+INSERT INTO master_screen (screen_name, module_id) SELECT 'Holiday Calendar', 5 WHERE NOT EXISTS (SELECT 1 FROM master_screen WHERE screen_name = 'Holiday Calendar' AND module_id = 5);
+
+INSERT INTO master_screen (screen_name, module_id) SELECT 'Payslips', 7 WHERE NOT EXISTS (SELECT 1 FROM master_screen WHERE screen_name = 'Payslips' AND module_id = 7);
+
+
+---------------------------------
+
+select * from master_designation order by 1;
+
+BEGIN;
+
+DELETE FROM master_designation
+WHERE id BETWEEN 21 AND 27;
+
+SELECT * FROM master_designation order by 1;
+
+COMMIT;
+
+UPDATE master_designation SET is_active = true;
+cluster master_designation using pk_master_designation_id;
