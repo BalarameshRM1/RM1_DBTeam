@@ -1382,3 +1382,20 @@ alter table if exists home_service add column if not exists duration_id integer;
 alter table if exists hs_add_on add column if not exists duration_id integer;
 alter table if exists home_service add constraint fk_home_service_duration_id foreign key(duration_id) references master_duration(id);
 alter table if exists hs_add_on add constraint fk_hs_add_on_duration_id foreign key(duration_id) references master_duration(id);
+
+-----
+alter table user_services add constraint fk_user_services_created_by foreign key(created_by) references user_registration (id);
+alter table user_skill add constraint fk_user_skill_created_by foreign key(created_by) references user_registration (id);
+alter table student_qualification add constraint fk_student_qualification_created_by foreign key(created_by) references user_registration (id);
+alter table student_certificate add constraint fk_student_certificate_created_by foreign key(created_by) references user_registration (id);
+
+alter table user_services add constraint fk_user_services_modified_by foreign key(modified_by) references user_registration (id);
+alter table user_skill add constraint fk_user_skill_modified_by foreign key(modified_by) references user_registration (id);
+alter table student_qualification add constraint fk_student_qualification_modified_by foreign key(modified_by) references user_registration (id);
+alter table student_certificate add constraint fk_student_certificate_modified_by foreign key(modified_by) references user_registration (id);
+
+alter table freelancer_task_history add constraint fk_freelancer_task_history_created_by foreign key(created_by) references user_registration (id);
+alter table hs_add_on add constraint fk_hs_add_on_created_by foreign key(created_by) references user_registration (id);
+alter table freelancer_task_history add constraint fk_freelancer_task_history_modified_by foreign key(modified_by) references user_registration (id);
+alter table hs_add_on add constraint fk_hs_add_on_modified_by foreign key(modified_by) references user_registration (id);
+
