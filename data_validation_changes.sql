@@ -1399,3 +1399,10 @@ alter table hs_add_on add constraint fk_hs_add_on_created_by foreign key(created
 alter table freelancer_task_history add constraint fk_freelancer_task_history_modified_by foreign key(modified_by) references user_registration (id);
 alter table hs_add_on add constraint fk_hs_add_on_modified_by foreign key(modified_by) references user_registration (id);
 
+------9/1/2026 lavanya
+INSERT INTO public.master_module(id,module_name) SELECT 5, 'Education' WHERE NOT EXISTS (SELECT 5 FROM public.master_module WHERE id = 5 AND module_name = 'Education');
+----
+alter table user_registration add column noc_number varchar(255);
+alter table user_registration add column police_station_name varchar(255);
+alter table user_registration add column issue_year int;
+alter table user_registration add column upload_noc varchar(500);
