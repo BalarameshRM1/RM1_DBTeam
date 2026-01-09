@@ -812,3 +812,42 @@ COMMIT;
 
 UPDATE master_designation SET is_active = true;
 cluster master_designation using pk_master_designation_id;
+
+------------Tharun ---09/01/2026
+create table if not exists employee_activity(
+id bigserial not null,
+emp_id int not null,
+module_id int not null,
+screen_id int not null,
+activity_description varchar(255) not null,
+created_by bigint,
+created_date timestamp default now(),
+modified_by bigint,
+modified_date timestamp,  	
+is_active boolean default true,
+constraint pk_employee_activity_id primary key (id),
+constraint fk_employee_activity_emp_id foreign key (emp_id) references employee_registration (id),
+constraint fk_employee_activity_module_id foreign key (module_id) references master_module (id),
+constraint fk_employee_activity_screen_id foreign key (screen_id) references master_screen (id)
+);
+
+select * from employee_activity;
+
+-------------
+create or replace view vw_recent_activity as
+with active_employees AS (
+select id as emp_id,
+CONCAT_WS(' ', first_name, last_name)::varchar as employee_name
+from employee_registration
+where is_active = true
+)
+select ea.emp_id,ae.employee_name, ea.module_id, mm.module_name,ea.screen_id, ms.screen_name,
+TO_CHAR(ea.created_date,'DD-MM-YYYY HH12:MI:SS AM')::varchar AS created_date, ea.activity_description
+from employee_activity ea
+left join active_employees ae on ae.emp_id = ea.emp_id and ea.is_active = true
+left join master_module mm on mm.id = ea.module_id and mm.is_active = true
+left join master_screen ms on ms.id = ea.screen_id and ms.is_active = true
+where ea.is_active = true
+order by ea.created_date desc;
+
+select * from vw_recent_activity where (emp_id = emp_id or -1 = emp_id);
