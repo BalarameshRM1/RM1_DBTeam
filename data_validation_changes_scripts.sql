@@ -851,3 +851,82 @@ where ea.is_active = true
 order by ea.created_date desc;
 
 select * from vw_recent_activity where (emp_id = emp_id or -1 = emp_id);
+
+-------------- tharun ----12/01/2026
+insert into master_module (module_name) select 'All' where not exists (select 1 from master_module where module_name ='All');
+insert into master_screen (screen_name) select 'All' where not exists (select 1 from master_screen where screen_name ='All');
+
+---------
+truncate table master_screen_permission restart identity;
+delete from employee_activity;
+delete from master_screen;
+delete from master_module;
+
+
+-- call public.sp_sequence_reset_or_restart('public');
+
+INSERT INTO master_module(module_name) SELECT 'Dashboard' WHERE NOT EXISTS (SELECT 1 FROM master_module WHERE module_name='Dashboard');
+INSERT INTO master_module(module_name) SELECT 'Employees' WHERE NOT EXISTS (SELECT 1 FROM master_module WHERE module_name='Employees');
+INSERT INTO master_module(module_name) SELECT 'Attendance Management' WHERE NOT EXISTS (SELECT 1 FROM master_module WHERE module_name='Attendance Management');
+INSERT INTO master_module(module_name) SELECT 'Task Management' WHERE NOT EXISTS (SELECT 1 FROM master_module WHERE module_name='Task Management');
+INSERT INTO master_module(module_name) SELECT 'Leave Management' WHERE NOT EXISTS (SELECT 1 FROM master_module WHERE module_name='Leave Management');
+INSERT INTO master_module(module_name) SELECT 'Payroll Management' WHERE NOT EXISTS (SELECT 1 FROM master_module WHERE module_name='Payroll management');
+INSERT INTO master_module(module_name) SELECT 'Salary' WHERE NOT EXISTS (SELECT 1 FROM master_module WHERE module_name='Salary');
+INSERT INTO master_module(module_name) SELECT 'Performance' WHERE NOT EXISTS (SELECT 1 FROM master_module WHERE module_name='Performance');
+INSERT INTO master_module(module_name) SELECT 'Recruitment' WHERE NOT EXISTS (SELECT 1 FROM master_module WHERE module_name='Recruitment');
+INSERT INTO master_module(module_name) SELECT 'Config' WHERE NOT EXISTS (SELECT 1 FROM master_module WHERE module_name='Config');
+INSERT INTO master_module(module_name) SELECT 'Reports' WHERE NOT EXISTS (SELECT 1 FROM master_module WHERE module_name='Reports');
+INSERT INTO master_module(module_name) SELECT 'Analytics' WHERE NOT EXISTS (SELECT 1 FROM master_module WHERE module_name='Analytics');
+INSERT INTO master_module(module_name) SELECT 'Access' WHERE NOT EXISTS (SELECT 1 FROM master_module WHERE module_name='Access');
+INSERT INTO master_module(module_name) SELECT 'Access Management' WHERE NOT EXISTS (SELECT 1 FROM master_module WHERE module_name='Access Management');
+INSERT INTO master_module(module_name) SELECT 'Settings' WHERE NOT EXISTS (SELECT 1 FROM master_module WHERE module_name='Settings');
+INSERT INTO master_module(module_name) SELECT 'All' WHERE NOT EXISTS (SELECT 1 FROM master_module WHERE module_name='All');
+
+-------
+INSERT INTO master_screen(screen_name,module_id,screen_label) SELECT 'Dashboard',1,'Dashboard'   WHERE NOT EXISTS (SELECT 1 FROM master_screen WHERE screen_name='Dashboard' AND module_id=1  AND screen_label='Dashboard');
+INSERT INTO master_screen(screen_name,module_id,screen_label) SELECT 'Employees',2,'Employees'   WHERE NOT EXISTS (SELECT 1 FROM master_screen WHERE screen_name='Employees' AND module_id=2  AND screen_label='Employees');
+INSERT INTO master_screen(screen_name,module_id,screen_label) SELECT 'Attendance Management',3,'AttendanceManagement'   WHERE NOT EXISTS (SELECT 1 FROM master_screen WHERE screen_name='Attendance Management' AND module_id=3  AND screen_label='AttendanceManagement');
+INSERT INTO master_screen(screen_name,module_id,screen_label) SELECT 'Task Management',4,'TaskManagement'   WHERE NOT EXISTS (SELECT 1 FROM master_screen WHERE screen_name='Task Management' AND module_id=4  AND screen_label='TaskManagement');
+INSERT INTO master_screen(screen_name,module_id,screen_label) SELECT 'Leave Management',5,'LeaveManagement'   WHERE NOT EXISTS (SELECT 1 FROM master_screen WHERE screen_name='Leave Management' AND module_id=5  AND screen_label='LeaveManagement');
+INSERT INTO master_screen(screen_name,module_id,screen_label) SELECT 'Leave Apply',5,'LeaveApply'   WHERE NOT EXISTS (SELECT 1 FROM master_screen WHERE screen_name='Leave Apply' AND module_id=5  AND screen_label='LeaveApply');
+INSERT INTO master_screen(screen_name,module_id,screen_label) SELECT 'Leave Balance',5,'LeaveBalance'   WHERE NOT EXISTS (SELECT 1 FROM master_screen WHERE screen_name='Leave Balance' AND module_id=5  AND screen_label='LeaveBalance');
+INSERT INTO master_screen(screen_name,module_id,screen_label) SELECT 'Leave Calendar',5,'LeaveCalendar'   WHERE NOT EXISTS (SELECT 1 FROM master_screen WHERE screen_name='Leave Calendar' AND module_id=5  AND screen_label='LeaveCalendar');
+INSERT INTO master_screen(screen_name,module_id,screen_label) SELECT 'Holiday Calendar',5,'HolidayCalendar'   WHERE NOT EXISTS (SELECT 1 FROM master_screen WHERE screen_name='Holiday Calendar' AND module_id=5  AND screen_label='HolidayCalendar');
+INSERT INTO master_screen(screen_name,module_id,screen_label) SELECT 'Payroll management',6,'PayrollManagement'   WHERE NOT EXISTS (SELECT 1 FROM master_screen WHERE screen_name='Payroll management' AND module_id=6  AND screen_label='PayrollManagement');
+INSERT INTO master_screen(screen_name,module_id,screen_label) SELECT 'Payslips',7,'Payslips'   WHERE NOT EXISTS (SELECT 1 FROM master_screen WHERE screen_name='Payslips' AND module_id=7  AND screen_label='Payslips');
+INSERT INTO master_screen(screen_name,module_id,screen_label) SELECT 'Performance',8,'Performance'   WHERE NOT EXISTS (SELECT 1 FROM master_screen WHERE screen_name='Performance' AND module_id=8  AND screen_label='Performance');
+INSERT INTO master_screen(screen_name,module_id,screen_label) SELECT 'Recruitment',9,'Recruitment'   WHERE NOT EXISTS (SELECT 1 FROM master_screen WHERE screen_name='Recruitment' AND module_id=9  AND screen_label='Recruitment');
+INSERT INTO master_screen(screen_name,module_id,screen_label) SELECT 'Config',10,'Config'   WHERE NOT EXISTS (SELECT 1 FROM master_screen WHERE screen_name='Config' AND module_id=10  AND screen_label='Config');
+INSERT INTO master_screen(screen_name,module_id,screen_label) SELECT 'Reports',11,'Reports'   WHERE NOT EXISTS (SELECT 1 FROM master_screen WHERE screen_name='Reports' AND module_id=11  AND screen_label='Reports');
+INSERT INTO master_screen(screen_name,module_id,screen_label) SELECT 'Analytics',12,'Analytics'   WHERE NOT EXISTS (SELECT 1 FROM master_screen WHERE screen_name='Analytics' AND module_id=12  AND screen_label='Analytics');
+INSERT INTO master_screen(screen_name,module_id,screen_label) SELECT 'Access',13,'Access'   WHERE NOT EXISTS (SELECT 1 FROM master_screen WHERE screen_name='Access' AND module_id=13  AND screen_label='Access');
+INSERT INTO master_screen(screen_name,module_id,screen_label) SELECT 'Access Management',14,'AccessManagement'   WHERE NOT EXISTS (SELECT 1 FROM master_screen WHERE screen_name='Access Management' AND module_id=14  AND screen_label='AccessManagement');
+INSERT INTO master_screen(screen_name,module_id,screen_label) SELECT 'Settings',15,'Settings'   WHERE NOT EXISTS (SELECT 1 FROM master_screen WHERE screen_name='Settings' AND module_id=15  AND screen_label='Settings');
+INSERT INTO master_screen(screen_name,module_id,screen_label) SELECT 'ALL',16,'ALL'   WHERE NOT EXISTS (SELECT 1 FROM master_screen WHERE screen_name='ALL' AND module_id=16  AND screen_label='ALL');
+
+-----------
+-- DROP VIEW public.vw_screen_permission_list;
+
+CREATE OR REPLACE VIEW public.vw_screen_permission_list
+ AS
+ SELECT mm.id AS module_id,
+    mm.module_name,
+    ms.id AS screen_id,
+    ms.screen_name,
+    ms.screen_label,
+    ms.fa_fa_icon AS screen_icon,
+    ms.routes AS screen_routes,
+    msp.role_id,
+    mr.role_name,
+    msp.can_view,
+    msp.can_edit,
+    msp.can_delete,
+    msp.can_access,
+    msp.can_update
+   FROM master_module mm
+     LEFT JOIN master_screen ms ON ms.module_id = mm.id AND ms.is_active = true
+     LEFT JOIN master_screen_permission msp ON msp.screen_id = ms.id AND msp.is_active = true
+     LEFT JOIN master_role mr ON mr.id = msp.role_id AND mr.is_active = true AND mm.is_active = true
+  ORDER BY mm.id, mm.module_name DESC;
+  
+  -----------------
