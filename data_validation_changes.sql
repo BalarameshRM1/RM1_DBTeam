@@ -1406,3 +1406,60 @@ alter table user_registration add column noc_number varchar(255);
 alter table user_registration add column police_station_name varchar(255);
 alter table user_registration add column issue_year int;
 alter table user_registration add column upload_noc varchar(500);
+
+
+---- 13/1/2026 dhanusha
+
+INSERT INTO public.master_sub_module (module_id, sub_module_name) SELECT 1, 'Home Services' WHERE NOT EXISTS (SELECT 1 FROM public.master_sub_module  WHERE module_id = 1 AND sub_module_name = 'Home Services');
+INSERT INTO public.master_sub_module (module_id, sub_module_name) SELECT 1, 'Cleaning Services' WHERE NOT EXISTS (SELECT 1 FROM public.master_sub_module  WHERE module_id = 1 AND sub_module_name = 'Cleaning Services');
+
+
+INSERT INTO public.master_service (sub_module_id, service_name) SELECT 1, 'Floor Cleaning' WHERE NOT EXISTS (SELECT 1 FROM public.master_service WHERE sub_module_id = 1 AND service_name = 'Floor Cleaning');
+INSERT INTO public.master_service (sub_module_id, service_name) SELECT 1, 'Kitchen Cleaning' WHERE NOT EXISTS (SELECT 1 FROM public.master_service WHERE sub_module_id = 1 AND service_name = 'Kitchen Cleaning');
+INSERT INTO public.master_service (sub_module_id, service_name) SELECT 1, 'Washroom Cleaning' WHERE NOT EXISTS (SELECT 1 FROM public.master_service WHERE sub_module_id = 1 AND service_name = 'Washroom Cleaning');
+INSERT INTO public.master_service (sub_module_id, service_name) SELECT 1, 'Carpentry' WHERE NOT EXISTS (SELECT 1 FROM public.master_service WHERE sub_module_id = 1 AND service_name = 'Carpentry');
+INSERT INTO public.master_service (sub_module_id, service_name) SELECT 1, 'Electrician' WHERE NOT EXISTS (SELECT 1 FROM public.master_service WHERE sub_module_id = 1 AND service_name = 'Electrician');
+INSERT INTO public.master_service (sub_module_id, service_name) SELECT 1, 'Floor/Tiles Repair' WHERE NOT EXISTS (SELECT 1 FROM public.master_service WHERE sub_module_id = 1 AND service_name = 'Floor/Tiles Repair');
+INSERT INTO public.master_service (sub_module_id, service_name) SELECT 2, 'Apartment Cleaning' WHERE NOT EXISTS (SELECT 1 FROM public.master_service WHERE sub_module_id = 2 AND service_name = 'Apartment Cleaning');
+INSERT INTO public.master_service (sub_module_id, service_name) SELECT 2, 'Commercial/Office Cleaning' WHERE NOT EXISTS (SELECT 1 FROM public.master_service WHERE sub_module_id = 2 AND service_name = 'Commercial/Office Cleaning');
+INSERT INTO public.master_service (sub_module_id, service_name) SELECT 2, 'Vehicle Cleaning' WHERE NOT EXISTS (SELECT 1 FROM public.master_service WHERE sub_module_id = 2 AND service_name = 'Vehicle Cleaning');
+
+
+INSERT INTO public.master_sub_service (service_id, sub_service_name) SELECT 7, 'Floor Cleaning' WHERE NOT EXISTS (SELECT 1 FROM public.master_sub_service WHERE service_id = 7 AND sub_service_name = 'Floor Cleaning');
+INSERT INTO public.master_sub_service (service_id, sub_service_name) SELECT 7, 'Kitchen Cleaning' WHERE NOT EXISTS (SELECT 1 FROM public.master_sub_service WHERE service_id = 7 AND sub_service_name = 'Kitchen Cleaning');
+INSERT INTO public.master_sub_service (service_id, sub_service_name) SELECT 7, 'Washroom Cleaning' WHERE NOT EXISTS (SELECT 1 FROM public.master_sub_service WHERE service_id = 7 AND sub_service_name = 'Washroom Cleaning');
+INSERT INTO public.master_sub_service (service_id, sub_service_name) SELECT 7, 'Carpentry' WHERE NOT EXISTS (SELECT 1 FROM public.master_sub_service WHERE service_id = 7 AND sub_service_name = 'Carpentry');
+INSERT INTO public.master_sub_service (service_id, sub_service_name) SELECT 7, 'Electrician' WHERE NOT EXISTS (SELECT 1 FROM public.master_sub_service WHERE service_id = 7 AND sub_service_name = 'Electrician');
+INSERT INTO public.master_sub_service (service_id, sub_service_name) SELECT 7, 'Floor/Tiles Repair' WHERE NOT EXISTS (SELECT 1 FROM public.master_sub_service WHERE service_id = 7 AND sub_service_name = 'Floor/Tiles Repair');
+INSERT INTO public.master_sub_service (service_id, sub_service_name) SELECT 8, 'Office Cleaning' WHERE NOT EXISTS (SELECT 1 FROM public.master_sub_service WHERE service_id = 8 AND sub_service_name = 'Office Cleaning');
+INSERT INTO public.master_sub_service (service_id, sub_service_name) SELECT 8, 'Pool Cleaning' WHERE NOT EXISTS (SELECT 1 FROM public.master_sub_service WHERE service_id = 8 AND sub_service_name = 'Pool Cleaning');
+INSERT INTO public.master_sub_service (service_id, sub_service_name) SELECT 8, 'Villa Cleaning' WHERE NOT EXISTS (SELECT 1 FROM public.master_sub_service WHERE service_id = 8 AND sub_service_name = 'Villa Cleaning');
+INSERT INTO public.master_sub_service (service_id, sub_service_name) SELECT 9, 'Car Cleaning' WHERE NOT EXISTS (SELECT 1 FROM public.master_sub_service WHERE service_id = 9 AND sub_service_name = 'Car Cleaning');
+INSERT INTO public.master_sub_service (service_id, sub_service_name) SELECT 9, 'Bike Cleaning' WHERE NOT EXISTS (SELECT 1 FROM public.master_sub_service WHERE service_id = 9 AND sub_service_name = 'Bike Cleaning');
+
+
+-------------- delete script
+begin;
+rollback
+
+delete from home_service where sub_module_id between 1 and 24;
+
+delete from master_sub_group where sub_service_id in 
+(select id from master_sub_service where service_id in 
+(select id from master_service where sub_module_id in 
+(select id from master_sub_module where id between 1 and 49)));
+
+delete from master_sub_service where service_id in 
+(select id from master_service where sub_module_id in
+ (select id from master_sub_module where id between 1 and 22));
+
+delete from master_service where sub_module_id in 
+(select id from master_sub_module where id between 1 and 89);
+
+delete from master_sub_module where id between 1 and 24;
+
+commit;
+-----------------
+
+alter table home_service add column others_address varchar(255);
+alter table home_service drop column sub_group_id;
