@@ -1463,3 +1463,7 @@ commit;
 
 alter table home_service add column others_address varchar(255);
 alter table home_service drop column sub_group_id;
+-------13/1/2026
+alter table home_service alter column sub_service_id type bigint using sub_service_id::bigint;
+alter table home_service alter column module_id type bigint using module_id::bigint;
+alter table home_service alter column sub_module_id type bigint using sub_module_id::bigint;
