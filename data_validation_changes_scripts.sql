@@ -852,6 +852,31 @@ order by ea.created_date desc;
 
 select * from vw_recent_activity where (emp_id = emp_id or -1 = emp_id);
 
+---- 9-jan ---dhanusha
+create view vw_view_login_list as
+
+select er.id as emp_id, u.id as user_id, concat_ws(' ',u.first_name,u.last_name)::varchar as user_name,
+u.email,u.password,mr.id as role_id,mr.role_name 
+from users u
+left join employee_registration er ON er.user_id = u.id and er.is_active = true
+left join master_role mr on mr.id = u.role_id and mr.is_active=true
+
+
+create view vw_screen_permission_list as
+select mm.id as module_id,mm.module_name,ms.id as screen_id,ms.screen_name,msp.role_id,
+mm.fa_fa_icon,mm.routes,msp.can_view,msp.can_edit,msp.can_delete,msp.can_access,msp.can_update
+from master_module mm
+left join master_screen ms on ms.module_id = mm.id and ms.is_active =true
+left join master_screen_permission msp on msp.screen_id = ms.id and msp.is_active =true
+
+--- added unique constraints for below table 
+
+alter table employee_registration add constraint uk_employee_registration_user_id unique (user_id);
+alter table master_screen_permission add constraint uk_master_screen_permission_module_screen_role_id unique(module_id,screen_id,role_id);
+alter table  master_screen add constraint uk_master_screen_module_id_screen_name unique(module_id,screen_name);
+
+
+
 -------------- tharun ----12/01/2026
 insert into master_module (module_name) select 'All' where not exists (select 1 from master_module where module_name ='All');
 insert into master_screen (screen_name) select 'All' where not exists (select 1 from master_screen where screen_name ='All');
