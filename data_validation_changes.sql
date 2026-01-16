@@ -1477,3 +1477,81 @@ alter table user_registration add column latitude numeric(9,6) ;
 alter table user_registration add column longitude numeric(9,6);
 alter table freelancer_task_history add column latitude numeric(9,6); 
 alter table freelancer_task_history add column longitude numeric(9,6);
+---------------
+16-jan-2026
+create drop table if  exists job_openings (
+id bigserial,
+job_id bigint not null,
+company_name varchar(255) not null,
+company_address varchar(255) not null,
+location_type_id int not null,
+work_type_id int not null,
+role_description varchar(500),
+requirements varchar(500),
+created_by bigint,
+created_date timestamp default now(),
+modified_by bigint,
+modified_date timestamp,
+is_active boolean default true,
+constraint pk_job_openings_id primary key (id),
+constraint fk_job_openings_job_id foreign key (job_id) references master_job(id),
+constraint fk_job_openings_location_type_id foreign key(location_type_id) references master_location_type (id),
+constraint fk_job_openings_work_type_id foreign key (work_type_id) references master_work_type (id)
+);
+alter table job_openings add column sub_module_id bigint;
+------------------------	
+
+create table if not exists job_skill(
+id bigserial,
+job_openings_id bigint not null,
+skill_id bigint not null,
+created_by bigint,
+created_date timestamp default now(),
+modified_by bigint,
+modified_date timestamp,
+is_active boolean default true,
+constraint pk_job_skill_id primary key (id),
+constraint fk_job_skill_job_openings_id foreign key (job_openings_id) references job_openings (id),
+constraint fk_job_skill_skill_id foreign key (skill_id) references master_skill (id)
+);
+
+
+----------------------
+	create table if not exists job_application (
+	id bigserial,
+	user_id bigint not null,
+	job_openings_id bigint not null,
+	first_name varchar(255) not null,
+	last_name varchar(255) not null,
+	mobile_number varchar(255) not null,
+	mobile_code_id bigint not null,
+	email varchar(150) not null,
+	city_id bigint not null,
+	upload_resume  varchar(500) not null,
+	title varchar(255),
+	company varchar(255),
+	from_date date,
+	to_date date,
+	company_city_id bigint,
+	description  varchar(255),
+	current_ctc numeric(10,2),
+	expected_ctc numeric(10,2),
+	fresher boolean default false,
+	experienced boolean default false,
+	notice_period_in_days int not null,
+	created_date timestamp default now(),
+	modified_by bigint,
+	modified_date timestamp,
+	is_active boolean default true,
+	constraint pk_job_application_id primary key (id),
+	constraint fk_job_application_user_id foreign key (user_id) references user_registration (id),
+	constraint fk_job_application_job_openings_id foreign key (job_openings_id) references job_openings (id),
+	constraint fk_job_application_mobile_code_id foreign key (mobile_code_id) references master_mobile_code (id),
+	constraint fk_job_application_city_id foreign key (city_id) references master_city (id),
+	constraint fk_job_application_company_city_id foreign key (company_city_id) references master_city (id),
+	constraint ck_job_application_fresher_experienced 	check ((fresher = true and experienced = false and company is null and from_date is null and to_date is null and company_city_id is null and current_ctc is null) 
+	or (fresher = false and experienced = true and company is not null and from_date is not null and to_date is not null and company_city_id is not null and current_ctc is not null)
+	)
+	
+
+);
