@@ -1467,3 +1467,13 @@ alter table home_service drop column sub_group_id;
 alter table home_service alter column sub_service_id type bigint using sub_service_id::bigint;
 alter table home_service alter column module_id type bigint using module_id::bigint;
 alter table home_service alter column sub_module_id type bigint using sub_module_id::bigint;
+
+------14/1/2026 lavanya
+alter table home_service add column work_status_id int; 
+alter table home_service add constraint fk_home_service_work_status_id foreign key(work_status_id) references master_work_status(id); 
+alter table home_service add column latitude numeric(9,6) ; 
+alter table home_service add column longitude numeric(9,6);
+alter table user_registration add column latitude numeric(9,6) ;
+alter table user_registration add column longitude numeric(9,6);
+alter table freelancer_task_history add column latitude numeric(9,6); 
+alter table freelancer_task_history add column longitude numeric(9,6);
