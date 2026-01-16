@@ -1555,3 +1555,154 @@ constraint fk_job_skill_skill_id foreign key (skill_id) references master_skill 
 	
 
 );
+
+-------16/1/2026 lavanya
+create table if not exists public.master_job(
+id bigserial not null,
+job_name varchar(255),
+is_active boolean default true,
+constraint pk_master_job_id primary key (id),
+constraint uk_master_job_job_name unique (job_name)
+); 
+
+INSERT INTO master_job (job_name) SELECT 'Backend Developer' WHERE NOT EXISTS (SELECT 1 FROM master_job WHERE job_name = 'Backend Developer');
+INSERT INTO master_job (job_name) SELECT 'Business Analyst' WHERE NOT EXISTS (SELECT 1 FROM master_job WHERE job_name = 'Business Analyst');
+INSERT INTO master_job (job_name) SELECT 'Cloud Architect' WHERE NOT EXISTS (SELECT 1 FROM master_job WHERE job_name = 'Cloud Architect');
+INSERT INTO master_job (job_name) SELECT 'Data Analyst' WHERE NOT EXISTS (SELECT 1 FROM master_job WHERE job_name = 'Data Analyst');
+INSERT INTO master_job (job_name) SELECT 'Database Administrator' WHERE NOT EXISTS (SELECT 1 FROM master_job WHERE job_name = 'Database Administrator');
+INSERT INTO master_job (job_name) SELECT 'DevOps Engineer' WHERE NOT EXISTS (SELECT 1 FROM master_job WHERE job_name = 'DevOps Engineer');
+INSERT INTO master_job (job_name) SELECT 'Frontend Developer' WHERE NOT EXISTS (SELECT 1 FROM master_job WHERE job_name = 'Frontend Developer');
+INSERT INTO master_job (job_name) SELECT 'Mobile App Developer' WHERE NOT EXISTS (SELECT 1 FROM master_job WHERE job_name = 'Mobile App Developer');
+INSERT INTO master_job (job_name) SELECT 'QA Engineer' WHERE NOT EXISTS (SELECT 1 FROM master_job WHERE job_name = 'QA Engineer');
+INSERT INTO master_job (job_name) SELECT 'Software Engineer' WHERE NOT EXISTS (SELECT 1 FROM master_job WHERE job_name = 'Software Engineer');
+
+------
+create table if not exists public.master_location_type(
+id serial not null,
+location_type varchar(255),
+is_active boolean default true,
+constraint pk_master_location_type_id primary key (id),
+constraint uk_master_location_type_location_type unique (location_type)
+
+); 
+
+INSERT INTO master_location_type (location_type) SELECT 'Client Location' WHERE NOT EXISTS (SELECT 1 FROM master_location_type WHERE location_type = 'Client Location');
+INSERT INTO master_location_type (location_type) SELECT 'Hybrid' WHERE NOT EXISTS (SELECT 1 FROM master_location_type WHERE location_type = 'Hybrid');
+INSERT INTO master_location_type (location_type) SELECT 'Onsite' WHERE NOT EXISTS (SELECT 1 FROM master_location_type WHERE location_type = 'Onsite');
+INSERT INTO master_location_type (location_type) SELECT 'Remote' WHERE NOT EXISTS (SELECT 1 FROM master_location_type WHERE location_type = 'Remote');
+INSERT INTO master_location_type (location_type) SELECT 'Work From Home' WHERE NOT EXISTS (SELECT 1 FROM master_location_type WHERE location_type = 'Work From Home');
+
+------
+create table if not exists public.master_work_type(
+id serial not null,
+work_type varchar(255),
+is_active boolean default true,
+constraint pk_master_work_type_id primary key (id),
+constraint uk_master_work_type_work_type unique (work_type)
+); 
+
+INSERT INTO master_work_type (work_type) SELECT 'Contract' WHERE NOT EXISTS (SELECT 1 FROM master_work_type WHERE work_type = 'Contract');
+INSERT INTO master_work_type (work_type) SELECT 'Freelance' WHERE NOT EXISTS (SELECT 1 FROM master_work_type WHERE work_type = 'Freelance');
+INSERT INTO master_work_type (work_type) SELECT 'Full Time' WHERE NOT EXISTS (SELECT 1 FROM master_work_type WHERE work_type = 'Full Time');
+INSERT INTO master_work_type (work_type) SELECT 'Internship' WHERE NOT EXISTS (SELECT 1 FROM master_work_type WHERE work_type = 'Internship');
+INSERT INTO master_work_type (work_type) SELECT 'Part Time' WHERE NOT EXISTS (SELECT 1 FROM master_work_type WHERE work_type = 'Part Time');
+INSERT INTO master_work_type (work_type) SELECT 'Temporary' WHERE NOT EXISTS (SELECT 1 FROM master_work_type WHERE work_type = 'Temporary');
+
+---
+create table if not exists public.master_job_skill(
+id bigserial not null,
+skill varchar(255),
+is_active boolean default true,
+constraint pk_master_job_skill_id primary key (id),
+constraint uk_master_job_skill_skill unique (skill)
+); 
+
+INSERT INTO master_job_skill (skill) SELECT 'AWS' WHERE NOT EXISTS (SELECT 1 FROM master_job_skill WHERE skill = 'AWS');
+INSERT INTO master_job_skill (skill) SELECT 'CSS' WHERE NOT EXISTS (SELECT 1 FROM master_job_skill WHERE skill = 'CSS');
+INSERT INTO master_job_skill (skill) SELECT 'Docker' WHERE NOT EXISTS (SELECT 1 FROM master_job_skill WHERE skill = 'Docker');
+INSERT INTO master_job_skill (skill) SELECT 'Git' WHERE NOT EXISTS (SELECT 1 FROM master_job_skill WHERE skill = 'Git');
+INSERT INTO master_job_skill (skill) SELECT 'HTML' WHERE NOT EXISTS (SELECT 1 FROM master_job_skill WHERE skill = 'HTML');
+INSERT INTO master_job_skill (skill) SELECT 'Java' WHERE NOT EXISTS (SELECT 1 FROM master_job_skill WHERE skill = 'Java');
+INSERT INTO master_job_skill (skill) SELECT 'JavaScript' WHERE NOT EXISTS (SELECT 1 FROM master_job_skill WHERE skill = 'JavaScript');
+INSERT INTO master_job_skill (skill) SELECT 'Linux' WHERE NOT EXISTS (SELECT 1 FROM master_job_skill WHERE skill = 'Linux');
+INSERT INTO master_job_skill (skill) SELECT 'MongoDB' WHERE NOT EXISTS (SELECT 1 FROM master_job_skill WHERE skill = 'MongoDB');
+INSERT INTO master_job_skill (skill) SELECT 'MySQL' WHERE NOT EXISTS (SELECT 1 FROM master_job_skill WHERE skill = 'MySQL');
+INSERT INTO master_job_skill (skill) SELECT 'PostgreSQL' WHERE NOT EXISTS (SELECT 1 FROM master_job_skill WHERE skill = 'PostgreSQL');
+INSERT INTO master_job_skill (skill) SELECT 'Python' WHERE NOT EXISTS (SELECT 1 FROM master_job_skill WHERE skill = 'Python');
+INSERT INTO master_job_skill (skill) SELECT 'React' WHERE NOT EXISTS (SELECT 1 FROM master_job_skill WHERE skill = 'React');
+INSERT INTO master_job_skill (skill) SELECT 'SQL' WHERE NOT EXISTS (SELECT 1 FROM master_job_skill WHERE skill = 'SQL');
+INSERT INTO master_job_skill (skill) SELECT 'Terraform' WHERE NOT EXISTS (SELECT 1 FROM master_job_skill WHERE skill = 'Terraform');
+
+---
+create table if not exists public.master_mobile_code(
+id bigserial not null,
+mobile_code varchar(255),
+is_active boolean default true,
+constraint pk_master_mobile_code_id primary key (id),
+constraint uk_master_mobile_code_mobile_code unique (mobile_code)
+); 
+
+INSERT INTO master_mobile_code (mobile_code) SELECT '+1' WHERE NOT EXISTS (SELECT 1 FROM master_mobile_code WHERE mobile_code = '+1');
+INSERT INTO master_mobile_code (mobile_code) SELECT '+44' WHERE NOT EXISTS (SELECT 1 FROM master_mobile_code WHERE mobile_code = '+44');
+INSERT INTO master_mobile_code (mobile_code) SELECT '+91' WHERE NOT EXISTS (SELECT 1 FROM master_mobile_code WHERE mobile_code = '+91');
+INSERT INTO master_mobile_code (mobile_code) SELECT '+61' WHERE NOT EXISTS (SELECT 1 FROM master_mobile_code WHERE mobile_code = '+61');
+INSERT INTO master_mobile_code (mobile_code) SELECT '+81' WHERE NOT EXISTS (SELECT 1 FROM master_mobile_code WHERE mobile_code = '+81');
+INSERT INTO master_mobile_code (mobile_code) SELECT '+49' WHERE NOT EXISTS (SELECT 1 FROM master_mobile_code WHERE mobile_code = '+49');
+INSERT INTO master_mobile_code (mobile_code) SELECT '+33' WHERE NOT EXISTS (SELECT 1 FROM master_mobile_code WHERE mobile_code = '+33');
+INSERT INTO master_mobile_code (mobile_code) SELECT '+86' WHERE NOT EXISTS (SELECT 1 FROM master_mobile_code WHERE mobile_code = '+86');
+INSERT INTO master_mobile_code (mobile_code) SELECT '+971' WHERE NOT EXISTS (SELECT 1 FROM master_mobile_code WHERE mobile_code = '+971');
+INSERT INTO master_mobile_code (mobile_code) SELECT '+65' WHERE NOT EXISTS (SELECT 1 FROM master_mobile_code WHERE mobile_code = '+65');
+
+---
+
+create table if not exists public.master_city(
+id bigserial not null,
+city varchar(255),
+is_active boolean default true,
+constraint pk_master_city_id primary key (id),
+constraint uk_master_city_city unique (city)
+); 
+INSERT INTO master_city (city) SELECT 'Ahmedabad' WHERE NOT EXISTS (SELECT 1 FROM master_city WHERE city = 'Ahmedabad');
+INSERT INTO master_city (city) SELECT 'Bengaluru' WHERE NOT EXISTS (SELECT 1 FROM master_city WHERE city = 'Bengaluru');
+INSERT INTO master_city (city) SELECT 'Berlin' WHERE NOT EXISTS (SELECT 1 FROM master_city WHERE city = 'Berlin');
+INSERT INTO master_city (city) SELECT 'Chennai' WHERE NOT EXISTS (SELECT 1 FROM master_city WHERE city = 'Chennai');
+INSERT INTO master_city (city) SELECT 'Delhi' WHERE NOT EXISTS (SELECT 1 FROM master_city WHERE city = 'Delhi');
+INSERT INTO master_city (city) SELECT 'Dubai' WHERE NOT EXISTS (SELECT 1 FROM master_city WHERE city = 'Dubai');
+INSERT INTO master_city (city) SELECT 'Hyderabad' WHERE NOT EXISTS (SELECT 1 FROM master_city WHERE city = 'Hyderabad');
+INSERT INTO master_city (city) SELECT 'Jaipur' WHERE NOT EXISTS (SELECT 1 FROM master_city WHERE city = 'Jaipur');
+INSERT INTO master_city (city) SELECT 'Kolkata' WHERE NOT EXISTS (SELECT 1 FROM master_city WHERE city = 'Kolkata');
+INSERT INTO master_city (city) SELECT 'London' WHERE NOT EXISTS (SELECT 1 FROM master_city WHERE city = 'London');
+INSERT INTO master_city (city) SELECT 'Los Angeles' WHERE NOT EXISTS (SELECT 1 FROM master_city WHERE city = 'Los Angeles');
+INSERT INTO master_city (city) SELECT 'Mumbai' WHERE NOT EXISTS (SELECT 1 FROM master_city WHERE city = 'Mumbai');
+INSERT INTO master_city (city) SELECT 'New York' WHERE NOT EXISTS (SELECT 1 FROM master_city WHERE city = 'New York');
+INSERT INTO master_city (city) SELECT 'Paris' WHERE NOT EXISTS (SELECT 1 FROM master_city WHERE city = 'Paris');
+INSERT INTO master_city (city) SELECT 'Pune' WHERE NOT EXISTS (SELECT 1 FROM master_city WHERE city = 'Pune');
+INSERT INTO master_city (city) SELECT 'San Francisco' WHERE NOT EXISTS (SELECT 1 FROM master_city WHERE city = 'San Francisco');
+INSERT INTO master_city (city) SELECT 'Singapore' WHERE NOT EXISTS (SELECT 1 FROM master_city WHERE city = 'Singapore');
+INSERT INTO master_city (city) SELECT 'Sydney' WHERE NOT EXISTS (SELECT 1 FROM master_city WHERE city = 'Sydney');
+INSERT INTO master_city (city) SELECT 'Toronto' WHERE NOT EXISTS (SELECT 1 FROM master_city WHERE city = 'Toronto');
+INSERT INTO master_city (city) SELECT 'Zurich' WHERE NOT EXISTS (SELECT 1 FROM master_city WHERE city = 'Zurich');
+
+---
+
+INSERT INTO public.master_sub_module (sub_module_name, module_id)
+ SELECT 'Students', 5 WHERE NOT EXISTS ( SELECT 1 FROM public.master_sub_module WHERE sub_module_name = 'Students' AND module_id = 5 );
+ 
+INSERT INTO public.master_sub_module (sub_module_name, module_id)
+ SELECT 'Internship/projects', 5 WHERE NOT EXISTS ( SELECT 1 FROM public.master_sub_module WHERE sub_module_name = 'Internship/projects' AND module_id = 5 );
+ 
+INSERT INTO public.master_sub_module (sub_module_name, module_id)
+ SELECT 'Companies', 5 WHERE NOT EXISTS ( SELECT 1 FROM public.master_sub_module WHERE sub_module_name = 'Companies' AND module_id = 5 );
+ 
+INSERT INTO public.master_sub_module (sub_module_name, module_id)
+ SELECT 'Training', 5 WHERE NOT EXISTS ( SELECT 1 FROM public.master_sub_module WHERE sub_module_name = 'Training' AND module_id = 5 );
+ 
+INSERT INTO public.master_sub_module (sub_module_name, module_id)
+ SELECT 'Buy', 3 WHERE NOT EXISTS ( SELECT 1 FROM public.master_sub_module WHERE sub_module_name = 'Buy' AND module_id = 3 );
+ 
+INSERT INTO public.master_sub_module (sub_module_name, module_id)
+ SELECT 'Sale', 3 WHERE NOT EXISTS ( SELECT 1 FROM public.master_sub_module WHERE sub_module_name = 'Sale' AND module_id = 3 );
+ 
+INSERT INTO public.master_sub_module (sub_module_name, module_id)
+ SELECT 'Rent', 3 WHERE NOT EXISTS ( SELECT 1 FROM public.master_sub_module WHERE sub_module_name = 'Rent' AND module_id = 3 );
+ 
