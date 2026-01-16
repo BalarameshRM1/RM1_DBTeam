@@ -183,3 +183,6 @@ CHECK (
 );
 
 update user_registration set inv_reg_id = null where role_id = 3
+
+----14/1/2026 dhanusha
+delete from user_registration where id in (83,84);
