@@ -1706,3 +1706,184 @@ INSERT INTO public.master_sub_module (sub_module_name, module_id)
 INSERT INTO public.master_sub_module (sub_module_name, module_id)
  SELECT 'Rent', 3 WHERE NOT EXISTS ( SELECT 1 FROM public.master_sub_module WHERE sub_module_name = 'Rent' AND module_id = 3 );
  
+------------------------------------ dhanusha 17/01/2026
+create table if not exists public.master_property_type (
+    id serial not null,
+    property_type varchar(255),
+    is_active boolean default true,
+    constraint pk_master_property_type_id primary key (id),
+	constraint uk_master_property_type_property_type unique(property_type)
+);
+insert into master_property_type (property_type)select 'Land' where not exists (select 1 from master_property_type where property_type = 'Land')
+insert into master_property_type (property_type)select 'Apartment/Flat' where not exists (select 1 from master_property_type where property_type = 'Apartment / Flat');
+insert into master_property_type (property_type)select 'Independent House/Villa' where not exists (select 1 from master_property_type where property_type = 'Independent House / Villa');
+
+---------------
+create table if not exists public.master_land_type (
+    id serial not null,
+    land_type varchar(255),
+    is_active boolean default true,
+    constraint pk_master_land_type_id primary key (id),
+	constraint uk_master_land_type_land_type unique(land_type)
+);
+
+insert into master_land_type (land_type)select 'Residential' where not exists (select 1 from master_land_type where land_type = 'Residential');
+insert into master_land_type (land_type)select 'Commercial' where not exists (select 1 from master_land_type where land_type = 'Commercial');
+insert into master_land_type (land_type)select 'Agricultural' where not exists (select 1 from master_land_type where land_type = 'Agricultural');
+insert into master_land_type (land_type)select 'Industrial' where not exists (select 1 from master_land_type where land_type = 'Industrial');
+insert into master_land_type (land_type)select 'Open Plot' where not exists (select 1 from master_land_type where land_type = 'Open Plot');
+
+------------
+
+create table if not exists public.master_boundary_type (
+    id serial not null,
+    boundary_type varchar(255),
+    is_active boolean default true,
+    constraint pk_master_boundary_type_id primary key (id),
+	constraint uk_master_boundary_type_boundary_type unique(boundary_type)
+);
+
+insert into master_boundary_type (boundary_type)select 'Open' where not exists (select 1 from master_boundary_type where boundary_type = 'Open');
+insert into master_boundary_type (boundary_type)select 'Fenced' where not exists (select 1 from master_boundary_type where boundary_type = 'Fenced');
+insert into master_boundary_type (boundary_type)select 'Compound Wall' where not exists (select 1 from master_boundary_type where boundary_type = 'Compound Wall');
+
+
+------------------
+
+create table if not exists public.master_facing (
+    id serial not null,
+    facing varchar(100),
+    is_active boolean default true,
+    constraint pk_master_facing_id primary key (id),
+	constraint uk_master_facing_facing unique(facing)
+);
+
+insert into master_facing (facing)select 'East' where not exists (select 1 from master_facing where facing = 'East');
+insert into master_facing (facing)select 'West' where not exists (select 1 from master_facing where facing = 'West')
+insert into master_facing (facing)select 'North'where not exists (select 1 from master_facing where facing = 'North');
+insert into master_facing (facing)select 'South' where not exists (select 1 from master_facing where facing = 'South');
+
+------------------------------
+create table if not exists public.master_approval_type (
+    id serial not null,
+    approval_type varchar(255),
+    is_active boolean default true,
+    constraint pk_master_approval_type_id primary key (id),
+	constraint uk_master_approval_type_approval_type unique(approval_type)
+);
+
+insert into master_approval_type(approval_type) select 'DTCP' where not exists (select 1 from master_approval_type where approval_type='DTCP');
+insert into master_approval_type(approval_type) select 'HMDA' where not exists (select 1 from master_approval_type where approval_type='HMDA');
+insert into master_approval_type(approval_type) select 'Panchayat' where not exists (select 1 from master_approval_type where approval_type='Panchayat');
+insert into master_approval_type(approval_type) select 'Unapproved' where not exists (select 1 from master_approval_type where approval_type='Unapproved');
+
+---------------------------
+create table if not exists public.master_ownership_type (
+    id serial not null,
+    ownership_type varchar(255),
+    is_active boolean default true,
+    constraint pk_master_ownership_type_id primary key (id),
+	constraint uk_master_ownership_type_ownership_type unique(ownership_type)
+);
+
+insert into master_ownership_type(ownership_type) select 'Single' where not exists (select 1 from master_ownership_type where ownership_type='Single');
+insert into master_ownership_type(ownership_type) select 'Joint' where not exists (select 1 from master_ownership_type where ownership_type='Joint');
+
+=--------------------
+
+create table if not exists public.master_parking (
+    id serial not null,
+    parking_type varchar(100),
+    is_active boolean default true,
+    constraint pk_master_parking_type_id primary key (id),
+	constraint uk_master_parking_type_parking_type unique(parking_type)
+);
+
+insert into master_parking(parking_type) select 'Bike' where not exists (select 1 from master_parking where parking_type='Bike');
+insert into master_parking(parking_type) select 'Car' where not exists (select 1 from master_parking where parking_type='Car');
+insert into master_parking(parking_type) select 'Both' where not exists (select 1 from master_parking where parking_type='Both');
+insert into master_parking(parking_type) select 'None' where not exists (select 1 from master_parking where parking_type='None');
+
+-----------------------------
+create table if not exists public.master_availability_status (
+    id serial not null,
+    availability_status varchar(255),
+    is_active boolean default true,
+    constraint pk_master_availability_status_id primary key (id),
+	constraint uk_master_availability_status_availability_status unique(availability_status)
+);
+
+insert into master_availability_status(availability_status) select 'Ready to Move' where not exists (select 1 from master_availability_status where availability_status='Ready to Move');
+insert into master_availability_status(availability_status) select 'Under Construction' where not exists (select 1 from master_availability_status where availability_status='Under Construction');
+
+-------------------------------
+
+create table if not exists public.master_preferred_tenants (
+    id serial not null,
+    tenant_type varchar(255),
+    is_active boolean default true,
+    constraint pk_master_preferred_tenants_id primary key (id),
+	constraint uk_master_preferred_tenants_tenant_type unique(tenant_type)
+);
+
+insert into master_preferred_tenants(tenant_type) select 'Family' where not exists (select 1 from master_preferred_tenants where tenant_type='Family');
+insert into master_preferred_tenants(tenant_type) select 'Bachelors' where not exists (select 1 from master_preferred_tenants where tenant_type='Bachelors');
+insert into master_preferred_tenants(tenant_type) select 'Company' where not exists (select 1 from master_preferred_tenants where tenant_type='Company');
+
+----------------------------
+
+create table if not exists public.master_lease_type (
+    id serial not null,
+    lease_type varchar(100),
+    is_active boolean default true,
+    constraint pk_master_lease_type_id primary key (id),
+	constraint uk_master_lease_type_lease_type unique(lease_type);
+);
+
+insert into master_lease_type(lease_type) select 'Rent' where not exists (select 1 from master_lease_type where lease_type='Rent');
+insert into master_lease_type(lease_type) select 'Lease' where not exists (select 1 from master_lease_type where lease_type='Lease');
+
+------------------------
+create table if not exists public.master_posted_by (
+    id serial not null,
+    posted_by varchar(100),
+    is_active boolean default true,
+    constraint pk_master_posted_by_id primary key (id),
+	constraint uk_master_posted_by_posted_by unique(posted_by);
+);
+
+insert into master_posted_by(posted_by) select 'Owner' where not exists (select 1 from master_posted_by where posted_by='Owner');
+insert into master_posted_by(posted_by) select 'Agent' where not exists (select 1 from master_posted_by where posted_by='Agent');
+
+
+
+create table if not exists public.master_bhk_type (
+    id bigserial not null,
+    bhk_type varchar(10),
+    is_active boolean default true,
+    constraint pk_master_bhk_type_id primary key (id),
+	constraint uk_master_bhk_type unique(bhk_type)
+);
+
+insert into master_bhk_type(bhk_type) select '1 BHK' where not exists (select 1 from master_bhk_type where bhk_type='1 BHK');
+insert into master_bhk_type(bhk_type) select '2 BHK' where not exists (select 1 from master_bhk_type where bhk_type='2 BHK');
+insert into master_bhk_type(bhk_type) select '3 BHK' where not exists (select 1 from master_bhk_type where bhk_type='3 BHK');
+insert into master_bhk_type(bhk_type) select '4 BHK' where not exists (select 1 from master_bhk_type where bhk_type='4 BHK');
+
+
+------------------
+create table if not exists public.master_furnishing(
+id serial not null,
+furnisher_type varchar(255),
+is_active boolean default true,
+constraint pk_master_furnishing_id primary key (id),
+constraint uk_master_furnishig_furnisher_type unique(furnisher_type)
+
+); 
+
+INSERT INTO public.master_furnishing (furnisher_type)SELECT 'Fully Furnished'WHERE NOT EXISTS (SELECT 1 FROM public.master_furnishing WHERE furnisher_type = 'Fully Furnished');
+INSERT INTO public.master_furnishing (furnisher_type)SELECT 'Semi Furnished'WHERE NOT EXISTS (SELECT 1 FROM public.master_furnishing WHERE furnisher_type = 'Semi Furnished');
+INSERT INTO public.master_furnishing (furnisher_type)SELECT 'Unfurnished'WHERE NOT EXISTS (SELECT 1 FROM public.master_furnishing WHERE furnisher_type = 'Unfurnished');
+
+	
+
