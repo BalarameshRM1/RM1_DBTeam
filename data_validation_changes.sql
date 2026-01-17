@@ -1714,7 +1714,7 @@ create table if not exists public.master_property_type (
     constraint pk_master_property_type_id primary key (id),
 	constraint uk_master_property_type_property_type unique(property_type)
 );
-insert into master_property_type (property_type)select 'Land' where not exists (select 1 from master_property_type where property_type = 'Land')
+insert into master_property_type (property_type)select 'Land' where not exists (select 1 from master_property_type where property_type = 'Land');
 insert into master_property_type (property_type)select 'Apartment/Flat' where not exists (select 1 from master_property_type where property_type = 'Apartment / Flat');
 insert into master_property_type (property_type)select 'Independent House/Villa' where not exists (select 1 from master_property_type where property_type = 'Independent House / Villa');
 
@@ -1759,7 +1759,7 @@ create table if not exists public.master_facing (
 );
 
 insert into master_facing (facing)select 'East' where not exists (select 1 from master_facing where facing = 'East');
-insert into master_facing (facing)select 'West' where not exists (select 1 from master_facing where facing = 'West')
+insert into master_facing (facing)select 'West' where not exists (select 1 from master_facing where facing = 'West');
 insert into master_facing (facing)select 'North'where not exists (select 1 from master_facing where facing = 'North');
 insert into master_facing (facing)select 'South' where not exists (select 1 from master_facing where facing = 'South');
 
@@ -1837,7 +1837,7 @@ create table if not exists public.master_lease_type (
     lease_type varchar(100),
     is_active boolean default true,
     constraint pk_master_lease_type_id primary key (id),
-	constraint uk_master_lease_type_lease_type unique(lease_type);
+	constraint uk_master_lease_type_lease_type unique(lease_type)
 );
 
 insert into master_lease_type(lease_type) select 'Rent' where not exists (select 1 from master_lease_type where lease_type='Rent');
@@ -1849,7 +1849,7 @@ create table if not exists public.master_posted_by (
     posted_by varchar(100),
     is_active boolean default true,
     constraint pk_master_posted_by_id primary key (id),
-	constraint uk_master_posted_by_posted_by unique(posted_by);
+	constraint uk_master_posted_by_posted_by unique(posted_by)
 );
 
 insert into master_posted_by(posted_by) select 'Owner' where not exists (select 1 from master_posted_by where posted_by='Owner');
@@ -1885,5 +1885,109 @@ INSERT INTO public.master_furnishing (furnisher_type)SELECT 'Fully Furnished'WHE
 INSERT INTO public.master_furnishing (furnisher_type)SELECT 'Semi Furnished'WHERE NOT EXISTS (SELECT 1 FROM public.master_furnishing WHERE furnisher_type = 'Semi Furnished');
 INSERT INTO public.master_furnishing (furnisher_type)SELECT 'Unfurnished'WHERE NOT EXISTS (SELECT 1 FROM public.master_furnishing WHERE furnisher_type = 'Unfurnished');
 
-	
+------------17/1/2026 lavanya
+create table if not exists property_sell_listing (
+id bigserial not null,
+module_id bigint not null,
+sub_module_id bigint not null,
+property_type_id int,
+land_type_id int,
+plot_area numeric(10,2),
+length_breadth varchar(255),
+facing_id int,
+road_width numeric(10,2),
+boundary_type_id int,
+water_availability boolean,
+electricity_connection boolean,
+approval_type_id int,
+ownership_type_id int,
+expected_price numeric(10,2),
+negotiable boolean,
+road_access varchar(255),
+suitable_for varchar(255),
+warehouse varchar(255),
+monthly_rent numeric(10,2),
+lease_duration varchar(255),
+security_deposit numeric(10,2),
+available_from date,
+bhk_type_id int not null,
+built_up_area numeric(10,2),
+carpet_area numeric(10,2),
+floor_number int,
+total_floors int,
+property_age int,
+furnishing_id int not null,
+preferred_tenants_id int,
+parking_id int not null,
+bathrooms int,
+maintenance_charges numeric(10,2),
+balconies int,
+lease_type_id int,
+availability_status_id int ,
+state_id bigint,
+city_id bigint not null,
+locality_area varchar(255) not null,
+landmark varchar(255) not null,
+pincode int not null,
+upload_photos varchar(500) not null,
+upload_videos varchar(500),
+property_description varchar(255),
+owner_name varchar(255) not null,
+mobile_number varchar(255) not null,
+email varchar(255) ,
+best_time_to_call varchar(255),
+posted_by_id int,
+created_by bigint,
+created_date timestamp default now(),
+modified_by bigint,
+modified_date timestamp,
+is_active boolean default true,
+constraint pk_property_sell_listing primary key (id),
+constraint fk_property_sell_listing_module_id foreign key (module_id) references master_module(id),
+constraint fk_property_sell_listing_sub_module_id foreign key (sub_module_id) references master_sub_module(id),
+constraint fk_property_sell_listing_property_type_id foreign key (property_type_id) references master_property_type(id),
+constraint fk_property_sell_listing_land_type_id foreign key (land_type_id) references master_land_type(id),
+constraint fk_property_sell_listing_facing_id foreign key (facing_id) references master_facing(id),
+constraint fk_property_sell_listing_boundary_type_id foreign key (boundary_type_id) references master_boundary_type(id),
+constraint fk_property_sell_listing_approval_type_id foreign key (approval_type_id) references master_approval_type(id),
+constraint fk_property_sell_listing_ownership_type_id foreign key (ownership_type_id) references master_ownership_type(id),
+constraint fk_property_sell_listing_bhk_type_id foreign key (bhk_type_id) references master_bhk_type(id),
+constraint fk_property_sell_listing_furnishing_id foreign key (furnishing_id) references master_furnishing(id),
+constraint fk_property_sell_listing_preferred_tenants_id foreign key (preferred_tenants_id) references master_preferred_tenants(id),
+constraint fk_property_sell_listing_parking_id foreign key (parking_id) references master_parking(id),
+constraint fk_property_sell_listing_lease_type_id foreign key (lease_type_id) references master_lease_type(id),
+constraint fk_property_sell_listing_availability_status_id foreign key (availability_status_id) references master_availability_status(id),
+constraint fk_property_sell_listing_state_id foreign key (state_id) references master_state(id),
+constraint fk_property_sell_listing_city_id foreign key (city_id) references master_city(id),
+constraint fk_property_sell_listing_posted_by_id foreign key (posted_by_id) references master_posted_by(id),
+constraint fk_property_sell_listing_created_by foreign key (created_by) references user_registration (id),
+constraint fk_property_sell_listing_modified_by foreign key (modified_by) references user_registration (id)
+
+);
+
+---------------
+create table if not exists property_listing (
+id bigserial not null,
+property_sell_listing_id bigint not null,
+user_id bigint not null,
+created_by bigint,
+created_date timestamp default now(),
+modified_by bigint,
+modified_date timestamp,
+is_active boolean default true,
+constraint pk_property_listing_id primary key(id),
+constraint fk_property_listing_property_sell_listing_id foreign key (property_sell_listing_id) references property_sell_listing(id),
+constraint fk_property_listing_user_id foreign key (user_id) references user_registration(id),
+constraint fk_property_listing_created_by foreign key (created_by) references user_registration (id),
+constraint fk_property_listing_modified_by foreign key (modified_by) references user_registration (id)
+);
+
+----
+
+update master_sub_module set sub_module_name = 'sell' where id =8;
+
+
+
+
+
 
