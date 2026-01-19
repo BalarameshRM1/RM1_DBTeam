@@ -954,4 +954,87 @@ CREATE OR REPLACE VIEW public.vw_screen_permission_list
      LEFT JOIN master_role mr ON mr.id = msp.role_id AND mr.is_active = true AND mm.is_active = true
   ORDER BY mm.id, mm.module_name DESC;
   
-  -----------------
+  ----------------- 19/01/2026   ---Tharun
+
+  create table if not exists master_task_type(
+id serial not null,
+task_type varchar(255) not null,
+is_active boolean default true,
+constraint pk_master_task_type_id primary key(id),
+constraint uk_master_task_task_type unique(task_type));
+
+INSERT INTO master_task_type (task_type) SELECT 'Bug' WHERE NOT EXISTS ( SELECT 1 FROM master_task_type WHERE task_type = 'Bug' );
+INSERT INTO master_task_type (task_type) SELECT 'Feature' WHERE NOT EXISTS (SELECT 1 FROM master_task_type WHERE task_type = 'Feature');
+INSERT INTO master_task_type (task_type) SELECT 'Improvement' WHERE NOT EXISTS (SELECT 1 FROM master_task_type WHERE task_type = 'Improvement');
+INSERT INTO master_task_type (task_type) SELECT 'Incident' WHERE NOT EXISTS (SELECT 1 FROM master_task_type WHERE task_type = 'Incident');
+INSERT INTO master_task_type (task_type) SELECT 'Task' WHERE NOT EXISTS (SELECT 1 FROM master_task_type WHERE task_type = 'Task');
+INSERT INTO master_task_type (task_type) SELECT 'Change Request' WHERE NOT EXISTS (SELECT 1 FROM master_task_type WHERE task_type = 'Change Request');
+INSERT INTO master_task_type (task_type) SELECT 'Documentation' WHERE NOT EXISTS (SELECT 1 FROM master_task_type WHERE task_type = 'Documentation');
+INSERT INTO master_task_type (task_type) SELECT 'Database Change' WHERE NOT EXISTS (SELECT 1 FROM master_task_type WHERE task_type = 'Database Change');
+INSERT INTO master_task_type (task_type) SELECT 'Configuration Change' WHERE NOT EXISTS (SELECT 1 FROM master_task_type WHERE task_type = 'Configuration Change');
+
+select * from master_task_type;
+
+create table if not exists  master_project(
+id serial not null,
+project_name varchar(255) not null,
+is_active boolean default true,
+constraint pk_master_project_id primary key(id),
+constraint uk_master_project unique(project_name));
+
+select * from master_project;
+
+create table if not exists tasks(
+id bigserial not null,
+title varchar(255) not null,
+description text not null,
+task_type_id integer not null,
+project_id integer not null,
+emp_id bigint not null,
+reporting_manager_id bigint,
+task_manager_id bigint,
+status_id integer not null,
+due_date date not null,
+efforts_in_days integer,
+created_by bigint,
+created_date timestamp default now(),
+modified_by bigint,
+modified_date timestamp,  	
+is_active boolean default true,
+constraint pk_tasks_id primary key(id),
+constraint fk_tasks_task_type_id foreign key (task_type_id) references master_task_type(id),
+constraint fk_tasks_project_id foreign key (project_id) references master_project(id),
+constraint fk_tasks_emp_id foreign key (emp_id) references employee_registration (id),
+constraint fk_tasks_status_id foreign key (status_id) references master_status (id),
+constraint uk_tasks_title_task_type_id_project_id_emp_id_status_id unique (title,task_type_id,project_id,emp_id,status_id)
+);
+
+select * from tasks;
+
+create table if not exists task_history( 
+id bigserial not null,
+task_id bigint not null,
+emp_id bigint not  null,
+from_assignee_id bigint,
+to_assignee_id bigint,
+reporting_manager_id bigint,
+comments varchar,
+rating int, 
+created_by bigint,
+created_date timestamp default now(),
+modified_by bigint,
+modified_date timestamp,  	
+is_active boolean default true,
+constraint pk_task_history_id primary key (id),
+constraint fk_task_history_task_id foreign key (task_id) references tasks(id),
+constraint fk_task_history_emp_id foreign key (emp_id) references employee_registration (id),
+constraint ck_task_history_rating check (rating between 1 and 5),
+constraint fk_task_history_reporting_manager_id foreign key (reporting_manager_id) references employee_registration(id),
+constraint fk_task_history_from_assignee_id foreign key (from_assignee_id) references employee_registration(id),
+constraint fk_task_history_to_assignee_id foreign key (to_assignee_id) references employee_registration(id)
+);
+
+select * from task_history;
+
+
+
