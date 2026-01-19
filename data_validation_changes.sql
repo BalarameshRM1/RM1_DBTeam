@@ -1986,6 +1986,140 @@ constraint fk_property_listing_modified_by foreign key (modified_by) references 
 
 update master_sub_module set sub_module_name = 'sell' where id =8;
 
+---------------- 19/1/2026 dhanusha
+create table if not exists master_task_type(
+id serial not null,
+task_type varchar(255) not null,
+is_active boolean default true,
+constraint pk_master_task_type_id primary key(id),
+constraint uk_master_task_type unique(task_type));
+
+INSERT INTO master_task_type (task_type) SELECT 'Bug' WHERE NOT EXISTS ( SELECT 1 FROM master_task_type WHERE task_type = 'Bug' );
+INSERT INTO master_task_type (task_type) SELECT 'Feature' WHERE NOT EXISTS (SELECT 1 FROM master_task_type WHERE task_type = 'Feature');
+INSERT INTO master_task_type (task_type) SELECT 'Improvement' WHERE NOT EXISTS (SELECT 1 FROM master_task_type WHERE task_type = 'Improvement');
+INSERT INTO master_task_type (task_type) SELECT 'Incident' WHERE NOT EXISTS (SELECT 1 FROM master_task_type WHERE task_type = 'Incident');
+INSERT INTO master_task_type (task_type) SELECT 'Task' WHERE NOT EXISTS (SELECT 1 FROM master_task_type WHERE task_type = 'Task');
+INSERT INTO master_task_type (task_type) SELECT 'Change Request' WHERE NOT EXISTS (SELECT 1 FROM master_task_type WHERE task_type = 'Change Request');
+INSERT INTO master_task_type (task_type) SELECT 'Documentation' WHERE NOT EXISTS (SELECT 1 FROM master_task_type WHERE task_type = 'Documentation');
+INSERT INTO master_task_type (task_type) SELECT 'Database Change' WHERE NOT EXISTS (SELECT 1 FROM master_task_type WHERE task_type = 'Database Change');
+INSERT INTO master_task_type (task_type) SELECT 'Configuration Change' WHERE NOT EXISTS (SELECT 1 FROM master_task_type WHERE task_type = 'Configuration Change');
+
+select * from master_task_type;
+
+create table if not exists  master_project(
+id serial not null,
+project_name varchar(255) not null,
+is_active boolean default true,
+constraint pk_master_project_id primary key(id),
+constraint uk_master_project unique(project_name));
+
+select * from master_project;
+
+create table if not exists tasks(
+id bigserial not null,
+title varchar(255) not null,
+description text not null,
+task_type_id integer not null,
+project_id integer not null,
+user_id bigint not null,
+reporting_manager_id bigint,
+task_manager_id bigint,
+status_id integer not null,
+due_date date not null,
+efforts_in_days integer,
+created_by bigint,
+created_date timestamp default now(),
+modified_by bigint,
+modified_date timestamp,      
+is_active boolean default true,
+constraint pk_tasks_id primary key(id),
+constraint fk_tasks_task_type_id foreign key (task_type_id) references master_task_type(id),
+constraint fk_tasks_project_id foreign key (project_id) references master_project(id),
+constraint fk_tasks_user_id foreign key (user_id) references user_registration (id),
+constraint fk_tasks_status_id foreign key (status_id) references master_status (id),
+constraint uk_tasks_title_task_type_id_project_id_user_id_status_id unique (title,task_type_id,project_id,user_id,status_id)
+);
+
+select * from tasks;
+
+create table if not exists task_history( 
+id bigserial not null,
+task_id bigint not null,
+user_id bigint not  null,
+from_assignee_id bigint,
+to_assignee_id bigint,
+reporting_manager_id bigint,
+comments varchar,
+rating int, 
+created_by bigint,
+created_date timestamp default now(),
+modified_by bigint,
+modified_date timestamp,      
+is_active boolean default true,
+constraint pk_task_history_id primary key (id),
+constraint fk_task_history_task_id foreign key (task_id) references tasks(id),
+constraint fk_task_history_user_id foreign key (user_id) references user_registration (id),
+constraint ck_task_history_rating check (rating between 1 and 5),
+constraint fk_task_history_reporting_manager_id foreign key (reporting_manager_id) references user_registration(id),
+constraint fk_task_history_from_assignee_id foreign key (from_assignee_id) references user_registration(id),
+constraint fk_task_history_to_assignee_id foreign key (to_assignee_id) references user_registration(id)
+);
+
+
+-----------------------------
+
+swachify_productmodule
+----------
+create table if not exists public.master_business_type (
+    id bigserial not null,
+    business_type varchar(255),
+    is_active boolean default true,
+    constraint pk_master_business_type_id primary key (id)
+);
+
+insert into master_business_type(business_type) select 'Shop owners and Entrepreneurs' where not exists (select 1 from master_business_type where business_type='Shop owners and Entrepreneurs');
+insert into master_business_type(business_type) select 'Farmers' where not exists (select 1 from master_business_type where business_type='Farmers');
+insert into master_business_type(business_type) select 'Chefs' where not exists (select 1 from master_business_type where business_type='Chefs');
+insert into master_business_type(business_type) select 'Plumbers' where not exists (select 1 from master_business_type where business_type='Plumbers');
+insert into master_business_type(business_type) select 'Mechanics' where not exists (select 1 from master_business_type where business_type='Mechanics');
+insert into master_business_type(business_type) select 'Beauticians' where not exists (select 1 from master_business_type where business_type='Beauticians');
+--
+
+
+--------------- raw matrials.
+create table if not exists raw_material_details(
+id bigserial not null,
+module_id bigint not null,
+raw_material_type_id bigint not null,
+quantity int not null,
+cost numeric(10,2) not null,
+latitude numeric(9,6) not null,
+longitude numeric(9,6) not null,
+created_by bigint,
+created_date timestamp default now(),
+modified_by bigint,
+modified_date timestamp,
+is_active boolean default true,
+constraint pk_raw_material_details_id primary key (id),
+constraint fk_raw_material_details_raw_module_id foreign key (module_id) references master_module(id),
+constraint fk_raw_material_details_raw_sub_module_id foreign key (sub_module_id) references master_sub_module(id),
+constraint fk_raw_material_details_raw_material_type_id foreign key (raw_material_type_id) references master_raw_material_type(id)
+);
+
+
+create table if not exists public.master_raw_material_type (
+    id bigserial not null,
+    raw_material_type varchar(255),
+    is_active boolean default true,
+    constraint pk_master_raw_material_type primary key (id)
+);
+
+insert into master_raw_material_type(raw_material_type) select 'Steel' where not exists (select 1 from master_raw_material_type where raw_material_type='Steel');
+insert into master_raw_material_type(raw_material_type) select 'Cement' where not exists (select 1 from master_raw_material_type where raw_material_type='Cement');
+insert into master_raw_material_type(raw_material_type) select 'Wood' where not exists (select 1 from master_raw_material_type where raw_material_type='Wood');
+insert into master_raw_material_type(raw_material_type) select 'Plastic' where not exists (select 1 from master_raw_material_type where raw_material_type='Plastic');
+insert into master_raw_material_type(raw_material_type) select 'Aluminium' where not exists (select 1 from master_raw_material_type where raw_material_type='Aluminium');
+insert into master_raw_material_type(raw_material_type) select 'Copper' where not exists (select 1 from master_raw_material_type where raw_material_type='Copper');
 
 
 
