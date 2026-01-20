@@ -2121,7 +2121,69 @@ insert into master_raw_material_type(raw_material_type) select 'Plastic' where n
 insert into master_raw_material_type(raw_material_type) select 'Aluminium' where not exists (select 1 from master_raw_material_type where raw_material_type='Aluminium');
 insert into master_raw_material_type(raw_material_type) select 'Copper' where not exists (select 1 from master_raw_material_type where raw_material_type='Copper');
 
+-------19/1/2026 lavanya
+alter table if exists user_registration add column if not exists business_type_id int;
+alter table if exists user_registration add constraint fk_user_registration_business_type_id foreign key(business_type_id) references master_business_type(id);
+alter table if exists user_registration add column if not exists product_name varchar(255);
+alter table if exists user_registration add column if not exists business_description varchar(255);
+alter table if exists user_registration add column if not exists org_name varchar(255);
+alter table if exists user_registration add column if not exists gst_number varchar(100);
+alter table if exists user_registration add column if not exists job_skill_id int;
+alter table if exists user_registration add constraint fk_user_registration_job_skill_id foreign key(job_skill_id) references master_job_skill(id);
 
 
+CREATE TABLE IF NOT EXISTS public.master_designation
+(
+id bigserial NOT NULL ,
+designation_name NOT NULL,
+is_active boolean DEFAULT true,
+dept_id integer,
+CONSTRAINT pk_master_designation_id PRIMARY KEY (id),
+CONSTRAINT uk_master_designation_designation_name_dept_id UNIQUE (designation_name, dept_id),
+CONSTRAINT fk_master_designation_dept_id FOREIGN KEY (dept_id)
+REFERENCES public.master_department (id)
+);
 
+INSERT INTO public.master_designation (designation_name, dept_id) SELECT 'Operations Manager',1 WHERE NOT EXISTS (SELECT 1 FROM public.master_designation WHERE designation_name='Operations Manager' AND dept_id=1);
+INSERT INTO public.master_designation (designation_name, dept_id) SELECT 'Business Analyst',1 WHERE NOT EXISTS (SELECT 1 FROM public.master_designation WHERE designation_name='Business Analyst' AND dept_id=1);
+INSERT INTO public.master_designation (designation_name, dept_id) SELECT 'Content Manager',2 WHERE NOT EXISTS (SELECT 1 FROM public.master_designation WHERE designation_name='Content Manager' AND dept_id=2);
+INSERT INTO public.master_designation (designation_name, dept_id) SELECT 'Digital Marketing Executive',2 WHERE NOT EXISTS (SELECT 1 FROM public.master_designation WHERE designation_name='Digital Marketing Executive' AND dept_id=2);
+INSERT INTO public.master_designation (designation_name, dept_id) SELECT 'HR Executive',3 WHERE NOT EXISTS (SELECT 1 FROM public.master_designation WHERE designation_name='HR Executive' AND dept_id=3);
+INSERT INTO public.master_designation (designation_name, dept_id) SELECT 'Talent Acquisition Specialist',3 WHERE NOT EXISTS (SELECT 1 FROM public.master_designation WHERE designation_name='Talent Acquisition Specialist' AND dept_id=3);
+INSERT INTO public.master_designation (designation_name, dept_id) SELECT 'Legal Officer',4 WHERE NOT EXISTS (SELECT 1 FROM public.master_designation WHERE designation_name='Legal Officer' AND dept_id=4);
+INSERT INTO public.master_designation (designation_name, dept_id) SELECT 'Compliance Manager',4 WHERE NOT EXISTS (SELECT 1 FROM public.master_designation WHERE designation_name='Compliance Manager' AND dept_id=4);
+INSERT INTO public.master_designation (designation_name, dept_id) SELECT 'Procurement Executive',5 WHERE NOT EXISTS (SELECT 1 FROM public.master_designation WHERE designation_name='Procurement Executive' AND dept_id=5);
+INSERT INTO public.master_designation (designation_name, dept_id) SELECT 'Logistics Coordinator',5 WHERE NOT EXISTS (SELECT 1 FROM public.master_designation WHERE designation_name='Logistics Coordinator' AND dept_id=5);
+INSERT INTO public.master_designation (designation_name, dept_id) SELECT 'Project Manager',6 WHERE NOT EXISTS (SELECT 1 FROM public.master_designation WHERE designation_name='Project Manager' AND dept_id=6);
+INSERT INTO public.master_designation (designation_name, dept_id) SELECT 'Strategy Analyst',6 WHERE NOT EXISTS (SELECT 1 FROM public.master_designation WHERE designation_name='Strategy Analyst' AND dept_id=6);
+INSERT INTO public.master_designation (designation_name, dept_id) SELECT 'Technology Lead',7 WHERE NOT EXISTS (SELECT 1 FROM public.master_designation WHERE designation_name='Technology Lead' AND dept_id=7);
+INSERT INTO public.master_designation (designation_name, dept_id) SELECT 'IT Support Engineer',8 WHERE NOT EXISTS (SELECT 1 FROM public.master_designation WHERE designation_name='IT Support Engineer' AND dept_id=8);
+INSERT INTO public.master_designation (designation_name, dept_id) SELECT 'Software Engineer',9 WHERE NOT EXISTS (SELECT 1 FROM public.master_designation WHERE designation_name='Software Engineer' AND dept_id=9);
+INSERT INTO public.master_designation (designation_name, dept_id) SELECT 'DevOps Engineer',10 WHERE NOT EXISTS (SELECT 1 FROM public.master_designation WHERE designation_name='DevOps Engineer' AND dept_id=10);
+INSERT INTO public.master_designation (designation_name, dept_id) SELECT 'QA Engineer',11 WHERE NOT EXISTS (SELECT 1 FROM public.master_designation WHERE designation_name='QA Engineer' AND dept_id=11);
+INSERT INTO public.master_designation (designation_name, dept_id) SELECT 'Security Analyst',12 WHERE NOT EXISTS (SELECT 1 FROM public.master_designation WHERE designation_name='Security Analyst' AND dept_id=12);
+INSERT INTO public.master_designation (designation_name, dept_id) SELECT 'Data Analyst',13 WHERE NOT EXISTS (SELECT 1 FROM public.master_designation WHERE designation_name='Data Analyst' AND dept_id=13);
+---------------
+CREATE TABLE IF NOT EXISTS master_department
+(
+id bigserial NOT NULL ,
+department character varying(255) NOT NULL,
+is_active boolean DEFAULT true,
+CONSTRAINT pk_master_department_id PRIMARY KEY (id),
+CONSTRAINT uk_master_department_department UNIQUE (department)
+);
+
+INSERT INTO public.master_department (department)SELECT 'Business & Operations'WHERE NOT EXISTS (SELECT 1 FROM public.master_department WHERE department = 'Business & Operations');
+INSERT INTO public.master_department (department)SELECT 'Media & Communication'WHERE NOT EXISTS (SELECT 1 FROM public.master_department WHERE department = 'Media & Communication');
+INSERT INTO public.master_department (department) SELECT 'People & Support' WHERE NOT EXISTS (SELECT 1 FROM public.master_department WHERE department = 'People & Support');
+INSERT INTO public.master_department (department)SELECT 'Legal, Risk & Compliance'WHERE NOT EXISTS (SELECT 1 FROM public.master_department WHERE department = 'Legal, Risk & Compliance');
+INSERT INTO public.master_department (department)SELECT 'Supply Chain & Procurement'WHERE NOT EXISTS (SELECT 1 FROM public.master_department WHERE department = 'Supply Chain & Procurement');
+INSERT INTO public.master_department (department)SELECT 'Management & Strategy'WHERE NOT EXISTS (SELECT 1 FROM public.master_department WHERE department = 'Management & Strategy');
+INSERT INTO public.master_department (department)SELECT 'Technology & Engineering'WHERE NOT EXISTS (SELECT 1 FROM master_department WHERE department = 'Technology & Engineering');
+INSERT INTO public.master_department (department)SELECT 'Information Technology'WHERE NOT EXISTS (SELECT 1 FROM master_department WHERE department = 'Information Technology');
+INSERT INTO public.master_department (department)SELECT 'Software Development'WHERE NOT EXISTS (SELECT 1 FROM master_department WHERE department = 'Software Development');
+INSERT INTO public.master_department (department)SELECT 'DevOps & Cloud'WHERE NOT EXISTS (SELECT 1 FROM master_department WHERE department = 'DevOps & Cloud');
+INSERT INTO public.master_department (department)SELECT 'Quality Assurance'WHERE NOT EXISTS (SELECT 1 FROM master_department WHERE department = 'Quality Assurance');
+INSERT INTO public.master_department (department)SELECT 'Cyber Security'WHERE NOT EXISTS (SELECT 1 FROM master_department WHERE department = 'Cyber Security');
+INSERT INTO public.master_department (department)SELECT 'Data & Analytics'WHERE NOT EXISTS (SELECT 1 FROM master_department WHERE department = 'Data & Analytics');
 
