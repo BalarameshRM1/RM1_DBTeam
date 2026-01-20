@@ -1,0 +1,22 @@
+create view vw_students_get_list as
+with latest_qualification as (
+    select distinct on (user_id)user_id,degree
+    from student_qualification
+    order by user_id, id desc
+),
+avg_rating as (
+    select
+        user_id,round(avg(rating)::numeric, 2) as rating
+    from task_history
+    group by user_id
+)
+select
+    concat_ws(' ', ur.first_name, ur.last_name)::varchar as student_name,
+    ur.job_skill_id as skill_id,mjs.skill,ar.rating,lq.degree
+from user_registration ur
+left join master_job_skill mjs on mjs.id = ur.job_skill_id and mjs.is_active = true
+left join avg_rating ar on ar.user_id = ur.id
+left join latest_qualification lq on lq.user_id = ur.id;
+
+select * from vw_students_get_list
+where (skill_id = skill_id or -1 = skill_id);
