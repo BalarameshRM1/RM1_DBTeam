@@ -24,28 +24,35 @@ where (skill_id = skill_id or -1 = skill_id);
 
 ----------------
 CREATE OR REPLACE VIEW vw_students_get_list AS
-WITH avg_rating AS (
-    SELECT user_id,ROUND(AVG(rating), 2) AS rating
-    FROM task_history WHERE is_active = true
+WITH latest_qualification AS (
+SELECT DISTINCT ON (user_id) user_id, degree
+FROM student_qualification
+    ORDER BY user_id, id DESC
+),
+avg_rating AS (
+    SELECT user_id, ROUND(AVG(rating)::numeric, 2) AS rating
+    FROM task_history 
+    WHERE is_active = true
     GROUP BY user_id
 )
 SELECT
     ur.id AS user_id,
-    CONCAT_WS(' ', ur.first_name, ur.last_name) AS student_name,ur.created_date AS joined_date,sa.attendance_percentage,
+    CONCAT_WS(' ', ur.first_name, ur.last_name)::varchar AS student_name,
+    ur.created_date AS joined_date,ur.job_skill_id AS skill_id,
+    mjs.skill,sa.attendance_percentage,
     CASE
         WHEN sa.attendance_percentage >= 90 THEN '90%+'
         WHEN sa.attendance_percentage >= 80 THEN '80-90%'
         WHEN sa.attendance_percentage >= 60 THEN '60-80%'
         ELSE '<60%'
-    END AS aggregate,sq.degree,mi.internship_status,ar.rating,
-    CASE
-        WHEN ar.rating >= 4.5 THEN 'TOP_PERFORMER'
-        ELSE 'NORMAL'
-    END AS performance_tag
+    END AS aggregate,                 
+    sc.certificate_name,lq.degree,mi.internship_status,ar.rating                                
 FROM user_registration ur
+LEFT JOIN master_job_skill mjs ON mjs.id = ur.job_skill_id AND mjs.is_active = true
 LEFT JOIN student_attendance sa ON sa.user_id = ur.id AND sa.is_active = true
-LEFT JOIN student_qualification sq ON sq.user_id = ur.id
-LEFT JOIN master_internship_status mi ON mi.user_id = ur.id AND mi.is_active = true
+LEFT JOIN student_certificate sc  ON sc.user_id = ur.id AND sc.is_active = true
+LEFT JOIN latest_qualification lq  ON lq.user_id = ur.id
+LEFT JOIN master_internship_status mi  ON mi.user_id = ur.id AND mi.is_active = true
 LEFT JOIN avg_rating ar ON ar.user_id = ur.id
 WHERE ur.is_active = true
   AND ur.role_id = 5;
