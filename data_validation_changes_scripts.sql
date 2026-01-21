@@ -1015,6 +1015,7 @@ create table if not exists task_history(
 id bigserial not null,
 task_id bigint not null,
 emp_id bigint not  null,
+project_id bigint not null,
 from_assignee_id bigint,
 to_assignee_id bigint,
 reporting_manager_id bigint,
@@ -1029,12 +1030,44 @@ constraint pk_task_history_id primary key (id),
 constraint fk_task_history_task_id foreign key (task_id) references tasks(id),
 constraint fk_task_history_emp_id foreign key (emp_id) references employee_registration (id),
 constraint ck_task_history_rating check (rating between 1 and 5),
+constraint fk_task_history_project_id foreign key (project_id) references master_project(id),
 constraint fk_task_history_reporting_manager_id foreign key (reporting_manager_id) references employee_registration(id),
 constraint fk_task_history_from_assignee_id foreign key (from_assignee_id) references employee_registration(id),
 constraint fk_task_history_to_assignee_id foreign key (to_assignee_id) references employee_registration(id)
 );
 
 select * from task_history;
+
+-------------------21/01/2026  ------tharun
+create or replace view vw_task_history_details as
+with emp_details as (
+select
+id,concat_ws(' ', first_name, last_name)::varchar as emp_name
+from employee_registration
+where is_active = true
+),
+active_task_history as (
+select
+task_id,rating,comments,description,modified_date,from_assignee_id,to_assignee_id
+from task_history
+where is_active = true
+)
+select
+t.id as task_id, t.title, t.emp_id,e.emp_name as employee_name,t.project_id, mp.project_name,
+t.reporting_manager_id,e1.emp_name as reporting_manager_name, ath.comments, ath.rating,
+t.efforts_in_days,ath.description as description,
+    ath.modified_date,ath.from_assignee_id,ath.to_assignee_id
+from tasks t
+left join active_task_history ath on ath.task_id = t.id
+left join emp_details e on e.id = t.emp_id
+left join emp_details e1 on e1.id = t.reporting_manager_id
+left join emp_details e2 on e2.id = ath.from_assignee_id
+left join emp_details e3 on e3.id = ath.to_assignee_id
+left join master_project mp on mp.id = t.project_id and mp.is_active = true
+where t.is_active = true;
+
+------
+alter table task_history add column description varchar(500);
 
 
 
