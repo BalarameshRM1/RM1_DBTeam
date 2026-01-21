@@ -20,3 +20,32 @@ left join latest_qualification lq on lq.user_id = ur.id;
 
 select * from vw_students_get_list
 where (skill_id = skill_id or -1 = skill_id);
+
+
+----------------
+CREATE OR REPLACE VIEW vw_students_get_list AS
+WITH avg_rating AS (
+    SELECT user_id,ROUND(AVG(rating), 2) AS rating
+    FROM task_history WHERE is_active = true
+    GROUP BY user_id
+)
+SELECT
+    ur.id AS user_id,
+    CONCAT_WS(' ', ur.first_name, ur.last_name) AS student_name,ur.created_date AS joined_date,sa.attendance_percentage,
+    CASE
+        WHEN sa.attendance_percentage >= 90 THEN '90%+'
+        WHEN sa.attendance_percentage >= 80 THEN '80-90%'
+        WHEN sa.attendance_percentage >= 60 THEN '60-80%'
+        ELSE '<60%'
+    END AS aggregate,sq.degree,mi.internship_status,ar.rating,
+    CASE
+        WHEN ar.rating >= 4.5 THEN 'TOP_PERFORMER'
+        ELSE 'NORMAL'
+    END AS performance_tag
+FROM user_registration ur
+LEFT JOIN student_attendance sa ON sa.user_id = ur.id AND sa.is_active = true
+LEFT JOIN student_qualification sq ON sq.user_id = ur.id
+LEFT JOIN master_internship_status mi ON mi.user_id = ur.id AND mi.is_active = true
+LEFT JOIN avg_rating ar ON ar.user_id = ur.id
+WHERE ur.is_active = true
+  AND ur.role_id = 5;

@@ -2187,3 +2187,35 @@ INSERT INTO public.master_department (department)SELECT 'Quality Assurance'WHERE
 INSERT INTO public.master_department (department)SELECT 'Cyber Security'WHERE NOT EXISTS (SELECT 1 FROM master_department WHERE department = 'Cyber Security');
 INSERT INTO public.master_department (department)SELECT 'Data & Analytics'WHERE NOT EXISTS (SELECT 1 FROM master_department WHERE department = 'Data & Analytics');
 
+-----------21/1/2026 lavanya
+create table if not exists public.master_aggregate(
+id serial not null,
+aggregate varchar(255),
+is_active boolean default true,
+constraint pk_master_aggregate_id primary key (id)); 
+
+INSERT INTO public.master_aggregate (aggregate) SELECT 'All' WHERE NOT EXISTS (SELECT 1 FROM public.master_aggregate WHERE aggregate='All'); 
+INSERT INTO public.master_aggregate (aggregate) SELECT '90%+' WHERE NOT EXISTS (SELECT 1 FROM public.master_aggregate WHERE aggregate='90%+'); 
+INSERT INTO public.master_aggregate (aggregate) SELECT '80-90%' WHERE NOT EXISTS (SELECT 1 FROM public.master_aggregate WHERE aggregate='80-90%');
+INSERT INTO public.master_aggregate (aggregate) SELECT '60-80%' WHERE NOT EXISTS (SELECT 1 FROM public.master_aggregate WHERE aggregate='60-80%');
+
+create table if not exists public.master_internship_status(
+id serial not null,
+internship_status varchar(255),
+is_active boolean default true,
+constraint pk_master_internship_status_id primary key (id)); 
+
+INSERT INTO public.master_internship_status (internship_status) SELECT 'All' WHERE NOT EXISTS (SELECT 1 FROM public.master_internship_status WHERE internship_status='All'); 
+INSERT INTO public.master_internship_status (internship_status) SELECT 'Completed' WHERE NOT EXISTS (SELECT 1 FROM public.master_internship_status WHERE internship_status='Completed'); 
+INSERT INTO public.master_internship_status (internship_status) SELECT 'In Progress' WHERE NOT EXISTS (SELECT 1 FROM public.master_internship_status WHERE internship_status='In Progress');
+
+
+create table student_attendance (
+    id bigserial not null,
+    user_id bigint,
+    attendance_percentage numeric(5,2),
+    is_active boolean default true,
+	constraint pk_student_attendance_id primary key (id),
+	constraint fk_student_attendance_user_id foreign key (user_id) references user_registration(id)
+);
+
