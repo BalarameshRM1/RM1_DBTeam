@@ -1,0 +1,14 @@
+create or replace view public.vw_active_job_openings as
+select
+    jo.id as job_opening_id,mj.job_name,jo.company_name,jo.company_address,jo.location_type_id,
+    ml.location_type,jo.work_type_id,mw.work_type,jo.category_id,
+    mc.category_name,jo.internship_duration_id,md.duration_type as internship_duration,jo.stipend_type_id,
+    mst.stipend_type,jo.role_description,jo.requirements,jo.created_date
+from public.job_openings jo
+left join public.master_job mj on mj.id = jo.job_id and mj.is_active = true
+left join public.master_location_type ml on ml.id = jo.location_type_id and ml.is_active = true
+left join public.master_work_type mw on mw.id = jo.work_type_id and mw.is_active = true
+left join public.master_category mc on mc.id = jo.category_id and mc.is_active = true
+left join public.master_internship_duration md on md.id = jo.internship_duration_id and md.is_active = true
+left join public.master_stipend_type mst on mst.id = jo.stipend_type_id and mst.is_active = true
+where jo.is_active = true;
