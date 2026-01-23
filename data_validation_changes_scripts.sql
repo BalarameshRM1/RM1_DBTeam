@@ -1069,5 +1069,165 @@ where t.is_active = true;
 ------
 alter table task_history add column description varchar(500);
 
+------------------22/01/2026  -----tharun
+
+create table if not exists master_project_module(
+id serial not null,
+project_module varchar(255) not null,
+project_id bigint not null,
+is_active boolean default true,
+constraint pk_master_project_module_id primary key (id),
+constraint fk_master_project_module_project_id foreign key (project_id) references master_project(id)
+);
+
+select * from master_project_module;
+
+alter table tasks add column project_module_id bigint;
+alter table tasks add constraint fk_tasks_project_module_id foreign key(project_module_id) references master_project_module(id);
+
+alter table tasks add column project_screen_id bigint not null;
+alter table tasks add constraint fk_tasks_project_screen_id foreign key(project_screen_id) references master_project_screen(id);
+
+
+alter table task_history add column project_module_id bigint;
+alter table task_history add constraint fk_task_history_project_module_id foreign key(project_module_id) references master_project_module(id);
+
+alter table task_history add column project_screen_id bigint not null;
+alter table task_history add constraint fk_task_history_project_screen_id foreign key(project_screen_id) references master_project_screen(id);
+
+--------
+create or replace view vw_task_history_details as
+with emp_details as (
+select
+id,
+concat_ws(' ', first_name, last_name)::varchar as emp_name
+from employee_registration
+where is_active = true
+),
+active_task_history as (
+select
+task_id,
+rating,
+comments,
+from_assignee_id,
+project_module_id,
+to_assignee_id
+from task_history
+where is_active = true
+)
+select
+t.id as task_id, t.title, t.emp_id,e.emp_name as employee_name,t.project_id, mp.project_name,
+t.reporting_manager_id,e1.emp_name as reporting_manager_name, ath.comments, ath.rating,
+t.efforts_in_days,t.description,ath.from_assignee_id,ath.to_assignee_id,pm.id as project_module_id,pm.project_module
+
+from tasks t
+left join active_task_history ath on ath.task_id = t.id
+left join emp_details e on e.id = t.emp_id
+left join emp_details e1 on e1.id = t.reporting_manager_id
+left join emp_details e2 on e2.id = ath.from_assignee_id
+left join emp_details e3 on e3.id = ath.to_assignee_id
+left join master_project mp on mp.id = t.project_id and mp.is_active = true
+left join master_project_module pm on pm.id = ath.project_module_id and pm.is_active = true
+where t.is_active = true;
+
+
+INSERT INTO master_project_module (project_module, project_id) SELECT 'Dashboard', 1 WHERE NOT EXISTS (SELECT 1 FROM master_project_module WHERE project_id = 1 AND project_module = 'Dashboard');
+INSERT INTO master_project_module (project_module, project_id) SELECT 'Employees', 1 WHERE NOT EXISTS (SELECT 1 FROM master_project_module WHERE project_id = 1 AND project_module = 'Employees');
+INSERT INTO master_project_module (project_module, project_id) SELECT 'Task Management', 1 WHERE NOT EXISTS (SELECT 1 FROM master_project_module WHERE project_id = 1 AND project_module = 'Task Management');
+INSERT INTO master_project_module (project_module, project_id) SELECT 'Leave Management', 1 WHERE NOT EXISTS (SELECT 1 FROM master_project_module WHERE project_id = 1 AND project_module = 'Leave Management');
+INSERT INTO master_project_module (project_module, project_id) SELECT 'Payroll Management', 1 WHERE NOT EXISTS (SELECT 1 FROM master_project_module WHERE project_id = 1 AND project_module = 'Payroll Management');
+INSERT INTO master_project_module (project_module, project_id) SELECT 'Salary', 1 WHERE NOT EXISTS (SELECT 1 FROM master_project_module WHERE project_id = 1 AND project_module = 'Salary');
+INSERT INTO master_project_module (project_module, project_id) SELECT 'Performance', 1 WHERE NOT EXISTS (SELECT 1 FROM master_project_module WHERE project_id = 1 AND project_module = 'Performance');
+INSERT INTO master_project_module (project_module, project_id) SELECT 'Recruitment', 1 WHERE NOT EXISTS (SELECT 1 FROM master_project_module WHERE project_id = 1 AND project_module = 'Recruitment');
+INSERT INTO master_project_module (project_module, project_id) SELECT 'Config', 1 WHERE NOT EXISTS (SELECT 1 FROM master_project_module WHERE project_id = 1 AND project_module = 'Config');
+INSERT INTO master_project_module (project_module, project_id) SELECT 'Reports', 1 WHERE NOT EXISTS (SELECT 1 FROM master_project_module WHERE project_id = 1 AND project_module = 'Reports');
+INSERT INTO master_project_module (project_module, project_id) SELECT 'Analytics', 1 WHERE NOT EXISTS (SELECT 1 FROM master_project_module WHERE project_id = 1 AND project_module = 'Analytics');
+INSERT INTO master_project_module (project_module, project_id) SELECT 'Access Management', 1 WHERE NOT EXISTS (SELECT 1 FROM master_project_module WHERE project_id = 1 AND project_module = 'Access Management');
+INSERT INTO master_project_module (project_module, project_id) SELECT 'Settings', 1 WHERE NOT EXISTS (SELECT 1 FROM master_project_module WHERE project_id = 1 AND project_module = 'Settings');
+
+
+------------------23/01/2026  -----tharun
+create table if not exists master_sub_module(
+id serial not null,
+sub_module_name varchar(255) not null,
+module_id int,
+screen_label varchar(255),
+fa_fa_icon varchar(500),
+routes varchar(255),
+order_by int,
+is_active boolean DEFAULT true,
+constraint pk_master_sub_module_id primary key(id),
+constraint fk_master_sub_module_module_id foreign key (module_id) references master_module(id)
+);
+-------
+ALTER TABLE master_screen_permission
+DROP CONSTRAINT fk_master_screen_permission_screen_id;
+
+ALTER TABLE master_screen_permission
+RENAME COLUMN screen_id TO sub_module_id;
+
+
+ALTER TABLE master_screen_permission
+ADD CONSTRAINT fk_master_screen_permission_sub_module_id
+FOREIGN KEY (sub_module_id)
+REFERENCES master_sub_module (id);
+
+---
+ALTER TABLE employee_activity
+DROP CONSTRAINT fk_employee_activity_screen_id;
+
+ALTER TABLE employee_activity
+RENAME COLUMN screen_id TO sub_module_id;
+
+ALTER TABLE employee_activity
+ADD CONSTRAINT fk_employee_activity_sub_module_id
+FOREIGN KEY (sub_module_id)
+REFERENCES master_sub_module(id);
+------------------ modified
+create view vw_screen_permission_list as
+select mm.id as module_id,mm.module_name,ms.id as sub_module_id,ms.sub_module_name,msp.role_id,
+ms.fa_fa_icon,ms.routes,msp.can_view,msp.can_edit,msp.can_delete,msp.can_access,msp.can_update
+from master_module mm
+left join master_sub_module ms on ms.module_id = mm.id and ms.is_active =true
+left join master_screen_permission msp on msp.sub_module_id = ms.id and msp.is_active =true
+
+select * from vw_screen_permission_list;
+--------------------- modified
+create or replace view vw_recent_activity as
+with active_employees AS (
+select id as emp_id,
+CONCAT_WS(' ', first_name, last_name)::varchar as employee_name
+from employee_registration
+where is_active = true
+)
+select ea.emp_id,ae.employee_name, ea.module_id, mm.module_name,ea.sub_module_id, ms.sub_module_name,
+TO_CHAR(ea.created_date,'DD-MM-YYYY HH12:MI:SS AM')::varchar AS created_date, ea.activity_description
+from employee_activity ea
+left join active_employees ae on ae.emp_id = ea.emp_id and ea.is_active = true
+left join master_module mm on mm.id = ea.module_id and mm.is_active = true
+left join master_sub_module ms on ms.id = ea.sub_module_id and ms.is_active = true
+where ea.is_active = true
+order by ea.created_date desc;
+
+select * from vw_recent_activity where (emp_id = emp_id or -1 = emp_id);
+----------
+INSERT INTO master_sub_module (sub_module_name, module_id, screen_label)SELECT 'Create Task', 4, 'Task Management' WHERE NOT EXISTS (SELECT 1 FROM master_sub_module WHERE sub_module_name = 'Create Task' AND module_id = 4);
+INSERT INTO master_sub_module (sub_module_name, module_id, screen_label)SELECT 'Assign Task', 4, 'Task Management' WHERE NOT EXISTS (SELECT 1 FROM master_sub_module WHERE sub_module_name = 'Assign Task'AND module_id = 4);
+INSERT INTO master_sub_module (sub_module_name, module_id, screen_label)SELECT 'Task Board', 4, 'Task Management'WHERE NOT EXISTS ( SELECT 1 FROM master_sub_module WHERE sub_module_name = 'Task Board'AND module_id = 4);
+INSERT INTO master_sub_module (sub_module_name, module_id, screen_label)SELECT 'Task History', 4, 'Task Management'WHERE NOT EXISTS ( SELECT 1 FROM master_sub_module WHERE sub_module_name = 'Task History'AND module_id = 4);
+INSERT INTO master_sub_module (sub_module_name, module_id, screen_label)SELECT 'Leave Apply', 5, 'Leave Management' WHERE NOT EXISTS (SELECT 1 FROM master_sub_module WHERE sub_module_name = 'Leave Apply' AND module_id = 5);
+INSERT INTO master_sub_module (sub_module_name, module_id, screen_label)SELECT 'Leave Balance', 5, 'Leave Management' WHERE NOT EXISTS (SELECT 1 FROM master_sub_module WHERE sub_module_name = 'Leave Balance' AND module_id = 5);
+INSERT INTO master_sub_module (sub_module_name, module_id, screen_label)SELECT 'Leave Calendar', 5, 'Leave Management' WHERE NOT EXISTS (SELECT 1 FROM master_sub_module WHERE sub_module_name = 'Leave Calendar' AND module_id = 5);
+INSERT INTO master_sub_module (sub_module_name, module_id, screen_label)SELECT 'My Approvals', 5, 'Leave Management'WHERE NOT EXISTS (SELECT 1 FROM master_sub_module WHERE sub_module_name = 'My Approvals' AND module_id = 5);
+INSERT INTO master_sub_module (sub_module_name, module_id, screen_label)SELECT 'Holiday Calendar', 5, 'Leave Management'WHERE NOT EXISTS (SELECT 1 FROM master_sub_module WHERE sub_module_name = 'Holiday Calendar' AND module_id = 5);
+INSERT INTO master_sub_module (sub_module_name, module_id, screen_label)SELECT 'Payslips', 7, 'Salary' WHERE NOT EXISTS (SELECT 1 FROM master_sub_module WHERE sub_module_name = 'Payslips' AND module_id = 7);
+INSERT INTO master_sub_module (sub_module_name, module_id, screen_label) SELECT 'Salary Revision', 7, 'Salary' WHERE NOT EXISTS (SELECT 1 FROM master_sub_module WHERE sub_module_name = 'Salary Revision' AND module_id = 7);
+INSERT INTO master_sub_module(sub_module_name,module_id,screen_label) SELECT 'ALL',16,'ALL'   WHERE NOT EXISTS (SELECT 1 FROM master_sub_module WHERE sub_module_name='ALL' AND module_id=16  AND screen_label='ALL');
+INSERT INTO master_screen(screen_name,module_id,screen_label) SELECT 'ALL',16,'ALL'   WHERE NOT EXISTS (SELECT 1 FROM master_screen WHERE screen_name='ALL' AND module_id=16  AND screen_label='ALL');
+
+
+
+
+
 
 
