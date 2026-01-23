@@ -2218,4 +2218,85 @@ create table student_attendance (
 	constraint pk_student_attendance_id primary key (id),
 	constraint fk_student_attendance_user_id foreign key (user_id) references user_registration(id)
 );
+-----------22/1/2026
+INSERT INTO public.master_role (role_name) SELECT 'Doctor' WHERE NOT EXISTS (SELECT 1 FROM master_role WHERE role_name = 'Doctor');
+INSERT INTO public.master_module (module_name) SELECT 'Health Care' WHERE NOT EXISTS (SELECT 1 FROM master_module WHERE module_name = 'Health Care');
+------------
+
+create table if not exists public.master_internship_duration
+(
+    id bigserial not null,
+    duration_type varchar(100) not null,
+    is_active boolean default true,
+	constraint pk_master_internship_duration_id primary key (id),
+    constraint uk_master_internship_duration_duration_type unique (duration_type)
+);
+INSERT INTO public.master_internship_duration (duration_type) SELECT '1 month' WHERE NOT EXISTS (SELECT 1 FROM public.master_internship_duration WHERE duration_type = '1 month');
+INSERT INTO public.master_internship_duration (duration_type) SELECT '3 Months' WHERE NOT EXISTS (SELECT 1 FROM public.master_internship_duration WHERE duration_type = '3 Months');
+INSERT INTO public.master_internship_duration (duration_type) SELECT '6 Months' WHERE NOT EXISTS (SELECT 1 FROM public.master_internship_duration WHERE duration_type = '6 Months');
+
+CREATE TABLE IF NOT EXISTS public.master_category
+(
+    id bigserial not null,
+    category_name VARCHAR(100) not null,
+	is_active boolean default true,
+	constraint pk_master_master_category_id primary key (id),
+    constraint uk_master_master_category_category_name unique (category_name)
+);
+
+INSERT INTO public.master_category (category_name) SELECT 'Design' WHERE NOT EXISTS (SELECT 1 FROM public.master_category WHERE category_name = 'Design');
+INSERT INTO public.master_category (category_name) SELECT 'Engineering' WHERE NOT EXISTS (SELECT 1 FROM public.master_category WHERE category_name = 'Engineering');
+INSERT INTO public.master_category (category_name) SELECT 'Marketing' WHERE NOT EXISTS (SELECT 1 FROM public.master_category WHERE category_name = 'Marketing');
+
+alter table public.job_openings add column category_id bigint, add column internship_duration_id bigint;
+
+alter table public.job_openings add constraint fk_job_openings_category_id foreign key (category_id) references public.master_category(id);
+alter table public.job_openings add constraint fk_job_openings_duration foreign key (internship_duration_id) references public.master_internship_duration(id);
+------------------
+create table if not exists master_stipend_type(
+    id serial not null,
+    stipend_type varchar(50) not null,  
+    is_active boolean default true,
+    constraint pk_master_stipend_type_id primary key (id),
+    constraint uk_master_stipend_type_stipend_type unique (stipend_type)
+);
+
+-- Insert values
+insert into master_stipend_type (stipend_type) select 'Paid' where not exists (select 1 from master_stipend_type where stipend_type = 'Paid');
+insert into master_stipend_type (stipend_type) select 'Unpaid' where not exists (select 1 from master_stipend_type where stipend_type = 'Unpaid');
+
+alter table job_openings add column stipend_type_id int;
+
+alter table job_openings add constraint fk_job_openings_stipend_type_id
+foreign key (stipend_type_id) references master_stipend_type(id);
+--------
+CREATE TABLE IF NOT EXISTS master_health_categories (
+    id SERIAL NOT NULL,
+    category_name VARCHAR(255) NOT NULL,
+    is_active BOOLEAN DEFAULT TRUE,
+    CONSTRAINT pk_master_health_categories_id PRIMARY KEY (id),
+    CONSTRAINT uk_master_health_categories_category_name UNIQUE (category_name)
+);
+
+INSERT INTO master_health_categories (category_name) SELECT 'Heart' WHERE NOT EXISTS (SELECT 1 FROM master_health_categories WHERE category_name = 'Heart');
+INSERT INTO master_health_categories (category_name) SELECT 'Skin' WHERE NOT EXISTS (SELECT 1 FROM master_health_categories WHERE category_name = 'Skin');
+INSERT INTO master_health_categories (category_name) SELECT 'Eyes' WHERE NOT EXISTS (SELECT 1 FROM master_health_categories WHERE category_name = 'Eyes');
+INSERT INTO master_health_categories (category_name) SELECT 'Mental' WHERE NOT EXISTS (SELECT 1 FROM master_health_categories WHERE category_name = 'Mental');
+INSERT INTO master_health_categories (category_name)SELECT 'Diet' WHERE NOT EXISTS (SELECT 1 FROM master_health_categories WHERE category_name = 'Diet');
+
+---------
+
+CREATE TABLE IF NOT EXISTS master_doctor_specialization (
+    id SERIAL NOT NULL,
+    specialization_name VARCHAR(255) NOT NULL,
+    is_active BOOLEAN DEFAULT TRUE,
+    CONSTRAINT pk_master_doctor_specialization_id PRIMARY KEY (id),
+    CONSTRAINT uk_master_doctor_specialization_name UNIQUE (specialization_name)
+);
+
+INSERT INTO master_doctor_specialization (specialization_name) SELECT 'General Practitioner' WHERE NOT EXISTS (SELECT 1 FROM master_doctor_specialization WHERE specialization_name = 'General Practitioner');
+INSERT INTO master_doctor_specialization (specialization_name) SELECT 'Cardiologist' WHERE NOT EXISTS (SELECT 1 FROM master_doctor_specialization WHERE specialization_name = 'Cardiologist');
+INSERT INTO master_doctor_specialization (specialization_name) SELECT 'Dermatologist' WHERE NOT EXISTS (SELECT 1 FROM master_doctor_specialization WHERE specialization_name = 'Dermatologist');
+INSERT INTO master_doctor_specialization (specialization_name) SELECT 'Psychiatrist' WHERE NOT EXISTS (SELECT 1 FROM master_doctor_specialization WHERE specialization_name = 'Psychiatrist');
+INSERT INTO master_doctor_specialization (specialization_name) SELECT 'Ophthalmologist' WHERE NOT EXISTS (SELECT 1 FROM master_doctor_specialization WHERE specialization_name = 'Ophthalmologist');
 
