@@ -1,0 +1,23 @@
+CREATE OR REPLACE VIEW public.vw_company_list AS
+SELECT
+    ROW_NUMBER() OVER () AS company_row_id,jo.company_name,jo.company_address AS location,
+mi.id AS industry_id,mi.industry_name,mcs.id AS company_size_id,mcs.size_range AS company_size,
+    COUNT(
+        CASE WHEN mcat.category_name = 'Job' THEN jo.id END
+    ) AS jobs_count,
+
+    COUNT(
+        CASE WHEN mcat.category_name = 'Internship' THEN jo.id END
+    ) AS internships_count,
+
+    CASE 
+        WHEN COUNT(jo.id) > 0 THEN 'Active'
+        ELSE 'Hiring Frozen'
+    END AS hiring_status,
+    MAX(jo.created_date) AS last_active_time
+FROM job_openings jo
+LEFT JOIN master_category mcat ON jo.category_id = mcat.id
+LEFT JOIN master_industry mi ON jo.industry_id = mi.id AND mi.is_active = true
+LEFT JOIN master_company_size mcs ON jo.company_size_id = mcs.id  AND mcs.is_active = true
+WHERE jo.is_active = true
+GROUP BY jo.company_name,jo.company_address, mi.id, mi.industry_name,mcs.id,mcs.size_range;
