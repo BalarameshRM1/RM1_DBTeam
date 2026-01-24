@@ -2300,3 +2300,175 @@ INSERT INTO master_doctor_specialization (specialization_name) SELECT 'Dermatolo
 INSERT INTO master_doctor_specialization (specialization_name) SELECT 'Psychiatrist' WHERE NOT EXISTS (SELECT 1 FROM master_doctor_specialization WHERE specialization_name = 'Psychiatrist');
 INSERT INTO master_doctor_specialization (specialization_name) SELECT 'Ophthalmologist' WHERE NOT EXISTS (SELECT 1 FROM master_doctor_specialization WHERE specialization_name = 'Ophthalmologist');
 
+CREATE TABLE IF NOT EXISTS doctor_profile (
+    id BIGSERIAL NOT NULL,
+    user_id BIGINT NOT NULL,
+    specialization_id BIGINT NOT NULL,
+    experience_years INT,
+    rating NUMERIC(3,2),
+    fees_per_hour NUMERIC(10,2),
+    is_active BOOLEAN DEFAULT TRUE,
+	created_by BIGINT,
+    created_date TIMESTAMP DEFAULT NOW(),
+    modified_by BIGINT,
+    modified_date TIMESTAMP,
+    is_active BOOLEAN DEFAULT TRUE,
+    CONSTRAINT pk_doctor_profile_id PRIMARY KEY (id),
+    CONSTRAINT fk_doctor_profile_user_id FOREIGN KEY (user_id) REFERENCES user_registration(id),
+    CONSTRAINT fk_doctor_profile_specialization_id FOREIGN KEY (specialization_id) REFERENCES master_doctor_specialization(id),
+    CONSTRAINT uk_doctor_profile_user_id UNIQUE (user_id)
+);
+
+--------------------- 23/1/2026
+CREATE TABLE IF NOT EXISTS public.master_industry
+(
+    id bigserial NOT NULL,
+    industry_name VARCHAR(100) NOT NULL,
+    is_active BOOLEAN DEFAULT true,
+    CONSTRAINT pk_master_industry_id PRIMARY KEY (id),
+    CONSTRAINT uk_master_industry_name UNIQUE (industry_name)
+);
+
+INSERT INTO public.master_industry (industry_name) SELECT 'Artificial Intelligence & Machine Learning' WHERE NOT EXISTS (SELECT 1 FROM public.master_industry WHERE industry_name = 'Artificial Intelligence & Machine Learning');
+INSERT INTO public.master_industry (industry_name) SELECT 'Cloud Computing' WHERE NOT EXISTS (SELECT 1 FROM public.master_industry WHERE industry_name = 'Cloud Computing');
+INSERT INTO public.master_industry (industry_name) SELECT 'Consulting & Professional Services' WHERE NOT EXISTS (SELECT 1 FROM public.master_industry WHERE industry_name = 'Consulting & Professional Services');
+INSERT INTO public.master_industry (industry_name) SELECT 'Cybersecurity' WHERE NOT EXISTS (SELECT 1 FROM public.master_industry WHERE industry_name = 'Cybersecurity');
+INSERT INTO public.master_industry (industry_name) SELECT 'E-Commerce' WHERE NOT EXISTS (SELECT 1 FROM public.master_industry WHERE industry_name = 'E-Commerce');
+INSERT INTO public.master_industry (industry_name) SELECT 'EdTech' WHERE NOT EXISTS (SELECT 1 FROM public.master_industry WHERE industry_name = 'EdTech');
+INSERT INTO public.master_industry (industry_name) SELECT 'Energy & Utilities' WHERE NOT EXISTS (SELECT 1 FROM public.master_industry WHERE industry_name = 'Energy & Utilities');
+INSERT INTO public.master_industry (industry_name) SELECT 'Finance & Banking' WHERE NOT EXISTS (SELECT 1 FROM public.master_industry WHERE industry_name = 'Finance & Banking');
+INSERT INTO public.master_industry (industry_name) SELECT 'Healthcare' WHERE NOT EXISTS (SELECT 1 FROM public.master_industry WHERE industry_name = 'Healthcare');
+INSERT INTO public.master_industry (industry_name) SELECT 'Logistics & Supply Chain' WHERE NOT EXISTS (SELECT 1 FROM public.master_industry WHERE industry_name = 'Logistics & Supply Chain');
+INSERT INTO public.master_industry (industry_name) SELECT 'Manufacturing' WHERE NOT EXISTS (SELECT 1 FROM public.master_industry WHERE industry_name = 'Manufacturing');
+INSERT INTO public.master_industry (industry_name) SELECT 'Media & Entertainment' WHERE NOT EXISTS (SELECT 1 FROM public.master_industry WHERE industry_name = 'Media & Entertainment');
+INSERT INTO public.master_industry (industry_name) SELECT 'Retail' WHERE NOT EXISTS (SELECT 1 FROM public.master_industry WHERE industry_name = 'Retail');
+INSERT INTO public.master_industry (industry_name) SELECT 'Software Engineering' WHERE NOT EXISTS (SELECT 1 FROM public.master_industry WHERE industry_name = 'Software Engineering');
+INSERT INTO public.master_industry (industry_name) SELECT 'Telecommunications' WHERE NOT EXISTS (SELECT 1 FROM public.master_industry WHERE industry_name = 'Telecommunications');
+
+
+CREATE TABLE IF NOT EXISTS public.master_company_size
+(
+    id bigserial NOT NULL,
+    size_range VARCHAR(50) NOT NULL,
+    is_active BOOLEAN DEFAULT true,
+    CONSTRAINT pk_master_company_size_id PRIMARY KEY (id),
+    CONSTRAINT uk_master_company_size_range UNIQUE (size_range)
+);
+
+INSERT INTO public.master_company_size (size_range) SELECT 'All' WHERE NOT EXISTS (SELECT 1 FROM public.master_company_size WHERE size_range = 'All');
+INSERT INTO public.master_company_size (size_range) SELECT '50-200' WHERE NOT EXISTS (SELECT 1 FROM public.master_company_size WHERE size_range = '50-200');
+INSERT INTO public.master_company_size (size_range) SELECT '200-500' WHERE NOT EXISTS (SELECT 1 FROM public.master_company_size WHERE size_range = '200-500');
+INSERT INTO public.master_company_size (size_range) SELECT '500+' WHERE NOT EXISTS (SELECT 1 FROM public.master_company_size WHERE size_range = '500+');
+INSERT INTO public.master_company_size (size_range) SELECT '1000+' WHERE NOT EXISTS (SELECT 1 FROM public.master_company_size WHERE size_range = '1000+');
+
+ALTER TABLE public.job_openings ADD COLUMN industry_id BIGINT,ADD COLUMN company_size_id BIGINT;
+ALTER TABLE public.job_openings ADD CONSTRAINT fk_job_openings_industry FOREIGN KEY (industry_id) REFERENCES public.master_industry(id);
+ALTER TABLE public.job_openings ADD CONSTRAINT fk_job_openings_company_size FOREIGN KEY (company_size_id) REFERENCES public.master_company_size(id);
+
+--------------24/1/2026
+INSERT INTO public.master_sub_service (sub_service_name, service_id) SELECT 'Truck Cleaning', 9 WHERE NOT EXISTS (SELECT 1 FROM public.master_sub_service WHERE sub_service_name = 'Truck Cleaning' AND service_id = 9);
+------------
+
+insert into master_property_type (property_type)select 'Land' where not exists (select 1 from master_property_type where property_type = 'Land');
+insert into master_property_type (property_type)select 'Apartment/Flat' where not exists (select 1 from master_property_type where property_type = 'Apartment / Flat');
+insert into master_property_type (property_type)select 'Independent House/Villa' where not exists (select 1 from master_property_type where property_type = 'Independent House / Villa');
+insert into master_property_type (property_type)select 'Bike' where not exists (select 1 from master_property_type where property_type = 'Bike');
+insert into master_property_type (property_type)select 'Car' where not exists (select 1 from master_property_type where property_type = 'Car');
+insert into master_property_type (property_type)select 'Lorry' where not exists (select 1 from master_property_type where property_type = 'Lorry');
+insert into master_property_type (property_type)select 'Auto' where not exists (select 1 from master_property_type where property_type = 'Auto');
+insert into master_property_type (property_type)select 'Bus' where not exists (select 1 from master_property_type where property_type = 'Bus');
+insert into master_property_type (property_type)select 'Office' where not exists (select 1 from master_property_type where property_type = 'Office');
+insert into master_property_type (property_type)select 'Hospital' where not exists (select 1 from master_property_type where property_type = 'Hospital');
+insert into master_property_type (property_type)select 'Commercial Space' where not exists (select 1 from master_property_type where property_type = 'Commercial Space');
+insert into master_property_type (property_type)select 'All' where not exists (select 1 from master_property_type where property_type = 'All');
+insert into master_property_type (property_type)select 'Hostel' where not exists (select 1 from master_property_type where property_type = 'Hostel');
+
+----------------------
+CREATE TABLE IF NOT EXISTS public.master_vehicle_brand (
+    id BIGSERIAL NOT NULL,
+    brand_name VARCHAR(255) NOT NULL,
+    is_active BOOLEAN DEFAULT TRUE,
+    CONSTRAINT pk_master_vehicle_brand_id PRIMARY KEY (id),
+    CONSTRAINT uk_master_vehicle_brand_name UNIQUE (brand_name)
+);
+
+INSERT INTO public.master_vehicle_brand (brand_name) SELECT 'Audi' WHERE NOT EXISTS (SELECT 1 FROM public.master_vehicle_brand WHERE brand_name = 'Audi');
+INSERT INTO public.master_vehicle_brand (brand_name) SELECT 'Ashok Leyland' WHERE NOT EXISTS (SELECT 1 FROM public.master_vehicle_brand WHERE brand_name = 'Ashok Leyland');
+INSERT INTO public.master_vehicle_brand (brand_name) SELECT 'Bajaj' WHERE NOT EXISTS (SELECT 1 FROM public.master_vehicle_brand WHERE brand_name = 'Bajaj');
+INSERT INTO public.master_vehicle_brand (brand_name) SELECT 'BMW' WHERE NOT EXISTS (SELECT 1 FROM public.master_vehicle_brand WHERE brand_name = 'BMW');
+INSERT INTO public.master_vehicle_brand (brand_name) SELECT 'Eicher' WHERE NOT EXISTS (SELECT 1 FROM public.master_vehicle_brand WHERE brand_name = 'Eicher');
+INSERT INTO public.master_vehicle_brand (brand_name) SELECT 'Ford' WHERE NOT EXISTS (SELECT 1 FROM public.master_vehicle_brand WHERE brand_name = 'Ford');
+INSERT INTO public.master_vehicle_brand (brand_name) SELECT 'Hero' WHERE NOT EXISTS (SELECT 1 FROM public.master_vehicle_brand WHERE brand_name = 'Hero');
+INSERT INTO public.master_vehicle_brand (brand_name) SELECT 'Honda' WHERE NOT EXISTS (SELECT 1 FROM public.master_vehicle_brand WHERE brand_name = 'Honda');
+INSERT INTO public.master_vehicle_brand (brand_name) SELECT 'Hyundai' WHERE NOT EXISTS (SELECT 1 FROM public.master_vehicle_brand WHERE brand_name = 'Hyundai');
+INSERT INTO public.master_vehicle_brand (brand_name) SELECT 'Jeep' WHERE NOT EXISTS (SELECT 1 FROM public.master_vehicle_brand WHERE brand_name = 'Jeep');
+INSERT INTO public.master_vehicle_brand (brand_name) SELECT 'Kia' WHERE NOT EXISTS (SELECT 1 FROM public.master_vehicle_brand WHERE brand_name = 'Kia');
+INSERT INTO public.master_vehicle_brand (brand_name) SELECT 'Mahindra' WHERE NOT EXISTS (SELECT 1 FROM public.master_vehicle_brand WHERE brand_name = 'Mahindra');
+INSERT INTO public.master_vehicle_brand (brand_name) SELECT 'Maruti Suzuki' WHERE NOT EXISTS (SELECT 1 FROM public.master_vehicle_brand WHERE brand_name = 'Maruti Suzuki');
+INSERT INTO public.master_vehicle_brand (brand_name) SELECT 'Mercedes-Benz' WHERE NOT EXISTS (SELECT 1 FROM public.master_vehicle_brand WHERE brand_name = 'Mercedes-Benz');
+INSERT INTO public.master_vehicle_brand (brand_name) SELECT 'Nissan' WHERE NOT EXISTS (SELECT 1 FROM public.master_vehicle_brand WHERE brand_name = 'Nissan');
+INSERT INTO public.master_vehicle_brand (brand_name) SELECT 'Royal Enfield' WHERE NOT EXISTS (SELECT 1 FROM public.master_vehicle_brand WHERE brand_name = 'Royal Enfield');
+INSERT INTO public.master_vehicle_brand (brand_name) SELECT 'Suzuki' WHERE NOT EXISTS (SELECT 1 FROM public.master_vehicle_brand WHERE brand_name = 'Suzuki');
+INSERT INTO public.master_vehicle_brand (brand_name) SELECT 'Tata' WHERE NOT EXISTS (SELECT 1 FROM public.master_vehicle_brand WHERE brand_name = 'Tata');
+INSERT INTO public.master_vehicle_brand (brand_name) SELECT 'Toyota' WHERE NOT EXISTS (SELECT 1 FROM public.master_vehicle_brand WHERE brand_name = 'Toyota');
+INSERT INTO public.master_vehicle_brand (brand_name) SELECT 'TVS' WHERE NOT EXISTS (SELECT 1 FROM public.master_vehicle_brand WHERE brand_name = 'TVS');
+INSERT INTO public.master_vehicle_brand (brand_name) SELECT 'Volkswagen' WHERE NOT EXISTS (SELECT 1 FROM public.master_vehicle_brand WHERE brand_name = 'Volkswagen');
+INSERT INTO public.master_vehicle_brand (brand_name) SELECT 'Volvo' WHERE NOT EXISTS (SELECT 1 FROM public.master_vehicle_brand WHERE brand_name = 'Volvo');
+----------------------------------
+CREATE TABLE IF NOT EXISTS public.master_fuel_type (
+    id BIGSERIAL NOT NULL,
+    fuel_type_name VARCHAR(255) NOT NULL,
+    is_active BOOLEAN DEFAULT TRUE,
+    CONSTRAINT pk_master_fuel_type_id PRIMARY KEY (id),
+    CONSTRAINT uk_master_fuel_type_name UNIQUE (fuel_type_name),
+	
+);
+----------
+INSERT INTO public.master_fuel_type (fuel_type_name) SELECT 'Bio-Diesel' WHERE NOT EXISTS (SELECT 1 FROM public.master_fuel_type WHERE fuel_type_name = 'Bio-Diesel');
+INSERT INTO public.master_fuel_type (fuel_type_name) SELECT 'CNG' WHERE NOT EXISTS (SELECT 1 FROM public.master_fuel_type WHERE fuel_type_name = 'CNG');
+INSERT INTO public.master_fuel_type (fuel_type_name) SELECT 'Diesel' WHERE NOT EXISTS (SELECT 1 FROM public.master_fuel_type WHERE fuel_type_name = 'Diesel');
+INSERT INTO public.master_fuel_type (fuel_type_name) SELECT 'Electric' WHERE NOT EXISTS (SELECT 1 FROM public.master_fuel_type WHERE fuel_type_name = 'Electric');
+INSERT INTO public.master_fuel_type (fuel_type_name) SELECT 'Hybrid' WHERE NOT EXISTS (SELECT 1 FROM public.master_fuel_type WHERE fuel_type_name = 'Hybrid');
+INSERT INTO public.master_fuel_type (fuel_type_name) SELECT 'Hydrogen' WHERE NOT EXISTS (SELECT 1 FROM public.master_fuel_type WHERE fuel_type_name = 'Hydrogen');
+INSERT INTO public.master_fuel_type (fuel_type_name) SELECT 'LNG' WHERE NOT EXISTS (SELECT 1 FROM public.master_fuel_type WHERE fuel_type_name = 'LNG');
+INSERT INTO public.master_fuel_type (fuel_type_name) SELECT 'LPG' WHERE NOT EXISTS (SELECT 1 FROM public.master_fuel_type WHERE fuel_type_name = 'LPG');
+INSERT INTO public.master_fuel_type (fuel_type_name) SELECT 'Petrol' WHERE NOT EXISTS (SELECT 1 FROM public.master_fuel_type WHERE fuel_type_name = 'Petrol');
+INSERT INTO public.master_fuel_type (fuel_type_name) SELECT 'Plug-in Hybrid (PHEV)' WHERE NOT EXISTS (SELECT 1 FROM public.master_fuel_type WHERE fuel_type_name = 'Plug-in Hybrid (PHEV)');
+-----
+alter table home_service add column vehicle_brand_id bigint;
+alter table home_service add column fuel_type_id bigint;
+alter table home_service add constraint fk_home_service_vehicle_brand_id  foreign key(vehicle_brand_id ) references master_vehicle_brand(id);
+alter table home_service add constraint fk_home_service_fuel_type_id foreign key(fuel_type_id) references master_fuel_type(id);
+
+CREATE TABLE IF NOT EXISTS public.master_hostel_type (
+    id SERIAL NOT NULL,
+    hostel_type VARCHAR(255),
+    is_active BOOLEAN DEFAULT TRUE,
+    CONSTRAINT pk_master_hostel_type_id PRIMARY KEY (id)
+);
+
+INSERT INTO public.master_hostel_type (hostel_type)SELECT 'Boys Hostel'WHERE NOT EXISTS (SELECT 1 FROM public.master_hostel_type WHERE hostel_type = 'Boys Hostel');
+INSERT INTO public.master_hostel_type (hostel_type)SELECT 'Girls Hostel'WHERE NOT EXISTS ( SELECT 1 FROM public.master_hostel_type WHERE hostel_type = 'Girls Hostel');
+INSERT INTO public.master_hostel_type (hostel_type)SELECT 'Co-Living' WHERE NOT EXISTS (SELECT 1 FROM public.master_hostel_type WHERE hostel_type = 'Co-Living');
+
+CREATE TABLE IF NOT EXISTS public.master_item_condition (
+    id SERIAL NOT NULL,
+    item_condition VARCHAR(255),
+    is_active BOOLEAN DEFAULT TRUE,
+    CONSTRAINT pk_master_item_condition_id PRIMARY KEY (id)
+);
+
+INSERT INTO public.master_item_condition (item_condition)SELECT 'New item'WHERE NOT EXISTS (SELECT 1 FROM public.master_item_condition WHERE item_condition = 'New item');
+INSERT INTO public.master_item_condition (item_condition)SELECT 'Old item'WHERE NOT EXISTS (SELECT 1 FROM public.master_item_condition WHERE item_condition = 'Old item');
+
+select * from property_sell_listing
+alter table property_sell_listing add column item_condition_id int;
+alter table property_sell_listing add column hostel_type_id int;
+alter table property_sell_listing add column total_rooms int;
+alter table property_sell_listing add column available_rooms int;
+alter table property_sell_listing add column food_included boolean;
+alter table property_sell_listing add column location int;
+alter table property_sell_listing add constraint fk_property_sell_listing_item_condition_id foreign key (item_condition_id) references master_item_condition (id);
+alter table property_sell_listing add constraint fk_property_sell_listing_hostel_type_id foreign key (hostel_type_id) references master_hostel_type (id);
+
+
