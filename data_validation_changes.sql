@@ -2706,3 +2706,71 @@ CONSTRAINT fk_booking_service_mapping_garage_service_id FOREIGN KEY (garage_serv
 CONSTRAINT uq_booking_service UNIQUE (booking_id, garage_service_id)
 );
 
+-----------------------27/01/2026  -------tharun 
+CREATE TABLE IF NOT EXISTS public.master_ambulance
+(
+    id bigserial NOT NULL,
+    service_provider VARCHAR(100) NOT NULL,
+    contact_number VARCHAR(20),
+    availability_status VARCHAR(20) DEFAULT 'Available',
+    is_active boolean DEFAULT true,
+    CONSTRAINT pk_master_ambulance_id PRIMARY KEY (id),
+    CONSTRAINT uk_master_ambulance_service_provider UNIQUE (service_provider)
+);
+-------------------------
+INSERT INTO public.master_ambulance (service_provider, contact_number, availability_status, is_active) SELECT 'Apollo Ambulance', '+91-40-23607777', 'Available', true WHERE NOT EXISTS (SELECT 1 FROM public.master_ambulance WHERE service_provider = 'Apollo Ambulance');
+
+INSERT INTO public.master_ambulance (service_provider, contact_number, availability_status, is_active) SELECT 'Care Ambulance', '+91-40-61656565', 'Available', true WHERE NOT EXISTS (SELECT 1 FROM public.master_ambulance WHERE service_provider = 'Care Ambulance');
+
+INSERT INTO public.master_ambulance (service_provider, contact_number, availability_status, is_active) SELECT 'Medico Ambulance', '+91-40-24556677', 'Available', true WHERE NOT EXISTS (SELECT 1 FROM public.master_ambulance WHERE service_provider = 'Medico Ambulance');
+
+
+----------------------27/1/2026
+alter table ambulance_booking add column patient_name varchar(255);
+alter table ambulance_booking add column aadhar_number varchar(50) ;
+
+CREATE TABLE IF NOT EXISTS public.master_hospital (
+    id BIGSERIAL NOT NULL,
+    hospital_name VARCHAR(255) NOT NULL,
+    specialty_type VARCHAR(50),   
+    location VARCHAR(255),
+    distance_km NUMERIC(5,2),
+    estimated_arrival_mins INT,
+    contact_number VARCHAR(20),
+    is_active BOOLEAN DEFAULT TRUE,
+    CONSTRAINT pk_master_hospital_id PRIMARY KEY (id)
+    
+);
+
+INSERT INTO public.master_ambulance (service_provider, contact_number, availability_status, is_active)
+SELECT 'Apollo Ambulance', '+91-40-23607777', 'Available', true
+WHERE NOT EXISTS (SELECT 1 FROM public.master_ambulance WHERE service_provider = 'Apollo Ambulance');
+
+INSERT INTO public.master_ambulance (service_provider, contact_number, availability_status, is_active)
+SELECT 'Care Ambulance', '+91-40-61656565', 'Available', true
+WHERE NOT EXISTS (SELECT 1 FROM public.master_ambulance WHERE service_provider = 'Care Ambulance');
+
+INSERT INTO public.master_ambulance (service_provider, contact_number, availability_status, is_active)
+SELECT 'Yashoda Ambulance', '+91-40-23550000', 'Available', true
+WHERE NOT EXISTS (SELECT 1 FROM public.master_ambulance WHERE service_provider = 'Yashoda Ambulance');
+
+SELECT * FROM public.master_ambulance;
+
+INSERT INTO public.master_hospital 
+(hospital_name, specialty_type, location, distance_km, estimated_arrival_mins, contact_number, is_active)
+SELECT 'Apollo Hospital', 'Multi-Specialty', 'Jubilee Hills, Hyderabad', 2.3, 8, '+91-40-23607777', TRUE
+WHERE NOT EXISTS (SELECT 1 FROM public.master_hospital WHERE hospital_name = 'Apollo Hospital');
+
+INSERT INTO public.master_hospital 
+(hospital_name, specialty_type, location, distance_km, estimated_arrival_mins, contact_number, is_active)
+SELECT 'Care Hospital', 'Multi-Specialty', 'Banjara Hills, Hyderabad', 3.1, 12, '+91-40-61656565', TRUE
+WHERE NOT EXISTS (SELECT 1 FROM public.master_hospital WHERE hospital_name = 'Care Hospital');
+
+INSERT INTO public.master_hospital 
+(hospital_name, specialty_type, location, distance_km, estimated_arrival_mins, contact_number, is_active)
+SELECT 'Yashoda Hospital', 'Super-Specialty', 'Somajiguda, Hyderabad', 4.5, 15, '+91-40-23550000', TRUE
+WHERE NOT EXISTS (SELECT 1 FROM public.master_hospital WHERE hospital_name = 'Yashoda Hospital');
+---------
+insert into master_role (role_name)select 'Garage_Owner' where not exists (select 1 from master_role where role_name='Garage_Owner');
+
+insert into master_role (role_name)select 'Mechanic' where not exists (select 1 from master_role where role_name='Mechanic');
