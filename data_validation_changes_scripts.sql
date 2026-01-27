@@ -374,7 +374,7 @@ INSERT INTO public.master_relation (relation_type) SELECT  'Mother' WHERE NOT EX
 INSERT INTO public.master_relation (relation_type) SELECT  'Spouse' WHERE NOT EXISTS (SELECT 1 FROM public.master_relation WHERE   relation_type = 'Spouse');
 INSERT INTO public.master_relation (relation_type) SELECT  'Son' WHERE NOT EXISTS (SELECT 1 FROM public.master_relation WHERE   relation_type = 'Son');
 INSERT INTO public.master_relation (relation_type) SELECT  'Daughter' WHERE NOT EXISTS (SELECT 1 FROM public.master_relation WHERE   relation_type = 'Daughter');
-
+  
 -----------------------17/12/2025 ----tharun
 alter table if exists employee_registration add column if not exists father_name varchar(255);
 alter table if exists employee_registration add column if not exists blood_group_id int;
@@ -1225,7 +1225,15 @@ INSERT INTO master_sub_module (sub_module_name, module_id, screen_label) SELECT 
 INSERT INTO master_sub_module(sub_module_name,module_id,screen_label) SELECT 'ALL',16,'ALL'   WHERE NOT EXISTS (SELECT 1 FROM master_sub_module WHERE sub_module_name='ALL' AND module_id=16  AND screen_label='ALL');
 INSERT INTO master_screen(screen_name,module_id,screen_label) SELECT 'ALL',16,'ALL'   WHERE NOT EXISTS (SELECT 1 FROM master_screen WHERE screen_name='ALL' AND module_id=16  AND screen_label='ALL');
 
+----------------27/01/2026  ------tharun
 
+ALTER TABLE employee_registration
+ADD CONSTRAINT uk_employee_email UNIQUE (email),
+ADD CONSTRAINT uk_employee_pan UNIQUE (pan),
+ADD CONSTRAINT uk_employee_uan UNIQUE (uan),
+ADD CONSTRAINT uk_employee_aadhaar UNIQUE (aadhaar),
+ADD CONSTRAINT uk_employee_bank UNIQUE (bank_ac_no),
+ADD CONSTRAINT uk_employee_mobile UNIQUE (mobile);
 
 
 
