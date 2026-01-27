@@ -2472,3 +2472,237 @@ alter table property_sell_listing add constraint fk_property_sell_listing_item_c
 alter table property_sell_listing add constraint fk_property_sell_listing_hostel_type_id foreign key (hostel_type_id) references master_hostel_type (id);
 
 
+----------------------------------- vehicle_cleaning 24/12/2026 to 27/12/2026
+. master_vehicle_brand
+
+create table if not exists master_vehicle_brand(
+    id serial not null,
+    brand_name varchar(255) not null,
+    is_active boolean default true,
+    constraint pk_master_vehicle_brand_id primary key(id),
+    constraint uk_master_vehicle_brand_name unique (brand_name)
+);
+
+insert into master_vehicle_brand (brand_name)
+select 'Audi' where not exists (select 1 from master_vehicle_brand where brand_name='Audi');
+
+insert into master_vehicle_brand (brand_name)
+select 'BMW' where not exists (select 1 from master_vehicle_brand where brand_name='BMW');
+
+insert into master_vehicle_brand (brand_name)
+select 'Bajaj' where not exists (select 1 from master_vehicle_brand where brand_name='Bajaj');
+
+insert into master_vehicle_brand (brand_name)
+select 'Ashok Leyland' where not exists (select 1 from master_vehicle_brand where brand_name='Ashok Leyland');
+
+------------
+3. master_fuel_type
+
+create table if not exists master_fuel_type(
+    id serial not null,
+    fuel_type_name varchar(255) not null,
+    is_active boolean default true,
+    constraint pk_master_fuel_type_id primary key(id),
+    constraint uk_master_fuel_type_name unique (fuel_type_name)
+);
+
+insert into master_fuel_type (fuel_type_name)
+select 'Petrol' where not exists (select 1 from master_fuel_type where fuel_type_name='Petrol');
+
+insert into master_fuel_type (fuel_type_name)
+select 'Diesel' where not exists (select 1 from master_fuel_type where fuel_type_name='Diesel');
+
+insert into master_fuel_type (fuel_type_name)
+select 'Electric' where not exists (select 1 from master_fuel_type where fuel_type_name='Electric');
+
+insert into master_fuel_type (fuel_type_name)
+select 'CNG' where not exists (select 1 from master_fuel_type where fuel_type_name='CNG');
+
+insert into master_fuel_type (fuel_type_name)
+select 'LNG' where not exists (select 1 from master_fuel_type where fuel_type_name='LNG');
+
+----------------------
+
+4. vehicle_brand_fuel (Mapping)
+
+create table if not exists vehicle_brand_fuel(
+    id serial not null,
+    sub_service_id bigint not null,
+    brand_id bigint not null,
+    fuel_id bigint not null,
+	created_by BIGINT,
+    created_date TIMESTAMP DEFAULT now(),
+    modified_by BIGINT,
+    modified_date TIMESTAMP,
+    is_active boolean default true,
+    constraint pk_vehicle_brand_fuel_id primary key(id),
+    constraint fk_vehicle_brand_fuel_sub_service_id foreign key (sub_service_id) references master_sub_service(id),
+    constraint fk_vehicle_brand_fuel_brand_id foreign key (brand_id) references master_vehicle_brand(id),
+    constraint fk_vehicle_brand_fuel_fuel_id foreign key (fuel_id) references master_fuel_type(id),
+    constraint uk_vehicle_brand_fuel unique (sub_service_id, brand_id, fuel_id)
+);
+
+--------------------------------
+create table if not exists master_garage(
+    id serial not null,
+    garage_name varchar(255) not null,
+    address varchar(500) not null,
+    rating numeric(2,1),
+    sub_service_id bigint not null,   -- Car, Bike, Truck
+    is_active boolean default true,
+    constraint pk_master_garage_id primary key(id),
+    constraint fk_master_garage_sub_service_id foreign key (sub_service_id) references master_sub_service(id),
+    constraint uk_master_garage_name_sub_service unique (garage_name, sub_service_id)
+);
+insert into master_garage (garage_name, address, rating, sub_service_id)
+select 'Supreme Car Care','102, Royal Plaza, Rajkot',4.8,10
+where not exists (select 1 from master_garage where garage_name='Supreme Car Care' and sub_service_id=10);
+
+insert into master_garage (garage_name, address, rating, sub_service_id)
+select 'Apex Auto Garage','Plot 45, GIDC Phase 3, Rajkot',4.9,10
+where not exists (select 1 from master_garage where garage_name='Apex Auto Garage' and sub_service_id=10);
+
+insert into master_garage (garage_name, address, rating, sub_service_id)
+select 'Luxury Wheels Rajkot','University Road, Rajkot',4.6,10
+where not exists (select 1 from master_garage where garage_name='Luxury Wheels Rajkot' and sub_service_id=10);
+--------------
+create table if not exists master_garage_service(
+    id serial not null,
+    sub_service_id bigint not null,         -- Car Cleaning, Bike Cleaning, Truck Cleaning
+    service_name varchar(255) not null,     -- e.g. Engine Oil Replacement
+    price numeric(10,2) not null,           -- e.g. 1500.00
+    is_active boolean default true,
+    constraint pk_master_garage_service_id primary key(id),
+    constraint fk_master_garage_service_sub_service_id foreign key (sub_service_id) references master_sub_service(id),
+    constraint uk_master_garage_service unique (sub_service_id, service_name)
+);
+insert into master_garage_service (sub_service_id, service_name, price)
+select 10,'Engine Oil Replacement',1500 where not exists (select 1 from master_garage_service where sub_service_id=10 and service_name='Engine Oil Replacement');
+
+insert into master_garage_service (sub_service_id, service_name, price)
+select 10,'Oil Filter Change',450 where not exists (select 1 from master_garage_service where sub_service_id=10 and service_name='Oil Filter Change');
+
+insert into master_garage_service (sub_service_id, service_name, price)
+select 10,'AC Filter Cleaning',600 where not exists (select 1 from master_garage_service where sub_service_id=10 and service_name='AC Filter Cleaning');
+
+insert into master_garage_service (sub_service_id, service_name, price)
+select 10,'Brake Pad Checking',600 where not exists (select 1 from master_garage_service where sub_service_id=10 and service_name='Brake Pad Checking');
+
+insert into master_garage_service (sub_service_id, service_name, price)
+select 10,'Coolant Top-up',300 where not exists (select 1 from master_garage_service where sub_service_id=10 and service_name='Coolant Top-up');
+
+insert into master_garage_service (sub_service_id, service_name, price)
+select 10,'Wheel Alignment',1200 where not exists (select 1 from master_garage_service where sub_service_id=10 and service_name='Wheel Alignment');
+
+insert into master_garage_service (sub_service_id, service_name, price)
+select 10,'Interior Vacuuming',500 where not exists (select 1 from master_garage_service where sub_service_id=10 and service_name='Interior Vacuuming');
+insert into master_garage_service (sub_service_id, service_name, price)
+select 11,'Chain Lubrication',150 where not exists (select 1 from master_garage_service where sub_service_id=11 and service_name='Chain Lubrication');
+
+insert into master_garage_service (sub_service_id, service_name, price)
+select 11,'Spark Plug Cleaning',100 where not exists (select 1 from master_garage_service where sub_service_id=11 and service_name='Spark Plug Cleaning');
+
+insert into master_garage_service (sub_service_id, service_name, price)
+select 11,'Engine Oil (Bike)',450 where not exists (select 1 from master_garage_service where sub_service_id=11 and service_name='Engine Oil (Bike)');
+
+insert into master_garage_service (sub_service_id, service_name, price)
+select 11,'Brake Shoe Adjustment',200 where not exists (select 1 from master_garage_service where sub_service_id=11 and service_name='Brake Shoe Adjustment');
+
+insert into master_garage_service (sub_service_id, service_name, price)
+select 11,'Air Filter Cleaning',150 where not exists (select 1 from master_garage_service where sub_service_id=11 and service_name='Air Filter Cleaning');
+
+insert into master_garage_service (sub_service_id, service_name, price)
+select 11,'Clutch Cable Tightening',100 where not exists (select 1 from master_garage_service where sub_service_id=11 and service_name='Clutch Cable Tightening');
+insert into master_garage_service (sub_service_id, service_name, price)
+select 12,'Hydraulic System Check',2500 where not exists (select 1 from master_garage_service where sub_service_id=12 and service_name='Hydraulic System Check');
+
+insert into master_garage_service (sub_service_id, service_name, price)
+select 12,'Air Brake Adjustment',1200 where not exists (select 1 from master_garage_service where sub_service_id=12 and service_name='Air Brake Adjustment');
+
+insert into master_garage_service (sub_service_id, service_name, price)
+select 12,'Grease Point Lubrication',800 where not exists (select 1 from master_garage_service where sub_service_id=12 and service_name='Grease Point Lubrication');
+
+insert into master_garage_service (sub_service_id, service_name, price)
+select 12,'Heavy Duty Oil Change',4500 where not exists (select 1 from master_garage_service where sub_service_id=12 and service_name='Heavy Duty Oil Change');
+
+insert into master_garage_service (sub_service_id, service_name, price)
+select 12,'Suspension Inspection',1500 where not exists (select 1 from master_garage_service where sub_service_id=12 and service_name='Suspension Inspection');
+
+insert into master_garage_service (sub_service_id, service_name, price)
+select 12,'Fuel Filter Replacement',1800 where not exists (select 1 from master_garage_service where sub_service_id=12 and service_name='Fuel Filter Replacement');
+
+
+
+
+create table if not exists master_mechanic(
+    id serial not null,
+    garage_id bigint not null,
+    mechanic_name varchar(255) not null,
+    rating numeric(2,1),
+    is_active boolean default true,
+    constraint pk_master_mechanic_id primary key(id),
+    constraint fk_master_mechanic_garage_id foreign key (garage_id) references master_garage(id),
+    constraint uk_master_mechanic_name_garage unique (garage_id, mechanic_name)
+);
+
+insert into master_mechanic (garage_id, mechanic_name, rating)
+select 1,'Rahul M',4.8 where not exists (select 1 from master_mechanic where garage_id=1 and mechanic_name='Rahul M');
+insert into master_mechanic (garage_id, mechanic_name, rating)
+select 1,'Suresh K',4.9 where not exists (select 1 from master_mechanic where garage_id=1 and mechanic_name='Suresh K');
+insert into master_mechanic (garage_id, mechanic_name, rating)
+select 1,'Amit P',4.7 where not exists (select 1 from master_mechanic where garage_id=1 and mechanic_name='Amit P');
+-------------------
+
+TRANSACTION TABLES
+vehicle_service_booking
+
+CREATE TABLE IF NOT EXISTS vehicle_service_booking (
+    id BIGSERIAL NOT NULL,
+    sub_service_id BIGINT NOT NULL,
+    brand_id BIGINT NOT NULL,
+    fuel_id BIGINT NOT NULL,
+    garage_id BIGINT NOT NULL,
+	mechanic_id BIGINT,
+	problem_description varchar(500),
+	address varchar(500),	
+	customer_name varchar(255),
+	contact_number varchar(255),
+	preferred_date DATE,
+    time_slot_id BIGINT,	
+    image_urls varchar(500),
+	items_total numeric(10,2),
+	garage_base_fee numeric(10,2),
+	final_amount numeric(10,2),
+    created_by BIGINT,
+    created_date TIMESTAMP DEFAULT now(),
+    modified_by BIGINT,
+    modified_date TIMESTAMP,
+    is_active BOOLEAN DEFAULT TRUE,
+    CONSTRAINT pk_vehicle_service_booking_id PRIMARY KEY (id),
+    CONSTRAINT fk_vehicle_service_booking_sub_service_id FOREIGN KEY (sub_service_id) REFERENCES master_sub_service(id),
+    CONSTRAINT fk_vehicle_service_booking_brand_id FOREIGN KEY (brand_id) REFERENCES master_vehicle_brand(id),
+    CONSTRAINT fk_vehicle_service_booking_fuel_id FOREIGN KEY (fuel_id) REFERENCES master_fuel_type(id),
+    CONSTRAINT fk_vehicle_service_booking_garage_id FOREIGN KEY (garage_id) REFERENCES master_garage(id),
+    CONSTRAINT fk_vehicle_service_booking_mechanic_id FOREIGN KEY (mechanic_id) REFERENCES master_mechanic(id),
+    CONSTRAINT fk_vehicle_service_booking_time_slot_id FOREIGN KEY (time_slot_id) REFERENCES master_time_slot(id),
+    CONSTRAINT fk_vehicle_service_booking_created_by FOREIGN KEY (created_by) REFERENCES user_registration(id),
+    CONSTRAINT fk_vehicle_service_booking_modified_by FOREIGN KEY (modified_by) REFERENCES user_registration(id)
+);
+
+CREATE TABLE IF NOT EXISTS booking_service_mapping (
+    id BIGSERIAL NOT NULL,
+    booking_id BIGINT NOT NULL,
+    garage_service_id BIGINT NOT NULL,
+    quantity INT ,
+    service_price numeric(10,2), -- snapshot price
+	created_by BIGINT,
+    created_date TIMESTAMP DEFAULT now(),
+    modified_by BIGINT,
+    modified_date TIMESTAMP,
+    is_active BOOLEAN DEFAULT TRUE,
+CONSTRAINT pk_booking_service_mapping_id PRIMARY KEY (id),
+CONSTRAINT fk_booking_service_mapping_booking_id FOREIGN KEY (booking_id) REFERENCES vehicle_service_booking(id),
+CONSTRAINT fk_booking_service_mapping_garage_service_id FOREIGN KEY (garage_service_id)REFERENCES master_garage_service(id),
+CONSTRAINT uq_booking_service UNIQUE (booking_id, garage_service_id)
+);
+

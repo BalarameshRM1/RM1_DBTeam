@@ -1,0 +1,43 @@
+
+CREATE OR REPLACE FUNCTION public.fn_get_vehicle_service_details(
+    p_sub_service_id integer,
+    p_brand_id integer DEFAULT -1,
+    p_fuel_id integer DEFAULT -1,
+    p_garage_id integer DEFAULT -1,
+    p_limit integer DEFAULT 100,
+    p_offset integer DEFAULT 0
+)
+RETURNS TABLE(
+    booking_id bigint,user_id bigint,customer_name varchar,contact_number varchar,address varchar,
+    preferred_date date,brand_id bigint,brand_name varchar,fuel_id bigint,fuel_type_name varchar,
+    garage_id bigint,garage_name varchar,garage_rating numeric,mechanic_id bigint,
+    mechanic_name varchar,mechanic_rating numeric,service_id bigint,service_name varchar,
+    service_price numeric,quantity int,items_total numeric(10,2),garage_base_fee numeric(10,2),
+    final_amount numeric(10,2),created_date timestamp
+)
+LANGUAGE 'plpgsql'
+AS $$
+BEGIN
+    RETURN QUERY
+    SELECT
+        vsb.id AS booking_id,vsb.user_id,vsb.customer_name,vsb.contact_number,vsb.address,vsb.preferred_date,
+        vsb.brand_id,mvb.brand_name,vsb.fuel_id,mft.fuel_type_name,vsb.garage_id,mg.garage_name,
+        mg.rating AS garage_rating,vsb.mechanic_id,mm.mechanic_name,mm.rating AS mechanic_rating,
+        bsm.garage_service_id AS service_id,mgs.service_name,bsm.service_price,bsm.quantity,
+        vsb.items_total,vsb.garage_base_fee,vsb.final_amount,vsb.created_date
+    FROM vehicle_service_booking vsb
+    LEFT JOIN master_vehicle_brand mvb ON vsb.brand_id = mvb.id AND mvb.is_active = TRUE
+    LEFT JOIN master_fuel_type mft ON vsb.fuel_id = mft.id AND mft.is_active = TRUE
+    LEFT JOIN master_garage mg ON vsb.garage_id = mg.id AND mg.is_active = TRUE
+    LEFT JOIN master_mechanic mm ON vsb.mechanic_id = mm.id AND mm.is_active = TRUE
+    LEFT JOIN booking_service_mapping bsm ON vsb.id = bsm.booking_id AND bsm.is_active = TRUE
+    LEFT JOIN master_garage_service mgs ON bsm.garage_service_id = mgs.id AND mgs.is_active = TRUE
+    WHERE vsb.is_active = TRUE
+      AND vsb.sub_service_id = p_sub_service_id
+      AND (vsb.brand_id = p_brand_id OR p_brand_id = -1)
+      AND (vsb.fuel_id = p_fuel_id OR p_fuel_id = -1)
+      AND (vsb.garage_id = p_garage_id OR p_garage_id = -1)
+    ORDER BY vsb.id DESC
+    LIMIT p_limit OFFSET p_offset;
+END;
+$$;
