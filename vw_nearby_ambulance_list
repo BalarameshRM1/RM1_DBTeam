@@ -1,0 +1,9 @@
+create or replace view public.vw_nearby_ambulance_list as
+select
+    h.id as hospital_id, h.hospital_name,h.specialty_type, h.location, h.latitude, h.longitude,
+    h.contact_number as hospital_contact,a.id as ambulance_id,a.service_provider,a.contact_number as ambulance_contact,
+    a.availability_status
+from public.master_hospital h
+left join public.master_ambulance a on a.hospital_id = h.id where h.is_active = true
+  and a.is_active = true
+  and a.availability_status = 'Available';
