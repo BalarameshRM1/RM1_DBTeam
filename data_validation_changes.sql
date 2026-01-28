@@ -2774,3 +2774,211 @@ WHERE NOT EXISTS (SELECT 1 FROM public.master_hospital WHERE hospital_name = 'Ya
 insert into master_role (role_name)select 'Garage_Owner' where not exists (select 1 from master_role where role_name='Garage_Owner');
 
 insert into master_role (role_name)select 'Mechanic' where not exists (select 1 from master_role where role_name='Mechanic');
+  
+------------------------ healthcare
+ALTER TABLE public.master_ambulance ADD COLUMN hospital_id BIGINT;
+ALTER TABLE public.master_ambulance 
+  ADD CONSTRAINT fk_ambulance_hospital FOREIGN KEY (hospital_id) REFERENCES public.master_hospital(id);
+-----------
+CREATE TABLE IF NOT EXISTS public.master_assistants
+(
+    id bigserial NOT NULL,
+    name VARCHAR(100) NOT NULL,
+    rating numeric(3,2),
+    role VARCHAR(50) DEFAULT 'Professional',
+    is_active boolean DEFAULT true,
+    CONSTRAINT pk_master_assistants_id PRIMARY KEY (id),
+    CONSTRAINT uk_master_assistants_name UNIQUE (name)
+);
+-- Insert Assistant A
+INSERT INTO public.master_assistants (name, rating, role, is_active) SELECT 'Assistant A', 4.90, 'Professional', true WHERE NOT EXISTS (SELECT 1 FROM public.master_assistants WHERE name = 'Assistant A');
+
+-- Insert Assistant B
+INSERT INTO public.master_assistants (name, rating, role, is_active) SELECT 'Assistant B', 4.10, 'Professional', true WHERE NOT EXISTS (SELECT 1 FROM public.master_assistants WHERE name = 'Assistant B');
+
+-- Insert Assistant C
+INSERT INTO public.master_assistants (name, rating, role, is_active) SELECT 'Assistant C', 4.11, 'Professional', true WHERE NOT EXISTS (SELECT 1 FROM public.master_assistants WHERE name = 'Assistant C');
+
+
+--------------------
+CREATE TABLE IF NOT EXISTS public.appointments
+(
+    id bigserial NOT NULL,
+    user_id bigint NOT NULL,
+    doctor_id bigint,
+	doctor_specialization_id INT,
+    consultation_type VARCHAR(20) NOT NULL,
+    appointment_time timestamp NOT NULL,
+    description varchar,
+	days_of_suffering int,
+	health_insurance boolean,
+	upload_prescription varchar(500),
+	upload_test_list varchar(500),
+	required_ambulance boolean,
+    required_assistant boolean,
+    ambulance_id bigint,
+    pickup_time timestamp,
+    assistant_id bigint,
+	pharmacies_id bigint,
+	labs_id bigint,
+    created_by BIGINT,
+    created_date TIMESTAMP DEFAULT NOW(),
+    modified_by BIGINT,
+    modified_date TIMESTAMP,
+    is_active BOOLEAN DEFAULT TRUE,
+    CONSTRAINT pk_appointments_id PRIMARY KEY (id),
+    CONSTRAINT fk_appointments_user_id FOREIGN KEY (user_id) REFERENCES user_registration(id),
+    CONSTRAINT fk_appointments_doctor_id FOREIGN KEY (doctor_id) REFERENCES doctor_profile(id),
+    CONSTRAINT fk_appointments_doctor_specialization_id FOREIGN KEY (doctor_specialization_id) REFERENCES master_doctor_specialization(id),
+    CONSTRAINT fk_appointments_ambulance_id FOREIGN KEY (ambulance_id) REFERENCES master_ambulance(id),
+    CONSTRAINT fk_appointments_assistant_id FOREIGN KEY (assistant_id) REFERENCES master_assistants(id),
+	CONSTRAINT fk_appointments_pharmacies_id FOREIGN KEY (pharmacies_id) REFERENCES master_pharmacies(id),
+    CONSTRAINT fk_appointments_labs_id FOREIGN KEY (labs_id) REFERENCES master_labs(id)
+
+);
+----------------------
+CREATE TABLE IF NOT EXISTS public.ambulance_booking
+(
+    id bigserial NOT NULL,
+    appointment_id bigint NOT NULL,
+    ambulance_id bigint NOT NULL,
+	
+    created_by BIGINT,
+    created_date TIMESTAMP DEFAULT NOW(),
+    modified_by BIGINT,
+    modified_date TIMESTAMP,
+    is_active BOOLEAN DEFAULT TRUE,
+    CONSTRAINT pk_ambulance_booking_id PRIMARY KEY (id),
+    CONSTRAINT fk_ambulance_booking_appointment FOREIGN KEY (appointment_id) REFERENCES public.appointments(id),
+    CONSTRAINT fk_ambulance_booking_ambulance FOREIGN KEY (ambulance_id) REFERENCES public.master_ambulance(id)
+);
+---------------------------
+
+CREATE TABLE IF NOT EXISTS public.master_pharmacies
+(
+    id bigserial NOT NULL,
+    pharmacy_name VARCHAR(255) UNIQUE NOT NULL,
+    pharmacy_type VARCHAR(100), -- Retail, Discount, 24/7
+    services varchar(255),
+    rating int ,
+    delivery_time VARCHAR(50),
+    is_active boolean DEFAULT true,
+	CONSTRAINT pk_master_pharmacies_id PRIMARY KEY (id),
+    CONSTRAINT ck_master_pharmacies_rating check (rating between 1 and 5)
+
+);
+-------	------
+INSERT INTO public.master_pharmacies (pharmacy_name, pharmacy_type, services, rating, delivery_time, is_active)SELECT 'HealthCare Pharmacy', 'Retail Pharmacy', 'Prescription medicines, OTC drugs', 4, '30-50 mins', true WHERE NOT EXISTS (SELECT 1 FROM public.master_pharmacies WHERE pharmacy_name = 'HealthCare Pharmacy');
+INSERT INTO public.master_pharmacies (pharmacy_name, pharmacy_type, services, rating, delivery_time, is_active)SELECT 'Green Cross Pharma', 'Discount Pharmacy', 'Generic & Branded drugs', 5, '15-30 mins', true WHERE NOT EXISTS (SELECT 1 FROM public.master_pharmacies WHERE pharmacy_name = 'Green Cross Pharma');
+INSERT INTO public.master_pharmacies (pharmacy_name, pharmacy_type, services, rating, delivery_time, is_active) SELECT 'MedLife Pharmacy', '24/7 Pharmacy', 'Emergency supplies, Vitamins', 5, 'Immediate', true WHERE NOT EXISTS (SELECT 1 FROM public.master_pharmacies WHERE pharmacy_name = 'MedLife Pharmacy');
+----------
+
+CREATE TABLE IF NOT EXISTS public.master_labs
+(
+    id bigserial NOT NULL,
+    lab_name VARCHAR(255) UNIQUE NOT NULL,
+    services varchar(255),
+    rating int,
+    home_collection boolean ,
+    is_active boolean DEFAULT true,
+	CONSTRAINT pk_master_labs_id PRIMARY KEY (id),
+    CONSTRAINT ck_master_labs_rating check (rating between 1 and 5)
+
+);
+
+INSERT INTO public.master_labs (lab_name, services, rating, home_collection, is_active) SELECT 'Apollo Diagnostics', 'Blood tests, Imaging, Pathology', 5, true, true WHERE NOT EXISTS (SELECT 1 FROM public.master_labs WHERE lab_name = 'Apollo Diagnostics');
+INSERT INTO public.master_labs (lab_name, services, rating, home_collection, is_active) SELECT 'Dr. Lal PathLabs', 'Pathology, Biochemistry, Home sample collection', 4, true, true WHERE NOT EXISTS (SELECT 1 FROM public.master_labs WHERE lab_name = 'Dr. Lal PathLabs');
+INSERT INTO public.master_labs (lab_name, services, rating, home_collection, is_active) SELECT 'SRL Diagnostics', 'Full body checkups, Radiology, Home collection', 5, true, true WHERE NOT EXISTS (SELECT 1 FROM public.master_labs WHERE lab_name = 'SRL Diagnostics');
+
+
+----------
+drop table master_fuel_type;
+drop table master_vehicle_brand;
+
+alter table home_service drop column vehicle_brand_id;
+alter table home_service drop column fuel_type_id;
+
+ALTER TABLE public.master_pharmacies ADD COLUMN latitude NUMERIC(9,6),ADD COLUMN longitude NUMERIC(9,6);
+
+ALTER TABLE public.master_labs ADD COLUMN latitude NUMERIC(9,6),ADD COLUMN longitude NUMERIC(9,6);
+-----------
+ALTER TABLE public.doctor_profile
+ALTER COLUMN rating TYPE INT USING rating::INT;
+
+ALTER TABLE public.doctor_profile ADD CONSTRAINT ck_doctor_profile_rating CHECK (rating BETWEEN 1 AND 5);
+-----------
+alter table ambulance_booking add column patient_name varchar(255);
+alter table ambulance_booking add column aadhar_number varchar(50) ;
+
+CREATE TABLE IF NOT EXISTS public.master_hospital (
+    id BIGSERIAL NOT NULL,
+    hospital_name VARCHAR(255) NOT NULL,
+    specialty_type VARCHAR(50),   
+    location VARCHAR(255),
+    distance_km NUMERIC(5,2),
+    estimated_arrival_mins INT,
+    contact_number VARCHAR(20),
+    is_active BOOLEAN DEFAULT TRUE,
+    CONSTRAINT pk_master_hospital_id PRIMARY KEY (id)
+	
+);
+
+INSERT INTO public.master_ambulance (service_provider, contact_number, availability_status, is_active)
+SELECT 'Apollo Ambulance', '+91-40-23607777', 'Available', true
+WHERE NOT EXISTS (SELECT 1 FROM public.master_ambulance WHERE service_provider = 'Apollo Ambulance');
+
+INSERT INTO public.master_ambulance (service_provider, contact_number, availability_status, is_active)
+SELECT 'Care Ambulance', '+91-40-61656565', 'Available', true
+WHERE NOT EXISTS (SELECT 1 FROM public.master_ambulance WHERE service_provider = 'Care Ambulance');
+
+INSERT INTO public.master_ambulance (service_provider, contact_number, availability_status, is_active)
+SELECT 'Yashoda Ambulance', '+91-40-23550000', 'Available', true
+WHERE NOT EXISTS (SELECT 1 FROM public.master_ambulance WHERE service_provider = 'Yashoda Ambulance');
+
+INSERT INTO public.master_hospital 
+(hospital_name, specialty_type, location, distance_km, estimated_arrival_mins, contact_number, is_active)
+SELECT 'Apollo Hospital', 'Multi-Specialty', 'Jubilee Hills, Hyderabad', 2.3, 8, '+91-40-23607777', TRUE
+WHERE NOT EXISTS (SELECT 1 FROM public.master_hospital WHERE hospital_name = 'Apollo Hospital');
+
+INSERT INTO public.master_hospital 
+(hospital_name, specialty_type, location, distance_km, estimated_arrival_mins, contact_number, is_active)
+SELECT 'Care Hospital', 'Multi-Specialty', 'Banjara Hills, Hyderabad', 3.1, 12, '+91-40-61656565', TRUE
+WHERE NOT EXISTS (SELECT 1 FROM public.master_hospital WHERE hospital_name = 'Care Hospital');
+
+INSERT INTO public.master_hospital 
+(hospital_name, specialty_type, location, distance_km, estimated_arrival_mins, contact_number, is_active)
+SELECT 'Yashoda Hospital', 'Super-Specialty', 'Somajiguda, Hyderabad', 4.5, 15, '+91-40-23550000', TRUE
+WHERE NOT EXISTS (SELECT 1 FROM public.master_hospital WHERE hospital_name = 'Yashoda Hospital');
+
+SELECT * FROM master_hospital 
+ALTER TABLE public.master_ambulance ADD COLUMN hospital_id BIGINT;
+ALTER TABLE public.master_ambulance  ADD CONSTRAINT fk_ambulance_hospital FOREIGN KEY (hospital_id) REFERENCES public.master_hospital(id);
+-------
+Create table if not exists  master_relation(
+id serial not null,
+relation_type varchar(255) not null,
+is_active boolean default true,
+constraint pk_master_relation_id primary key(id));
+
+INSERT INTO public.master_relation (relation_type, is_active) SELECT 'Father', TRUE WHERE NOT EXISTS (SELECT 1 FROM public.master_relation WHERE relation_type = 'Father');
+INSERT INTO public.master_relation (relation_type, is_active) SELECT 'Mother', TRUE WHERE NOT EXISTS (SELECT 1 FROM public.master_relation WHERE relation_type = 'Mother');
+INSERT INTO public.master_relation (relation_type, is_active) SELECT 'Brother', TRUE WHERE NOT EXISTS (SELECT 1 FROM public.master_relation WHERE relation_type = 'Brother');
+INSERT INTO public.master_relation (relation_type, is_active) SELECT 'Sister', TRUE WHERE NOT EXISTS (SELECT 1 FROM public.master_relation WHERE relation_type = 'Sister');
+INSERT INTO public.master_relation (relation_type, is_active) SELECT 'Spouse', TRUE WHERE NOT EXISTS (SELECT 1 FROM public.master_relation WHERE relation_type = 'Spouse');
+
+Create table if not exists student_family_members(
+id serial not null,
+user_id bigint not null,
+relation_type_id int not null,
+first_name varchar(255),
+last_name varchar(255),
+phone_number varchar(255),
+created_by bigint,
+created_date timestamp DEFAULT now(),
+modified_by bigint,
+modified_date timestamp,
+is_active boolean default true,
+constraint pk_student_family_members_id primary key(id),
+constraint fk_student_family_members_user_id foreign key (user_id) references user_registration (id),
+constraint fk_student_family_members_relation_type_id foreign key (relation_type_id) references master_relation (id)
+);
