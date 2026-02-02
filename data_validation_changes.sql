@@ -2982,3 +2982,1483 @@ constraint pk_student_family_members_id primary key(id),
 constraint fk_student_family_members_user_id foreign key (user_id) references user_registration (id),
 constraint fk_student_family_members_relation_type_id foreign key (relation_type_id) references master_relation (id)
 );
+
+----------------------- 28 jan 2026 --- dhanusha-buy & sale
+CREATE OR REPLACE FUNCTION get_filtered_property_listings(
+    p_property_type_id INT DEFAULT NULL,
+    p_updated_range TEXT DEFAULT NULL,
+    p_min_rating NUMERIC DEFAULT NULL
+)
+RETURNS TABLE (
+    id BIGINT,
+    title VARCHAR,
+    price NUMERIC,
+    location TEXT,
+    rating NUMERIC,
+    created_date DATE,
+    property_type TEXT
+) AS $$
+BEGIN
+    RETURN QUERY
+    SELECT 
+        p.id,
+        p.property_description AS title,
+        p.expected_price AS price,
+        CONCAT(p.locality_area, ', ', p.landmark) AS location,
+        p.rating,
+        p.created_date,
+        pt.type_name AS property_type
+    FROM property_sell_listing p
+    JOIN master_property_type pt ON pt.id = p.property_type_id
+    WHERE p.is_active = true
+      AND (p_property_type_id IS NULL OR p.property_type_id = p_property_type_id)
+      AND (p_min_rating IS NULL OR p.rating >= p_min_rating)
+      AND (
+          p_updated_range IS NULL OR
+          (p_updated_range = 'Today' AND p.created_date = CURRENT_DATE) OR
+          (p_updated_range = 'Last 7 Days' AND p.created_date >= CURRENT_DATE - INTERVAL '7 days') OR
+          (p_updated_range = 'Last 30 Days' AND p.created_date >= CURRENT_DATE - INTERVAL '30 days') OR
+          (p_updated_range = 'Last 3 Months' AND p.created_date >= CURRENT_DATE - INTERVAL '3 months')
+      );
+END;
+$$ LANGUAGE plpgsql;
+
+----swachify_product
+CREATE TABLE IF NOT EXISTS product_rating (
+    id SERIAL not null,
+    product_id INT NOT NULL,
+    user_id BIGINT NOT NULL,
+    rating NUMERIC(2,1) NOT NULL,
+	created_by BIGINT, 
+	created_date TIMESTAMP DEFAULT NOW(),
+	modified_by BIGINT, 
+	modified_date TIMESTAMP, 
+	is_active BOOLEAN DEFAULT TRUE,
+	constraint pk_product_rating_id primary key (id),
+   constraint fk_product_rating_product_id FOREIGN KEY (product_id) REFERENCES product_registration(id),
+    constraint fk_product_rating_user_id FOREIGN KEY (user_id) REFERENCES user_registration(id)
+);
+---------------------------------------------
+
+CREATE TABLE IF NOT EXISTS master_vehicle_type (
+    id SERIAL PRIMARY KEY,
+    vehicle_type_name VARCHAR(100) UNIQUE,
+    is_active BOOLEAN DEFAULT TRUE
+);
+
+INSERT INTO master_vehicle_type (vehicle_type_name)
+SELECT 'Bike'
+WHERE NOT EXISTS (
+    SELECT 1 FROM master_vehicle_type WHERE vehicle_type_name = 'Bike'
+);
+
+INSERT INTO master_vehicle_type (vehicle_type_name)
+SELECT 'Light Motor Cargo'
+WHERE NOT EXISTS (
+    SELECT 1 FROM master_vehicle_type WHERE vehicle_type_name = 'Light Motor Cargo'
+);
+
+INSERT INTO master_vehicle_type (vehicle_type_name)
+SELECT 'DCM Van'
+WHERE NOT EXISTS (
+    SELECT 1 FROM master_vehicle_type WHERE vehicle_type_name = 'DCM Van'
+);
+
+INSERT INTO master_vehicle_type (vehicle_type_name)
+SELECT 'Freight/Lorry'
+WHERE NOT EXISTS (
+    SELECT 1 FROM master_vehicle_type WHERE vehicle_type_name = 'Freight/Lorry'
+);
+
+------------------------------------------------------
+CREATE TABLE IF NOT EXISTS product_order (
+    id SERIAL NOT NULL,
+    user_id BIGINT NOT NULL,
+    product_id INT NOT NULL,
+    full_name VARCHAR(255) NOT NULL,
+    phone_number VARCHAR(20) NOT NULL,
+    delivery_address TEXT NOT NULL,
+    quantity VARCHAR(50) NOT NULL, -- e.g., 2 kg / 5 pcs / 1 pack
+    vehicle_type_id INT, -- FK to master_vehicle_type
+    order_date TIMESTAMP DEFAULT NOW(),
+    status VARCHAR(50) DEFAULT 'Pending',
+    created_by BIGINT,
+    created_date TIMESTAMP DEFAULT NOW(),
+    modified_by BIGINT,
+    modified_date TIMESTAMP,
+    is_active BOOLEAN DEFAULT TRUE,
+    
+    CONSTRAINT pk_product_order_id PRIMARY KEY (id),
+    CONSTRAINT fk_product_order_user_id FOREIGN KEY (user_id) REFERENCES user_registration(id),
+    CONSTRAINT fk_product_order_product_id FOREIGN KEY (product_id) REFERENCES product_registration(id),
+    CONSTRAINT fk_product_order_vehicle_type_id FOREIGN KEY (vehicle_type_id) REFERENCES master_vehicle_type(id)
+);
+
+-------------------------------------------
+
+CREATE OR REPLACE FUNCTION get_filtered_products(
+    p_category_id INT DEFAULT NULL,
+    p_min_rating NUMERIC DEFAULT NULL,
+    p_distance_range TEXT DEFAULT NULL
+)
+RETURNS TABLE (
+    product_id INT,product_name VARCHAR,description VARCHAR,product_price NUMERIC,avg_rating NUMERIC,
+    total_ratings INT,,category_name VARCHAR
+) AS $$
+BEGIN
+    RETURN QUERY
+    SELECT 
+        pr.id, pr.product_name, pr.description,pr.product_price,ROUND(AVG(r.rating), 1) AS avg_rating,
+        COUNT(r.id) AS total_ratings,pr.latitude, pr.longitude,
+        pc.category_name
+    FROM product_registration pr
+    JOIN master_product_category pc ON pc.id = pr.category_id
+    LEFT JOIN product_rating r ON r.product_id = pr.id
+    WHERE pr.is_active = true
+      AND (p_category_id = -1 OR pr.category_id = p_category_id)
+      AND (
+          p_distance_range =-1 OR
+          (p_distance_range = '0-10' AND pr.latitude BETWEEN 0 AND 10) OR
+          (p_distance_range = '10-20' AND pr.distance_km BETWEEN 10 AND 20) OR
+          (p_distance_range = '20-40' AND pr.distance_km BETWEEN 20 AND 40) OR
+          (p_distance_range = 'Above 40' AND pr.distance_km > 40)
+      )
+    GROUP BY pr.id, pc.category_name
+    HAVING (p_min_rating IS NULL OR ROUND(AVG(r.rating), 1) >= p_min_rating);
+END;
+$$ LANGUAGE plpgsql;				
+
+
+
+select * from product_registration
+alter table product_registration add column latitude  numeric(9,6) ;
+alter table product_registration add column longitude  numeric(9,6) ;
+
+------------------------------------ 29th jan 2026
+CREATE OR REPLACE FUNCTION public.fn_get_internship_list(
+    p_category_id BIGINT DEFAULT -1,
+    p_location_type_id INT DEFAULT -1,
+    p_limit INT DEFAULT 100,
+    p_offset INT DEFAULT 0
+)
+RETURNS TABLE (
+    internship_id BIGINT,
+    job_id BIGINT,
+    company_name VARCHAR(255),
+    company_address VARCHAR(255),
+    role_description VARCHAR(500),
+    internship_stipend BOOLEAN,
+    stipend_type_id INT,
+    internship_duration_id BIGINT,
+    category_id BIGINT,
+    location_type_id INT,
+    work_type_id INT,
+    created_date TIMESTAMP
+)
+LANGUAGE plpgsql
+AS $BODY$
+BEGIN
+    RETURN QUERY
+    SELECT
+        jo.id AS internship_id,
+        jo.job_id,
+        jo.company_name,
+        jo.company_address,
+        jo.role_description,
+        jo.internship_stipend,
+        jo.stipend_type_id,
+        jo.internship_duration_id,
+        jo.category_id,
+        jo.location_type_id,
+        jo.work_type_id,
+        jo.created_date
+    FROM public.job_openings jo
+    WHERE jo.is_active = TRUE
+      AND (p_category_id = -1 OR jo.category_id = p_category_id)
+      AND (p_location_type_id = -1 OR jo.location_type_id = p_location_type_id)
+    ORDER BY jo.created_date DESC
+    LIMIT p_limit OFFSET p_offset;
+END;
+$BODY$;
+
+
+select * from master_module
+select * from master_sub_module
+
+select * from master_service
+select * from master_sub_service
+
+update master_module set module_name = 'Buy/Sell/Rent' where id =3
+
+update master_sub_module set sub_module_name = 'Home Cleaning' where id =1;
+update master_sub_module set sub_module_name = 'Home Service' where id =2;
+
+update master_service set service_name = 'Home Cleaning' where id =1;
+update master_service set service_name = 'Commercial Cleaning' where id =2;
+update master_service set service_name = 'Vehicle Cleaning' where id =3;
+update master_service set service_name = 'Plumbing' where id =4;
+update master_service set service_name = 'Painting' where id =5;
+update master_service set service_name = 'Electrician' where id =6;
+update master_service set service_name = 'AC Repair' where id =7;
+update master_service set service_name = 'Chef' where id =8;
+
+
+update master_service set sub_module_id = 1 where id =1;
+update master_service set sub_module_id = 1 where id =2;
+update master_service set sub_module_id = 1 where id =3;
+update master_service set sub_module_id = 2 where id =4;
+update master_service set sub_module_id = 2 where id =5;
+update master_service set sub_module_id = 2 where id =6;
+update master_service set sub_module_id = 2 where id =7;
+update master_service set sub_module_id = 2 where id =8;
+delete from master_service where id =9;
+-----------------------
+select * from master_sub_service
+begin;
+update master_sub_service set service_id =1  
+rollback
+update master_sub_service set sub_service_name = 'Kitchen Cleaning' , service_id = 1 where id =1;
+update master_sub_service set sub_service_name = 'Washroom Cleaning' , service_id = 1  where id =2;
+update master_sub_service set sub_service_name = 'Sofa Cleaning' , service_id = 1  where id =3;
+update master_sub_service set sub_service_name = 'Bedroom Cleaning' , service_id = 1  where id =4;
+update master_sub_service set sub_service_name = 'Window Cleaning' , service_id = 1  where id =5;
+update master_sub_service set sub_service_name = 'Full Deep Cleaning' , service_id = 1  where id =6;
+update master_sub_service set sub_service_name = 'Small Office' , service_id = 2 where id =7;
+update master_sub_service set sub_service_name = 'Medium Office' , service_id = 2 where id =8;
+update master_sub_service set sub_service_name = 'Large Corporate Office' , service_id = 2 where id =9;
+update master_sub_service set sub_service_name = 'Retail Shop/Showroom' , service_id = 2 where id =10;
+update master_sub_service set sub_service_name = 'Warehouse/Clinic' , service_id = 2 where id =11;
+update master_sub_service set sub_service_name = 'Car' , service_id = 3 where id =12;
+update master_sub_service set sub_service_name = 'Bike' , service_id = 3 where id =13;
+update master_sub_service set sub_service_name = 'Truck', service_id = 3 where id =14;
+
+INSERT INTO master_sub_service (sub_service_name, service_id)
+SELECT 'Bike', 3
+WHERE NOT EXISTS (
+    SELECT 1
+    FROM master_sub_service
+    WHERE sub_service_name = 'Bike'
+      AND service_id = 3
+);
+
+INSERT INTO master_sub_service (sub_service_name, service_id)
+SELECT 'Truck', 3
+WHERE NOT EXISTS (
+    SELECT 1
+    FROM master_sub_service
+    WHERE sub_service_name = 'Truck'
+      AND service_id = 3
+);
+
+
+-------------------------------------------------------------------- 30jan-2026 -- dhanusha
+-------------------- 30 jan
+INSERT INTO public.master_sub_module (sub_module_name, module_id)SELECT 'Institute', 5 WHERE NOT EXISTS (SELECT 1 FROM public.master_sub_module WHERE sub_module_name = 'Institute' AND module_id = 5 );
+----------------------
+CREATE TABLE IF NOT EXISTS public.institution_registration (
+    id SERIAL NOT NULL,
+    institution_name VARCHAR(255) NOT NULL,
+    institution_type_id INT NOT NULL,
+    identity_type_id INT NOT NULL,
+    identity_number VARCHAR(100) NOT NULL,
+    upload_id_proof varchar(500),
+    upload_address_proof varchar(500),
+    Location varchar(500) NOT NULL,
+    representative_name VARCHAR(255) NOT NULL,
+    email VARCHAR(150) NOT NULL,
+    phone_number VARCHAR(100) NOT NULL,
+    institute_website varchar(500),
+    total_branches INT ,
+    academic_year_start DATE,
+    academic_year_end DATE,
+    created_by BIGINT,
+    created_date TIMESTAMP DEFAULT now(),
+    modified_by BIGINT,
+    modified_date TIMESTAMP,
+    is_active BOOLEAN DEFAULT TRUE,
+    CONSTRAINT pk_institution_registration_id PRIMARY KEY (id),
+    CONSTRAINT fk_institution_registration_institution_type_id FOREIGN KEY (institution_type_id) REFERENCES master_institute_type(id),
+    CONSTRAINT fk_institution_registration_identity_type_id FOREIGN KEY (identity_type_id) REFERENCES master_identity_type(id),
+    CONSTRAINT uk_institution_registration UNIQUE (institution_name, identity_number)
+);
+
+-------------------------------------------------------------------------
+
+CREATE TABLE IF NOT EXISTS public.institution_branch (
+    id SERIAL NOT NULL,
+    institution_id BIGINT NOT NULL,
+    branch_name VARCHAR(255) NOT NULL,
+    city VARCHAR(255) NOT NULL,
+    branch_code VARCHAR(100) NOT NULL,
+    branch_head VARCHAR(255) NOT NULL,
+    created_date TIMESTAMP DEFAULT now(),
+    modified_by BIGINT,
+    modified_date TIMESTAMP,
+    is_active BOOLEAN DEFAULT TRUE,
+    CONSTRAINT pk_institution_branch_id PRIMARY KEY (id),
+    CONSTRAINT fk_institution_branch_institution_institution_id FOREIGN KEY (institution_id) REFERENCES institution_registration(id),
+    CONSTRAINT uk_institution_branch UNIQUE (institution_id, branch_code)
+);
+alter table  institution_branch add column created_by BIGINT;
+ALTER TABLE public.institution_branch
+ADD CONSTRAINT uq_institution_branch_branch_name UNIQUE (branch_name);
+
+--------------------
+CREATE TABLE IF NOT EXISTS public.master_institute_type (
+    id SERIAL NOT NULL,
+    institute_type VARCHAR(255),
+    is_active BOOLEAN DEFAULT TRUE,
+    CONSTRAINT pk_master_institute_type_id PRIMARY KEY (id)
+);
+
+INSERT INTO public.master_institute_type (institute_type)SELECT 'University'WHERE NOT EXISTS (SELECT 1 FROM public.master_institute_type WHERE institute_type = 'University');
+INSERT INTO public.master_institute_type (institute_type)SELECT 'College'WHERE NOT EXISTS (SELECT 1 FROM public.master_institute_type WHERE institute_type = 'College');
+INSERT INTO public.master_institute_type (institute_type)SELECT 'Institute' WHERE NOT EXISTS (SELECT 1 FROM public.master_institute_type WHERE institute_type = 'Institute');
+INSERT INTO public.master_institute_type (institute_type)SELECT 'Academy'WHERE NOT EXISTS (SELECT 1 FROM public.master_institute_type WHERE institute_type = 'Academy');
+
+CREATE TABLE IF NOT EXISTS public.master_identity_type (
+    id SERIAL NOT NULL,
+    identity_type_name VARCHAR(255),
+    is_active BOOLEAN DEFAULT TRUE,
+    CONSTRAINT pk_master_identity_type_id PRIMARY KEY (id)
+);
+
+INSERT INTO public.master_identity_type (identity_type_name)SELECT 'Registration Certificate' WHERE NOT EXISTS (SELECT 1 FROM public.master_identity_type WHERE identity_type_name = 'Registration Certificate');
+INSERT INTO public.master_identity_type (identity_type_name)SELECT 'Government Approval' WHERE NOT EXISTS (SELECT 1 FROM public.master_identity_type WHERE identity_type_name = 'Government Approval');
+
+---------------------------------------------- 
+CREATE OR REPLACE FUNCTION public.fn_get_branch_directory(
+    p_branch_id BIGINT DEFAULT -1
+)
+RETURNS TABLE (
+    total_students BIGINT,
+    branch_count BIGINT,
+    branch_id BIGINT,
+    branch_name VARCHAR(255),
+    location VARCHAR,
+    status VARCHAR(20),
+    student_count BIGINT
+)
+LANGUAGE plpgsql
+AS $$
+BEGIN
+    RETURN QUERY
+    WITH branch_data AS (
+        SELECT
+            ib.id,ib.branch_name,ib.city AS location,ib.status,COUNT(sp.id) AS student_count
+        FROM public.institution_branch ib
+ LEFT JOIN public.student_profile sp ON sp.branch_id = ib.id AND sp.is_active = TRUE WHERE ib.is_active = TRUE AND (p_branch_id = -1 OR ib.id = p_branch_id)
+        GROUP BY ib.id, ib.branch_name, ib.city, ib.status
+    )
+    SELECT
+        (SELECT COUNT(*) FROM public.student_profile WHERE is_active = TRUE) AS total_students,
+        (SELECT COUNT(*) FROM public.institution_branch WHERE is_active = TRUE) AS branch_count,
+        bd.id,bd.branch_name,bd.location,bd.status,bd.student_count
+    FROM branch_data bd
+    ORDER BY bd.branch_name;
+END;
+$$;
+
+select * from fn_get_branch_directory(-1)
+-------------------
+
+CREATE OR REPLACE  FUNCTION public.fn_get_students_by_branch(
+    p_branch_id BIGINT,
+    p_limit INT DEFAULT 10,
+    p_offset INT DEFAULT 0
+)
+RETURNS TABLE (
+    student_id VARCHAR,
+    student_name VARCHAR,
+    academic_year varchar,
+    profile_image_url VARCHAR,
+    branch_name VARCHAR
+)
+LANGUAGE plpgsql
+AS $$
+BEGIN
+    RETURN QUERY
+    SELECT
+        sp.student_id,
+        sp.student_name,
+        sp.academic_year,
+        sp.profile_image_url,
+        ib.branch_name
+    FROM public.student_profile sp
+    JOIN public.institution_branch ib ON sp.branch_id = ib.id
+    WHERE sp.is_active = TRUE
+      AND (p_branch_id = -1 OR sp.branch_id = p_branch_id)
+    ORDER BY ib.branch_name, sp.academic_year, sp.student_name
+    LIMIT p_limit OFFSET p_offset;
+END;
+$$;
+
+
+select * from fn_get_students_by_branch(-1)
+
+--------------------------------------------------
+
+CREATE TABLE IF NOT EXISTS  public.student_profile (
+    id SERIAL not null,
+    branch_id BIGINT NOT NULL,
+	branch_name varchar(255) not null,
+    student_name VARCHAR(255) NOT NULL,
+    student_id VARCHAR(150) NOT NULL,
+    academic_year varchar(100) NOT NULL,
+    profile_image_url varchar(500),
+    created_by BIGINT,
+    created_date TIMESTAMP DEFAULT now(),
+    modified_by BIGINT,
+    modified_date TIMESTAMP,
+    is_active BOOLEAN DEFAULT TRUE,
+	constraint pk_student_profile_id primary key (id),
+    CONSTRAINT fk_student_profile_branch_id FOREIGN KEY (branch_id) REFERENCES public.institution_branch(id),
+	CONSTRAINT fk_student_profile_branch_name FOREIGN KEY (branch_name) REFERENCES public.institution_branch(branch_name),
+	CONSTRAINT uk_student_profile_student_id unique  (student_id) 
+
+);
+
+------------------------------------------------------
+CREATE TABLE IF NOT EXISTS public.student_academic_finance (
+    id BIGSERIAL NOT NULL,
+    student_id VARCHAR(150) NOT NULL,
+    father_name VARCHAR(255),
+    background VARCHAR(255),
+    admission_date DATE,
+    aadhaar_number VARCHAR(150),
+    pan_number VARCHAR(150),
+    scholarship_amount NUMERIC(10,2),
+    scholarship_disbursed_date DATE,
+    sgpa NUMERIC(10,2),
+    attendance_percent INT,
+    backlogs INT,
+    created_by BIGINT,
+    created_date TIMESTAMP DEFAULT now(),
+    modified_by BIGINT,
+    modified_date TIMESTAMP,
+    is_active BOOLEAN DEFAULT TRUE,
+    CONSTRAINT pk_student_academic_finance_id PRIMARY KEY (id),
+    CONSTRAINT fk_student_academic_finance_student_id FOREIGN KEY (student_id) REFERENCES public.student_profile(student_id),
+    CONSTRAINT uk_student_academic_finance_student_id UNIQUE (student_id)
+);
+--------------------------------------------
+CREATE TABLE IF NOT EXISTS public.student_fee_installments (
+    id BIGSERIAL NOT NULL,
+    student_id VARCHAR(150) NOT NULL,
+    installment_no INT NOT NULL,
+    installment_amount NUMERIC NOT NULL,
+    due_date DATE NOT NULL,
+    paid_date DATE,
+    created_by BIGINT,
+    created_date TIMESTAMP DEFAULT now(),
+    modified_by BIGINT,
+    modified_date TIMESTAMP,
+    is_active BOOLEAN DEFAULT TRUE,
+    CONSTRAINT pk_student_fee_installments_id PRIMARY KEY (id),
+    CONSTRAINT fk_student_fee_installments_student_id FOREIGN KEY (student_id) REFERENCES public.student_profile(student_id),
+    CONSTRAINT uk_student_fee_installments UNIQUE (student_id, installment_no)
+);
+
+---------------------------------------------------------
+	CREATE OR REPLACE FUNCTION public.fn_get_student_full_details(
+    p_student_id VARCHAR DEFAULT '-1',
+    p_branch_id BIGINT DEFAULT -1
+)
+RETURNS TABLE (
+    student_id VARCHAR,
+    student_name VARCHAR,
+    academic_year VARCHAR,
+    branch_name VARCHAR,
+    father_name VARCHAR,
+    background VARCHAR,
+    admission_date DATE,
+    aadhaar_number VARCHAR,
+    pan_number VARCHAR,
+    scholarship_amount NUMERIC,
+    scholarship_disbursed_date DATE,
+    sgpa NUMERIC,
+    attendance_percent INT,
+    backlogs INT,
+    installment_no INT,
+    installment_amount NUMERIC,
+    due_date DATE,
+    paid_date DATE
+)
+LANGUAGE plpgsql
+AS $$
+BEGIN
+    RETURN QUERY
+    SELECT
+        sp.student_id,sp.student_name,sp.academic_year,ib.branch_name,saf.father_name,saf.background,
+        saf.admission_date,saf.aadhaar_number,saf.pan_number,saf.scholarship_amount,saf.scholarship_disbursed_date,
+        saf.sgpa,saf.attendance_percent,saf.backlogs,fi.installment_no,fi.installment_amount,fi.due_date,fi.paid_date
+    FROM public.student_profile sp
+    LEFT JOIN public.institution_branch ib ON sp.branch_id = ib.id
+    LEFT JOIN public.student_academic_finance saf ON sp.student_id = saf.student_id
+    LEFT JOIN public.student_fee_installments fi ON sp.student_id = fi.student_id
+    WHERE sp.is_active = TRUE
+      AND (p_student_id = '-1' OR sp.student_id = p_student_id)   -- -1 = all students
+      AND (p_branch_id = -1 OR sp.branch_id = p_branch_id)        -- -1 = all branches
+    ORDER BY sp.student_id, fi.installment_no;
+END;
+$$;
+SELECT * FROM fn_get_student_full_details('-1', -1);
+
+---------------------------------------------------------------------------------------
+ALTER TABLE public.student_profile ADD COLUMN parent_mobile VARCHAR(100);
+--------------------------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS public.exam_schedule (
+    id SERIAL NOT NULL,
+    branch_id BIGINT NOT NULL,
+    exam_type VARCHAR(100) NOT NULL, -- e.g. 'Mid-Term', 'Final'
+    subject_name VARCHAR(100) NOT NULL,
+    exam_date DATE NOT NULL,
+	created_by BIGINT,
+    created_date TIMESTAMP DEFAULT now(),
+    modified_by BIGINT,
+    modified_date TIMESTAMP,
+    is_active BOOLEAN DEFAULT TRUE,
+    CONSTRAINT pk_exam_schedule_id PRIMARY KEY (id),
+    CONSTRAINT fk_exam_schedule_branch_branch_id FOREIGN KEY (branch_id) REFERENCES institution_branch(id),
+    CONSTRAINT uk_exam_schedule UNIQUE (branch_id, exam_type, subject_name, exam_date)
+);
+
+-----------------------------------------------------------------------------
+CREATE OR REPLACE FUNCTION public.fn_get_exam_schedule(
+    p_branch_id BIGINT,
+    p_exam_type VARCHAR
+)
+RETURNS TABLE (
+    subject_name VARCHAR,
+    exam_date DATE
+)
+LANGUAGE plpgsql
+AS $$
+BEGIN
+    RETURN QUERY
+    SELECT es.subject_name, es.exam_date
+    FROM public.exam_schedule es
+    WHERE (p_branch_id = -1 OR branch_id = p_branch_id)   -- -1 means all branches
+      AND (p_exam_type = '-1' OR exam_type = p_exam_type) -- -1 means all exam types
+      AND is_active = TRUE
+    ORDER BY exam_date;
+END;
+$$;
+
+SELECT * FROM fn_get_exam_schedule(-1, '-1');
+-------------------------------------------------------------------------------
+CREATE OR REPLACE FUNCTION public.fn_get_management_overview(
+    p_branch_id BIGINT DEFAULT -1,
+    p_exam_type VARCHAR DEFAULT '-1'
+)
+RETURNS TABLE (
+    parents_connected BIGINT,
+    exam_type VARCHAR,
+    exam_start_date DATE,
+    subject_name VARCHAR,
+    subject_exam_date DATE
+)
+LANGUAGE plpgsql
+AS $$
+BEGIN
+    RETURN QUERY
+    SELECT 
+        -- Parents Connected
+        (SELECT COUNT(*) 
+         FROM student_profile 
+         WHERE is_active = TRUE
+           AND parent_mobile IS NOT NULL
+           AND (p_branch_id = -1 OR branch_id = p_branch_id)) AS parents_connected,
+
+        -- Exam Type
+        es.exam_type,
+
+        -- Exam Start Date
+        (SELECT MIN(es2.exam_date) 
+         FROM exam_schedule es2
+         WHERE es2.is_active = TRUE
+           AND (p_branch_id = -1 OR es2.branch_id = p_branch_id)
+           AND (p_exam_type = '-1' OR es2.exam_type = p_exam_type)) AS exam_start_date,
+
+        -- Exam Timetable (subject + date list)
+        es.subject_name,
+        es.exam_date AS subject_exam_date
+    FROM exam_schedule es
+    WHERE es.is_active = TRUE
+      AND (p_branch_id = -1 OR es.branch_id = p_branch_id)
+      AND (p_exam_type = '-1' OR es.exam_type = p_exam_type)
+    ORDER BY es.exam_date;
+END;
+$$;
+
+
+SELECT * FROM fn_get_management_overview(-1, '-1');
+
+CREATE TABLE IF NOT EXISTS public.otp_verification (
+    id SERIAL NOT NULL,
+    institution_id INT NOT NULL,
+    identity_number VARCHAR(100) NOT NULL,
+    email VARCHAR(150) NOT NULL,
+    otp_code VARCHAR(10) NOT NULL,
+    expires_at TIMESTAMP NOT NULL,
+    is_verified BOOLEAN ,
+    created_by BIGINT,
+    created_date TIMESTAMP DEFAULT now(),
+    modified_by BIGINT,
+    modified_date TIMESTAMP,
+    is_active BOOLEAN DEFAULT TRUE,
+    CONSTRAINT pk_otp_verification_id PRIMARY KEY (id),
+    CONSTRAINT fk_otp_verification_institution_id FOREIGN KEY (institution_id) REFERENCES institution_registration(id),
+    CONSTRAINT uk_otp_verification UNIQUE (identity_number, email, otp_code)
+);
+
+
+----------------------------------------------------------------------------------------------- 
+
+
+CREATE TABLE IF NOT EXISTS public.ai_documents (
+    id BIGSERIAL NOT NULL,
+    doc_id VARCHAR(150) NOT NULL,          
+    chunk_id INT NOT NULL,               
+    content varchar NOT NULL,              
+    embedding VECTOR(384) NOT NULL,    
+    language VARCHAR(50),               
+    metadata JSONB,    
+    created_by BIGINT,
+    created_date TIMESTAMP DEFAULT now(),
+    modified_by BIGINT,
+    modified_date TIMESTAMP,
+    is_active BOOLEAN DEFAULT TRUE,
+    CONSTRAINT pk_documents_id PRIMARY KEY (id),
+    CONSTRAINT uk_documents_doc_chunk UNIQUE (doc_id, chunk_id)
+);
+
+
+CREATE INDEX ON public.ai_documents
+USING ivfflat (embedding vector_cosine_ops)
+WITH (lists = 100);
+
+CREATE EXTENSION IF NOT EXISTS vector;
+
+
+----------------------------------
+CREATE TABLE IF NOT EXISTS public.student_sem_academic_progress (
+    id BIGSERIAL NOT NULL,
+    student_id VARCHAR(150) NOT NULL,
+    academic_year VARCHAR(100) NOT NULL,   -- e.g., '2023-24'
+    semester_no INT NOT NULL,            -- 1, 2, 3, 4...
+    sgpa NUMERIC(10,2),
+    attendance_percent INT,
+    backlogs INT,
+    created_by BIGINT,
+    created_date TIMESTAMP DEFAULT now(),
+    modified_by BIGINT,
+    modified_date TIMESTAMP,
+    is_active BOOLEAN DEFAULT TRUE,
+    CONSTRAINT pk_student_sem_academic_progress_id PRIMARY KEY (id),
+    CONSTRAINT fk_student_sem_academic_progress_student_id FOREIGN KEY (student_id) REFERENCES public.student_profile(student_id),
+    CONSTRAINT uk_student_sem_academic_progress UNIQUE (student_id, academic_year, semester_no)
+);
+
+ALTER TABLE public.student_fee_installments ADD COLUMN academic_year VARCHAR(100);
+
+CREATE OR REPLACE FUNCTION public.fn_get_student_full_details(
+    p_student_id VARCHAR DEFAULT '-1',
+    p_branch_id BIGINT DEFAULT -1
+)
+RETURNS TABLE (
+    student_id VARCHAR,
+    student_name VARCHAR,
+    academic_year VARCHAR,
+    branch_name VARCHAR,
+    father_name VARCHAR,
+    background VARCHAR,
+    admission_date DATE,
+    aadhaar_number VARCHAR,
+    pan_number VARCHAR,
+    scholarship_amount NUMERIC,
+    scholarship_disbursed_date DATE,
+    semester_no INT,
+    sgpa NUMERIC,
+    attendance_percent INT,
+    backlogs INT,
+    installment_no INT,
+    installment_amount NUMERIC,
+    due_date DATE,
+    paid_date DATE
+)
+LANGUAGE plpgsql
+AS $$
+BEGIN
+    RETURN QUERY
+    SELECT
+        sp.student_id,
+        sp.student_name,
+        sp.academic_year,
+        ib.branch_name,
+        saf.father_name,
+        saf.background,
+        saf.admission_date,
+        saf.aadhaar_number,
+        saf.pan_number,
+        saf.scholarship_amount,
+        saf.scholarship_disbursed_date,
+        sap.semester_no,
+        sap.sgpa,
+        sap.attendance_percent,
+        sap.backlogs,
+        fi.installment_no,
+        fi.installment_amount,
+        fi.due_date,
+        fi.paid_date
+    FROM public.student_profile sp
+    LEFT JOIN public.institution_branch ib 
+        ON sp.branch_id = ib.id
+    LEFT JOIN public.student_academic_finance saf 
+        ON sp.student_id = saf.student_id
+    LEFT JOIN public.student_sem_academic_progress sap 
+        ON sp.student_id = sap.student_id AND sp.academic_year = sap.academic_year
+    LEFT JOIN public.student_fee_installments fi 
+        ON sp.student_id = fi.student_id AND sp.academic_year = fi.academic_year
+    WHERE sp.is_active = TRUE
+      AND (p_student_id = '-1' OR sp.student_id = p_student_id)
+      AND (p_branch_id = -1 OR sp.branch_id = p_branch_id)
+    ORDER BY sp.student_id, sap.semester_no, fi.installment_no;
+END;
+$$;
+
+select * from fn_get_student_full_details()
+
+------------------------------------------------- 30 jan 2026 -- dhanusha
+CREATE TABLE IF NOT EXISTS public.enrollment_status (
+    id BIGSERIAL NOT NULL,
+    institute_id BIGINT NOT NULL,          -- link to institution_branch
+    total_capacity INT NOT NULL,
+    approved_seats INT NOT NULL,
+    last_updated TIMESTAMP DEFAULT now(),
+    created_by BIGINT,
+    created_date TIMESTAMP DEFAULT now(),
+    modified_by BIGINT,
+    modified_date TIMESTAMP,
+    is_active BOOLEAN DEFAULT TRUE,
+    CONSTRAINT pk_enrollment_status_id PRIMARY KEY (id),
+    CONSTRAINT fk_enrollment_status_institute FOREIGN KEY (institute_id) REFERENCES public.institution_branch(id)
+);
+
+-------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS public.bus_fleet (
+    id BIGSERIAL NOT NULL,
+    bus_id VARCHAR(20) NOT NULL,
+    bus_name VARCHAR(100),
+    driver_name VARCHAR(100),
+	created_by BIGINT,
+    created_date TIMESTAMP DEFAULT now(),
+    modified_by BIGINT,
+    modified_date TIMESTAMP,
+    is_active BOOLEAN DEFAULT TRUE,
+    CONSTRAINT pk_bus_fleet_id PRIMARY KEY (id),
+    CONSTRAINT uk_bus_fleet_bus_id UNIQUE (bus_id)
+);
+
+
+CREATE TABLE IF NOT EXISTS public.bus_tracking_status (
+    id BIGSERIAL NOT NULL,
+    bus_id VARCHAR(20) NOT NULL,
+    status VARCHAR(50),              -- MOVING, IDLE, OFF-ROUTE
+    location_description TEXT,
+    current_speed NUMERIC(5,2),
+    next_stop VARCHAR(100),
+	eta_minutes INT,
+    last_updated TIMESTAMP DEFAULT now(),
+	created_by BIGINT,
+    created_date TIMESTAMP DEFAULT now(),
+    modified_by BIGINT,
+    modified_date TIMESTAMP,
+    is_active BOOLEAN DEFAULT TRUE,
+    CONSTRAINT pk_bus_tracking_status_id PRIMARY KEY (id),
+    CONSTRAINT fk_bus_tracking_status_bus_id FOREIGN KEY (bus_id) REFERENCES public.bus_fleet(bus_id)
+);
+
+
+CREATE TABLE IF NOT EXISTS public.bus_alert_log (
+    id BIGSERIAL NOT NULL,
+    bus_id VARCHAR(20) NOT NULL,
+    alert_type VARCHAR(100),         -- GPS_LAG, OFF_ROUTE
+    alert_message TEXT,
+    alert_time TIMESTAMP DEFAULT now(),
+    resolved BOOLEAN DEFAULT FALSE,
+	created_by BIGINT,
+    created_date TIMESTAMP DEFAULT now(),
+    modified_by BIGINT,
+    modified_date TIMESTAMP,
+    is_active BOOLEAN DEFAULT TRUE,
+    CONSTRAINT pk_bus_alert_log_id PRIMARY KEY (id),
+    CONSTRAINT fk_bus_alert_log_bus_id FOREIGN KEY (bus_id) REFERENCES public.bus_fleet(bus_id)
+);
+
+CREATE OR REPLACE FUNCTION public.fn_get_bus_tracking_overview()
+RETURNS TABLE (
+    bus_id VARCHAR,
+    bus_name VARCHAR,
+    driver_name VARCHAR,
+    status VARCHAR,
+    location_description TEXT,
+    current_speed NUMERIC,
+    eta_minutes INT,
+    next_stop VARCHAR
+)
+LANGUAGE plpgsql
+AS $$
+BEGIN
+    RETURN QUERY
+    SELECT
+        bf.bus_id,
+        bf.bus_name,
+        bf.driver_name,
+        bts.status,
+        bts.location_description,
+        bts.current_speed,
+        bts.eta_minutes,
+        bts.next_stop
+    FROM public.bus_fleet bf
+    LEFT JOIN public.bus_tracking_status bts ON bf.bus_id = bts.bus_id
+    WHERE bf.is_active = TRUE
+    ORDER BY bf.bus_id;
+END;
+$$;
+
+select * from fn_get_bus_tracking_overview()
+
+
+CREATE OR REPLACE FUNCTION public.fn_get_bus_dashboard_summary()
+RETURNS TABLE (
+    active_buses BIGINT,
+    total_buses BIGINT,
+    unresolved_alerts BIGINT
+)
+LANGUAGE plpgsql
+AS $$
+BEGIN
+    RETURN QUERY
+    SELECT 
+        COUNT(*) FILTER (WHERE bts.status = 'MOVING') AS active_buses,
+        COUNT(*) AS total_buses,
+        (SELECT COUNT(*) FROM public.bus_alert_log WHERE resolved = FALSE) AS unresolved_alerts
+    FROM public.bus_fleet bf
+    LEFT JOIN public.bus_tracking_status bts ON bf.bus_id = bts.bus_id
+    WHERE bf.is_active = TRUE;
+END;
+$$;
+
+select * from fn_get_bus_dashboard_summary()
+----------------------------------------------------------------------------------------
+
+CREATE TABLE IF NOT EXISTS public.staff_profile (
+    id BIGSERIAL NOT NULL,
+    staff_id VARCHAR(50) NOT NULL,
+    staff_name VARCHAR(255) NOT NULL,
+    job_title VARCHAR(255),
+    department VARCHAR(100),
+    created_by BIGINT,
+    created_date TIMESTAMP DEFAULT now(),
+    modified_by BIGINT,
+    modified_date TIMESTAMP,
+    is_active BOOLEAN DEFAULT TRUE,
+    CONSTRAINT pk_staff_profile_id PRIMARY KEY (id),
+    CONSTRAINT uk_staff_profile_staff_id UNIQUE (staff_id)
+);
+
+CREATE TABLE IF NOT EXISTS public.staff_payslip (
+    id BIGSERIAL NOT NULL,
+    staff_id VARCHAR(50) NOT NULL,
+    payroll_month VARCHAR(20) NOT NULL,  -- e.g., 'Sep 2023'
+    payment_date DATE,
+    basic_pay NUMERIC(10,2),
+    hra NUMERIC(10,2),
+    medical_allowance NUMERIC(10,2),
+    conveyance NUMERIC(10,2),
+    performance_bonus NUMERIC(10,2),
+    gross_earnings NUMERIC(10,2),
+    pf_deduction NUMERIC(10,2),
+    income_tax NUMERIC(10,2),
+    professional_tax NUMERIC(10,2),
+    health_insurance NUMERIC(10,2),
+    total_deductions NUMERIC(10,2),
+    net_salary NUMERIC(10,2),
+    status VARCHAR(50) DEFAULT 'DISBURSED',
+    created_by BIGINT,
+    created_date TIMESTAMP DEFAULT now(),
+    modified_by BIGINT,
+    modified_date TIMESTAMP,
+    is_active BOOLEAN DEFAULT TRUE,
+    CONSTRAINT pk_staff_payslip_id PRIMARY KEY (id),
+    CONSTRAINT fk_staff_payslip_staff_id FOREIGN KEY (staff_id) REFERENCES public.staff_profile(staff_id),
+    CONSTRAINT uk_staff_payslip UNIQUE (staff_id, payroll_month)
+);
+
+CREATE TABLE IF NOT EXISTS public.payroll_summary (
+    id BIGSERIAL NOT NULL,
+    payroll_month VARCHAR(20) NOT NULL UNIQUE,
+    total_net_disbursement NUMERIC(12,2),
+    staff_count INT,
+    status VARCHAR(50) DEFAULT 'DISBURSED',
+    created_by BIGINT,
+    created_date TIMESTAMP DEFAULT now(),
+    modified_by BIGINT,
+    modified_date TIMESTAMP,
+    is_active BOOLEAN DEFAULT TRUE,
+    CONSTRAINT pk_payroll_summary_id PRIMARY KEY (id)
+);
+
+CREATE OR REPLACE FUNCTION public.fn_get_staff_payslip_summary(
+    p_staff_id VARCHAR DEFAULT '-1',
+    p_month VARCHAR DEFAULT '-1'
+)
+RETURNS TABLE (
+    staff_id VARCHAR,
+    staff_name VARCHAR,
+    job_title VARCHAR,
+    department VARCHAR,
+    payroll_month VARCHAR,
+    payment_date DATE,
+    basic_pay NUMERIC,
+    hra NUMERIC,
+    medical_allowance NUMERIC,
+    conveyance NUMERIC,
+    performance_bonus NUMERIC,
+    gross_earnings NUMERIC,
+    pf_deduction NUMERIC,
+    income_tax NUMERIC,
+    professional_tax NUMERIC,
+    health_insurance NUMERIC,
+    total_deductions NUMERIC,
+    net_salary NUMERIC,
+    status VARCHAR
+)
+LANGUAGE plpgsql
+AS $$
+BEGIN
+    RETURN QUERY
+    SELECT
+        sp.staff_id,
+        sp.staff_name,
+        sp.job_title,
+        sp.department,
+        ps.payroll_month,
+        ps.payment_date,
+        ps.basic_pay,
+        ps.hra,
+        ps.medical_allowance,
+        ps.conveyance,
+        ps.performance_bonus,
+        ps.gross_earnings,
+        ps.pf_deduction,
+        ps.income_tax,
+        ps.professional_tax,
+        ps.health_insurance,
+        ps.total_deductions,
+        ps.net_salary,
+        ps.status
+    FROM public.staff_profile sp
+    LEFT JOIN public.staff_payslip ps ON sp.staff_id = ps.staff_id
+    WHERE sp.is_active = TRUE
+      AND (p_staff_id = '-1' OR sp.staff_id = p_staff_id)
+      AND (p_month = '-1' OR ps.payroll_month = p_month)
+    ORDER BY sp.staff_id, ps.payroll_month;
+END;
+$$;
+
+select * from fn_get_staff_payslip_summary()
+
+------------------------------------------------------------------------------------
+
+CREATE TABLE IF NOT EXISTS public.maintenance_budget (
+    id BIGSERIAL NOT NULL,
+    institute_id BIGINT NOT NULL,              -- FK to institution_branch
+    budget_limit NUMERIC(10,2),
+    budget_used NUMERIC(10,2),
+    status VARCHAR(50),                        -- UNDER_BUDGET, OVER_BUDGET
+    created_by BIGINT,
+    created_date TIMESTAMP DEFAULT now(),
+    modified_by BIGINT,
+    modified_date TIMESTAMP,
+    is_active BOOLEAN DEFAULT TRUE,
+    CONSTRAINT pk_maintenance_budget_id PRIMARY KEY (id),
+    CONSTRAINT fk_maintenance_budget_institute FOREIGN KEY (institute_id) REFERENCES public.institution_branch(id)
+);
+
+----------------------------------------------------------------------
+
+
+CREATE TABLE IF NOT EXISTS public.exam_schedule (
+    id BIGSERIAL NOT NULL,
+    institute_id BIGINT NOT NULL,              -- FK to institution_branch
+    exam_type VARCHAR(255) NOT NULL,            -- MID_TERM, FINAL
+    subject_name VARCHAR(255) NOT NULL,
+    exam_date DATE NOT NULL,
+    start_time TIME NOT NULL,
+    end_time TIME NOT NULL,
+    location VARCHAR(255),
+    created_by BIGINT,
+    created_date TIMESTAMP DEFAULT now(),
+    modified_by BIGINT,
+    modified_date TIMESTAMP,
+    is_active BOOLEAN DEFAULT TRUE,
+    CONSTRAINT pk_exam_schedule_id PRIMARY KEY (id),
+    CONSTRAINT fk_exam_schedule_institute FOREIGN KEY (institute_id) REFERENCES public.institution_branch(id)
+);
+
+
+CREATE TABLE IF NOT EXISTS public.exam_notification_log (
+    id BIGSERIAL NOT NULL,
+    exam_schedule_id BIGINT NOT NULL,          -- FK to exam_schedule
+    message varchar(255),
+    sent_count INT,
+    failed_count INT,
+    retry_success INT,
+    scheduled_date DATE,
+    status VARCHAR(255),                        -- SENT, FAILED, DRAFT
+    created_by BIGINT,
+    created_date TIMESTAMP DEFAULT now(),
+    modified_by BIGINT,
+    modified_date TIMESTAMP,
+    is_active BOOLEAN DEFAULT TRUE,
+    CONSTRAINT pk_exam_notification_log_id PRIMARY KEY (id),
+    CONSTRAINT fk_exam_notification_log_exam FOREIGN KEY (exam_schedule_id) REFERENCES public.exam_schedule(id)
+);
+
+CREATE TABLE IF NOT EXISTS public.exam_reminder_settings (
+    id BIGSERIAL NOT NULL,
+    exam_schedule_id BIGINT NOT NULL,          -- FK to exam_schedule
+    enable_notifications BOOLEAN DEFAULT TRUE,
+    trigger_time VARCHAR(255),                  -- 15 min, 1 hour, 1 day, etc.
+    notification_sound VARCHAR(150),            -- Chime, Bell, Alert, etc.
+    created_by BIGINT,
+    created_date TIMESTAMP DEFAULT now(),
+    modified_by BIGINT,
+    modified_date TIMESTAMP,
+    is_active BOOLEAN DEFAULT TRUE,
+    CONSTRAINT pk_exam_reminder_settings_id PRIMARY KEY (id),
+    CONSTRAINT fk_exam_reminder_settings_exam FOREIGN KEY (exam_schedule_id) REFERENCES public.exam_schedule(id)
+);
+
+CREATE TABLE IF NOT EXISTS public.exam_invigilation_assignment (
+    id BIGSERIAL NOT NULL,
+    exam_schedule_id BIGINT NOT NULL,          -- FK to exam_schedule
+    staff_id BIGINT NOT NULL,                  -- FK to staff_profile
+    duty_notes varchar(255),
+    created_by BIGINT,
+    created_date TIMESTAMP DEFAULT now(),
+    modified_by BIGINT,
+    modified_date TIMESTAMP,
+    is_active BOOLEAN DEFAULT TRUE,
+    CONSTRAINT pk_exam_invigilation_assignment_id PRIMARY KEY (id),
+    CONSTRAINT fk_exam_invigilation_assignment_exam FOREIGN KEY (exam_schedule_id) REFERENCES public.exam_schedule(id),
+    CONSTRAINT fk_exam_invigilation_assignment_staff FOREIGN KEY (staff_id) REFERENCES public.staff_profile(id)
+);
+
+
+--------------------------- 2 jan 2026 --dhanusha
+alter table appointments drop column consultation_type;
+alter table appointments add column consultation_type_id int;
+alter table appointments add constraint fk_appointments_consultation_type_id foreign key (consultation_type_id) references master_consultation_type(id); 
+
+alter table appointments drop column upload_prescription;
+alter table appointments drop column upload_test_list;
+
+ALTER TABLE public.master_labs RENAME TO available_labs;
+ALTER TABLE public.master_pharmacies RENAME TO available_pharmacies;
+
+ALTER TABLE public.master_pharmacies add columns
+
+ALTER TABLE public.available_labs add column created_by BIGINT;
+ALTER TABLE public.available_labs add column created_date TIMESTAMP DEFAULT now();
+ALTER TABLE public.available_labs add column modified_by BIGINT;
+ALTER TABLE public.available_labs add column modified_date TIMESTAMP;
+ALTER TABLE public.available_labs add column upload_prescription varchar(500);
+ALTER TABLE public.available_labs add column proceed_type varchar(255);
+ALTER TABLE public.available_labs add column delivery_address varchar(255);
+ALTER TABLE public.available_labs add column special_instructions varchar(255);
+
+
+ALTER TABLE public.available_pharmacies add column created_by BIGINT;
+ALTER TABLE public.available_pharmacies add column created_date TIMESTAMP DEFAULT now();
+ALTER TABLE public.available_pharmacies add column modified_by BIGINT;
+ALTER TABLE public.available_pharmacies add column modified_date TIMESTAMP;
+ALTER TABLE public.available_pharmacies add column upload_prescription varchar(500);
+ALTER TABLE public.available_pharmacies add column proceed_type varchar(255);
+ALTER TABLE public.available_pharmacies add column delivery_address varchar(255);
+ALTER TABLE public.available_pharmacies add column special_instructions varchar(255);
+
+
+DROP VIEW IF EXISTS public.vw_active_pharmacies;
+DROP VIEW IF EXISTS public.vw_active_labs;
+DROP VIEW IF EXISTS public.vw_available_doctors;
+
+
+------------------------------------------------------------------------------------------------
+select * from public.appointments
+
+CREATE TABLE IF NOT EXISTS public.master_consultation_type (
+    id SERIAL NOT NULL,
+    consultation_type VARCHAR(255),
+    is_active BOOLEAN DEFAULT TRUE,
+    CONSTRAINT pk_master_consultation_type_id PRIMARY KEY (id)
+);
+
+INSERT INTO public.master_consultation_type (consultation_type)SELECT 'Online' WHERE NOT EXISTS (SELECT 1 FROM public.master_consultation_type WHERE consultation_type = 'Online');
+INSERT INTO public.master_consultation_type (consultation_type)SELECT 'Offline' WHERE NOT EXISTS (SELECT 1 FROM public.master_consultation_type WHERE consultation_type = 'Offline');
+
+
+--------------------------------------------------------------------------------------------------
+
+ALTER TABLE public.master_hospital ADD COLUMN rating numeric(3,2)
+alter TABLE public.master_hospital add constraint ck_master_hospital_rating	check (rating between 1 and 5)
+ADD COLUMN next_open TIMESTAMP;
+ADD COLUMN timing_from TIME,
+ADD COLUMN timing_to TIME,
+ADD COLUMN is_24x7 BOOLEAN;
+
+
+ALTER TABLE doctor_profile
+ADD COLUMN hospital_id BIGINT REFERENCES master_hospital(id),
+ADD COLUMN consultation_type_id INT REFERENCES master_consultation_type(id);
+
+CREATE OR REPLACE FUNCTION fn_get_available_hospitals()
+RETURNS TABLE (
+    hospital_id BIGINT,
+    hospital_name VARCHAR,
+    specialty_type VARCHAR,
+    location VARCHAR,
+    contact_number VARCHAR,
+    rating NUMERIC(3,2),
+    hospital_status VARCHAR,
+    fees_per_hour NUMERIC(10,2)
+) AS $$
+BEGIN
+    RETURN QUERY
+    SELECT h.id,
+           h.hospital_name,
+           h.specialty_type,
+           h.location,
+           h.contact_number,
+           h.rating,
+           CAST(
+               CASE 
+                   WHEN h.is_24x7 = TRUE THEN 'Open 24/7'
+                   WHEN now()::time BETWEEN h.timing_from AND h.timing_to THEN 'Open Now'
+                   ELSE 'Next Open: ' || to_char(h.next_open, 'DD Mon YYYY HH:MI AM')
+               END AS VARCHAR
+           ) AS hospital_status,
+           d.fees_per_hour
+    FROM master_hospital h
+    JOIN doctor_profile d ON d.hospital_id = h.id
+    WHERE h.is_active = TRUE
+      AND d.consultation_type_id = (
+          SELECT id FROM master_consultation_type WHERE consultation_type = 'Offline'
+      )
+      AND d.is_active = TRUE
+      AND d.is_available = TRUE;
+END;
+$$ LANGUAGE plpgsql;
+
+
+select * from fn_get_available_hospitals()
+----------------------------------------------------------------------------
+CREATE OR REPLACE FUNCTION fn_get_available_doctors(p_specialization_id INT)
+RETURNS TABLE (
+    doctor_id BIGINT,
+    doctor_name VARCHAR,
+    specialization_name VARCHAR,
+    experience_years INT,
+    rating INT,                -- changed to INT to match table
+    fees_per_hour NUMERIC(10,2),
+    available_from TIME,
+    available_to TIME
+) AS $$
+BEGIN
+    RETURN QUERY
+    SELECT d.id,
+           CAST(concat_ws(' ', u.first_name, u.last_name) AS VARCHAR) AS doctor_name,
+           s.specialization_name,
+           d.experience_years,
+           d.rating,
+           d.fees_per_hour,
+           d.available_from,
+           d.available_to
+    FROM doctor_profile d
+    JOIN user_registration u ON d.user_id = u.id
+    JOIN master_doctor_specialization s ON d.specialization_id = s.id
+    WHERE d.consultation_type_id = (
+        SELECT id FROM master_consultation_type WHERE consultation_type = 'Online'
+    )
+      AND d.is_active = TRUE
+      AND d.is_available = TRUE
+      AND (
+          p_specialization_id = -1 
+          OR d.specialization_id = p_specialization_id
+      );
+END;
+$$ LANGUAGE plpgsql;
+
+
+select * from fn_get_available_doctors(-1)
+-----------------------------------------------------------------------------
+CREATE OR REPLACE VIEW vw_available_labs AS
+SELECT id AS lab_id,
+       lab_name,
+       services,
+       rating,
+       home_collection,
+       is_active,
+       latitude,
+       longitude,
+       upload_prescription,
+       proceed_type,
+       delivery_address,
+       special_instructions
+FROM public.available_labs
+WHERE is_active = TRUE;
+
+
+select * from public.vw_available_labs
+------------------------------------------------------------------------------
+CREATE OR REPLACE VIEW vw_available_pharmacies AS
+SELECT id AS pharmacy_id,
+       pharmacy_name,
+       pharmacy_type,
+       services,
+       rating,
+       delivery_time,
+       is_active,
+       latitude,
+       longitude,
+       upload_prescription,
+       proceed_type,
+       delivery_address,
+       special_instructions
+FROM public.available_pharmacies
+WHERE is_active = TRUE;
+
+
+SELECT * FROM vw_available_pharmacies;
+
+-----------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS public.service_requests
+(
+    id BIGSERIAL NOT NULL,
+    user_id BIGINT NOT NULL,
+    service_type VARCHAR(50) NOT NULL,
+    doctor_id BIGINT,
+    lab_id BIGINT,
+    pharmacy_id BIGINT,
+    upload_prescription VARCHAR(500),
+    delivery_address VARCHAR(255),
+    special_instructions VARCHAR(255),
+    status VARCHAR(50) DEFAULT 'PENDING',
+    created_date TIMESTAMP DEFAULT now(),
+CONSTRAINT pk_service_requests_id PRIMARY KEY (id),
+CONSTRAINT fk_service_requests_user_id FOREIGN KEY (user_id) REFERENCES user_registration(id),
+CONSTRAINT fk_service_requests_doctor_id FOREIGN KEY (doctor_id) REFERENCES doctor_profile(id),
+CONSTRAINT fk_service_requests_lab_id FOREIGN KEY (lab_id)REFERENCES available_labs(id),
+CONSTRAINT fk_service_requests_pharmacy_id FOREIGN KEY (pharmacy_id)REFERENCES available_pharmacies(id),
+CONSTRAINT ck_service_requests_service_type CHECK (service_type IN ('DOCTOR','LAB','PHARMACY')),
+CONSTRAINT ck_service_requests_one_service_only CHECK (
+            (doctor_id IS NOT NULL AND lab_id IS NULL AND pharmacy_id IS NULL)
+         OR (doctor_id IS NULL AND lab_id IS NOT NULL AND pharmacy_id IS NULL)
+         OR (doctor_id IS NULL AND lab_id IS NULL AND pharmacy_id IS NOT NULL)
+        )
+);
+--------------------------------------------------------------------------------
+ALTER TABLE appointments
+ADD COLUMN service_request_id BIGINT REFERENCES service_requests(id);
+
+ALTER TABLE appointments
+ADD COLUMN hospital_id BIGINT REFERENCES master_hospital(id);
+
+ALTER TABLE appointments
+ADD COLUMN status VARCHAR(50) DEFAULT 'PENDING';
+
+ALTER TABLE appointments
+ADD CONSTRAINT ck_appointments_status CHECK (status IN ('PENDING','CONFIRMED','CANCELLED'));
+
+
+
+-------------------------------------------------------------------------
+------------------------------------------------------------------------------
+
+CREATE TABLE IF NOT EXISTS public.payments (
+    id BIGSERIAL NOT NULL,
+    service_request_id BIGINT NOT NULL,
+    appointment_id BIGINT,
+    user_id BIGINT NOT NULL,
+    amount NUMERIC(10,2) NOT NULL,
+    payment_method VARCHAR(50) NOT NULL,
+    payment_status VARCHAR(50) DEFAULT 'PENDING',
+    transaction_id VARCHAR(100),
+    remarks VARCHAR(255),
+    created_by BIGINT,
+    created_date TIMESTAMP DEFAULT now(),
+    modified_by BIGINT,
+    modified_date TIMESTAMP,
+    is_active BOOLEAN DEFAULT TRUE,
+    CONSTRAINT pk_payments_id PRIMARY KEY (id),
+    CONSTRAINT fk_payments_service_request_id FOREIGN KEY (service_request_id) REFERENCES service_requests(id),
+    CONSTRAINT fk_payments_appointment_id FOREIGN KEY (appointment_id) REFERENCES appointments(id),
+    CONSTRAINT fk_payments_user_id FOREIGN KEY (user_id) REFERENCES user_registration(id),
+    CONSTRAINT ck_payments_method CHECK (payment_method IN ('CARD','UPI','CASH')),
+    CONSTRAINT ck_payments_status CHECK (payment_status IN ('PENDING','CONFIRMED','FAILED','SUCCESS')),
+    CONSTRAINT uk_payments_transaction UNIQUE (transaction_id)
+);
+
+CREATE OR REPLACE VIEW public.vw_my_bookings AS
+SELECT 
+    sr.id AS request_id,
+    sr.user_id,
+    sr.service_type,
+    sr.status AS booking_status,
+    sr.created_date AS request_date,
+    a.id AS appointment_id,
+    a.appointment_time,
+    a.status AS appointment_status,
+    p.id AS payment_id,
+    p.amount,
+    p.payment_method,
+    p.payment_status,
+    p.transaction_id,
+    p.created_date AS payment_date
+FROM service_requests sr
+LEFT JOIN appointments a 
+       ON sr.id = a.service_request_id
+LEFT JOIN payments p 
+       ON sr.id = p.service_request_id;
+
+select * from vw_my_bookings
+--------------------------------------- 2 feb 2026 -- lavanya
+CREATE OR REPLACE FUNCTION public.fn_get_exam_schedule(
+    p_exam_type varchar,
+    p_institution_id bigint
+)
+RETURNS TABLE (
+    exam_date date,
+    day_name varchar,
+    subject_name varchar,
+    exam_type varchar,
+    start_time time,
+    end_time time,
+    location varchar,
+    notification_status varchar,
+    notification_scheduled_date date
+)
+LANGUAGE plpgsql
+AS $$
+BEGIN
+    RETURN QUERY
+    SELECT
+        es.exam_date,
+        TO_CHAR(es.exam_date, 'FMDay')::varchar AS day_name,  -- cast text to varchar
+        es.subject_name,
+        es.exam_type,
+        es.start_time,
+        es.end_time,
+        es.location,
+        nl.status AS notification_status,
+        nl.scheduled_date AS notification_scheduled_date
+    FROM public.exam_schedule es
+    LEFT JOIN public.exam_notification_log nl
+        ON nl.exam_schedule_id = es.id
+       AND nl.is_active = true
+    WHERE es.is_active = true
+      AND (p_institution_id = -1 OR es.institution_id = p_institution_id)
+      AND (p_exam_type = '-1' OR es.exam_type = p_exam_type)
+    ORDER BY es.exam_date, es.start_time;
+END;
+$$;
+
+
+SELECT * FROM fn_get_exam_schedule('-1', -1);
+
+select * from exam_schedule
+select * from exam_notification_log
+select * from exam_reminder_settings
+select * from exam_invigilation_assignment
+
+
+select * from public.institution_branch
+
+ALTER TABLE institution_branch ADD CONSTRAINT uq_branch_name_per_institution UNIQUE (institution_id, branch_name);
+ALTER TABLE student_profile DROP CONSTRAINT fk_student_profile_branch_name;
+ALTER TABLE institution_branch DROP CONSTRAINT uq_institution_branch_branch_name;
+
+
+select * from appointments
+------------------------------------------------------------------------------------------------------
+select * from staff_profile
+select * from staff_payslip
+select * from payroll_summary
+
+create table if not exists payroll_period (
+    id bigserial not null,
+    month varchar not null,
+    year int not null,
+    start_date timestamp,
+    end_date timestamp,
+    created_by bigint,
+    created_date timestamp default now(),
+    modified_by bigint,
+    modified_date timestamp,
+    is_active boolean default true,
+    constraint pk_payroll_period_id primary key (id)
+);
+
+
+create table if not exists salary_overview (
+    id bigserial not null,
+    payroll_period_id bigint not null,
+    total_net_disbursement numeric(12,2) not null,
+    gross_earnings numeric(12,2) not null,
+    total_deductions numeric(12,2) not null,
+    staff_count int,
+    status varchar, -- disbursed / pending
+    created_by bigint,
+    created_date timestamp default now(),
+    modified_by bigint,
+    modified_date timestamp,
+    is_active boolean default true,
+    constraint pk_salary_overview_id primary key (id),
+    constraint fk_salary_overview_payroll_period_id foreign key (payroll_period_id) references payroll_period(id)
+);
+
+create table if not exists salary_earnings (
+    id bigserial not null,
+    salary_overview_id bigint not null,
+	basic_salary numeric(10,2),
+	hra numeric(10,2),
+	medical numeric(10,2),
+	conveyance numeric(10,2),
+	gross_earnings numeric(12,2),
+    created_by bigint,
+    created_date timestamp default now(),
+    modified_by bigint,
+    modified_date timestamp,
+    is_active boolean default true,
+    constraint pk_salary_earnings_id primary key (id),
+    constraint fk_salary_earnings_salary_overview_id foreign key (salary_overview_id) references salary_overview(id)
+);
+
+
+create table if not exists salary_deductions (
+    id bigserial not null,
+    salary_overview_id bigint not null,
+	pf numeric(10,2),
+	professional_tax numeric(10,2),
+	insurance numeric(10,2),
+    total_deduction numeric(10,2) not null, 
+    created_by bigint,
+    created_date timestamp default now(),
+    modified_by bigint,
+    modified_date timestamp,
+    is_active boolean default true,
+    constraint pk_salary_deductions_id primary key (id),
+    constraint fk_salary_deductions_salary_overview_id foreign key (salary_overview_id) references salary_overview(id)
+);
