@@ -1,0 +1,41 @@
+CREATE OR REPLACE FUNCTION fn_get_available_hospitals()
+RETURNS TABLE (
+    hospital_id BIGINT,
+    hospital_name VARCHAR,
+    specialty_type VARCHAR,
+    location VARCHAR,
+    contact_number VARCHAR,
+    rating NUMERIC(3,2),
+    hospital_status VARCHAR,
+    fees_per_hour NUMERIC(10,2)
+) AS $$
+BEGIN
+    RETURN QUERY
+    SELECT h.id,
+           h.hospital_name,
+           h.specialty_type,
+           h.location,
+           h.contact_number,
+           h.rating,
+           CAST(
+               CASE 
+                   WHEN h.is_24x7 = TRUE THEN 'Open 24/7'
+                   WHEN now()::time BETWEEN h.timing_from AND h.timing_to THEN 'Open Now'
+                   ELSE 'Next Open: ' || to_char(h.next_open, 'DD Mon YYYY HH:MI AM')
+               END AS VARCHAR
+           ) AS hospital_status,
+           d.fees_per_hour
+    FROM master_hospital h
+    JOIN doctor_profile d ON d.hospital_id = h.id
+    WHERE h.is_active = TRUE
+      AND d.consultation_type_id = (
+          SELECT id FROM master_consultation_type WHERE consultation_type = 'Offline'
+      )
+      AND d.is_active = TRUE
+      AND d.is_available = TRUE;
+END;
+$$ LANGUAGE plpgsql;
+
+
+select * from fn_get_available_hospitals()
+

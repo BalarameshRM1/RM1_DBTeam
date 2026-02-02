@@ -1,0 +1,23 @@
+CREATE OR REPLACE VIEW public.vw_my_bookings AS
+SELECT 
+    sr.id AS request_id,
+    sr.user_id,
+    sr.service_type,
+    sr.status AS booking_status,
+    sr.created_date AS request_date,
+    a.id AS appointment_id,
+    a.appointment_time,
+    a.status AS appointment_status,
+    p.id AS payment_id,
+    p.amount,
+    p.payment_method,
+    p.payment_status,
+    p.transaction_id,
+    p.created_date AS payment_date
+FROM service_requests sr
+LEFT JOIN appointments a 
+       ON sr.id = a.service_request_id
+LEFT JOIN payments p 
+       ON sr.id = p.service_request_id;
+
+select * from vw_my_bookings

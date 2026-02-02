@@ -1,0 +1,39 @@
+CREATE OR REPLACE FUNCTION public.fn_get_exam_schedule(
+    p_exam_type varchar,
+    p_institution_id bigint
+)
+RETURNS TABLE (
+    exam_date date,
+    day_name varchar,
+    subject_name varchar,
+    exam_type varchar,
+    start_time time,
+    end_time time,
+    location varchar,
+    notification_status varchar,
+    notification_scheduled_date date
+)
+LANGUAGE plpgsql
+AS $$
+BEGIN
+    RETURN QUERY
+    SELECT
+        es.exam_date,
+        TO_CHAR(es.exam_date, 'FMDay')::varchar AS day_name,  -- cast text to varchar
+        es.subject_name,
+        es.exam_type,
+        es.start_time,
+        es.end_time,
+        es.location,
+        nl.status AS notification_status,
+        nl.scheduled_date AS notification_scheduled_date
+    FROM public.exam_schedule es
+    LEFT JOIN public.exam_notification_log nl
+        ON nl.exam_schedule_id = es.id
+       AND nl.is_active = true
+    WHERE es.is_active = true
+      AND (p_institution_id = -1 OR es.institution_id = p_institution_id)
+      AND (p_exam_type = '-1' OR es.exam_type = p_exam_type)
+    ORDER BY es.exam_date, es.start_time;
+END;
+$$;
