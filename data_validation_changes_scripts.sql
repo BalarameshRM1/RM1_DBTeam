@@ -1235,6 +1235,25 @@ ADD CONSTRAINT uk_employee_aadhaar UNIQUE (aadhaar),
 ADD CONSTRAINT uk_employee_bank UNIQUE (bank_ac_no),
 ADD CONSTRAINT uk_employee_mobile UNIQUE (mobile);
 
+------------------------03/02/2026 -----tharun
+
+ALTER TABLE employee_registration ADD COLUMN password VARCHAR(500) not null;
+
+ALTER TABLE employee_registration ADD COLUMN status_id INT not null;
+Alter table  employee_registration add constraint fk_employee_registration_status_id foreign key (status_id) references master_emp_status(id);
+
+create table if not exists master_emp_status(
+id serial not null,
+status_name varchar(255)not null,
+is_active boolean DEFAULT true,
+constraint pk_master_emp_status_id primary key (id)
+);
+
+INSERT INTO master_emp_status (status_name) SELECT 'Active'  WHERE NOT EXISTS (SELECT 1 FROM master_emp_status WHERE status_name = 'Active');
+INSERT INTO master_emp_status (status_name) SELECT 'Inactive'WHERE NOT EXISTS (SELECT 1 FROM master_emp_status WHERE status_name = 'Inactive');
+INSERT INTO master_emp_status (status_name) SELECT 'On leave' WHERE NOT EXISTS (SELECT 1 FROM master_emp_status WHERE status_name = 'On leave');
+INSERT INTO master_emp_status (status_name) SELECT 'Resigned' WHERE NOT EXISTS (SELECT 1 FROM master_emp_status WHERE status_name = 'Resigned');
+
 
 
 
