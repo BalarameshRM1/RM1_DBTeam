@@ -39,3 +39,4 @@ $$ LANGUAGE plpgsql;
 
 select * from fn_get_available_hospitals()
 
+-

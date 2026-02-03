@@ -1,0 +1,33 @@
+CREATE OR REPLACE FUNCTION public.fn_get_branch_directory(
+    p_branch_id BIGINT DEFAULT -1
+)
+RETURNS TABLE (
+    total_students BIGINT,
+    branch_count BIGINT,
+    branch_id BIGINT,
+    branch_name VARCHAR(255),
+    location VARCHAR,
+    status VARCHAR(20),
+    student_count BIGINT
+)
+LANGUAGE plpgsql
+AS $$
+BEGIN
+    RETURN QUERY
+    WITH branch_data AS (
+        SELECT
+            ib.id,ib.branch_name,ib.city AS location,ib.status,COUNT(sp.id) AS student_count
+        FROM public.institution_branch ib
+ LEFT JOIN public.student_profile sp ON sp.branch_id = ib.id AND sp.is_active = TRUE WHERE ib.is_active = TRUE AND (p_branch_id = -1 OR ib.id = p_branch_id)
+        GROUP BY ib.id, ib.branch_name, ib.city, ib.status
+    )
+    SELECT
+        (SELECT COUNT(*) FROM public.student_profile WHERE is_active = TRUE) AS total_students,
+        (SELECT COUNT(*) FROM public.institution_branch WHERE is_active = TRUE) AS branch_count,
+        bd.id,bd.branch_name,bd.location,bd.status,bd.student_count
+    FROM branch_data bd
+    ORDER BY bd.branch_name;
+END;
+$$;
+
+select * from fn_get_branch_directory(-1)

@@ -1,0 +1,110 @@
+CREATE OR REPLACE FUNCTION public.fn_get_student_full_details(
+    p_student_id VARCHAR DEFAULT '-1',
+    p_branch_id BIGINT DEFAULT -1
+)
+RETURNS TABLE (
+    student_id VARCHAR,
+    student_name VARCHAR,
+    academic_year VARCHAR,
+    branch_name VARCHAR,
+    father_name VARCHAR,
+    background VARCHAR,
+    admission_date DATE,
+    aadhaar_number VARCHAR,
+    pan_number VARCHAR,
+    scholarship_amount NUMERIC,
+    scholarship_disbursed_date DATE,
+    sgpa NUMERIC,
+    attendance_percent INT,
+    backlogs INT,
+    installment_no INT,
+    installment_amount NUMERIC,
+    due_date DATE,
+    paid_date DATE
+)
+LANGUAGE plpgsql
+AS $$
+BEGIN
+    RETURN QUERY
+    SELECT
+        sp.student_id,sp.student_name,sp.academic_year,ib.branch_name,saf.father_name,saf.background,
+        saf.admission_date,saf.aadhaar_number,saf.pan_number,saf.scholarship_amount,saf.scholarship_disbursed_date,
+        saf.sgpa,saf.attendance_percent,saf.backlogs,fi.installment_no,fi.installment_amount,fi.due_date,fi.paid_date
+    FROM public.student_profile sp
+    LEFT JOIN public.institution_branch ib ON sp.branch_id = ib.id
+    LEFT JOIN public.student_academic_finance saf ON sp.student_id = saf.student_id
+    LEFT JOIN public.student_fee_installments fi ON sp.student_id = fi.student_id
+    WHERE sp.is_active = TRUE
+      AND (p_student_id = '-1' OR sp.student_id = p_student_id)   -- -1 = all students
+      AND (p_branch_id = -1 OR sp.branch_id = p_branch_id)        -- -1 = all branches
+    ORDER BY sp.student_id, fi.installment_no;
+END;
+$$;
+SELECT * FROM fn_get_student_full_details('-1', -1);
+------------------------
+CREATE OR REPLACE FUNCTION public.fn_get_student_full_details(
+    p_student_id VARCHAR DEFAULT '-1',
+    p_branch_id BIGINT DEFAULT -1
+)
+RETURNS TABLE (
+    student_id VARCHAR,
+    student_name VARCHAR,
+    academic_year VARCHAR,
+    branch_name VARCHAR,
+    father_name VARCHAR,
+    background VARCHAR,
+    admission_date DATE,
+    aadhaar_number VARCHAR,
+    pan_number VARCHAR,
+    scholarship_amount NUMERIC,
+    scholarship_disbursed_date DATE,
+    semester_no INT,
+    sgpa NUMERIC,
+    attendance_percent INT,
+    backlogs INT,
+    installment_no INT,
+    installment_amount NUMERIC,
+    due_date DATE,
+    paid_date DATE
+)
+LANGUAGE plpgsql
+AS $$
+BEGIN
+    RETURN QUERY
+    SELECT
+        sp.student_id,
+        sp.student_name,
+        sp.academic_year,
+        ib.branch_name,
+        saf.father_name,
+        saf.background,
+        saf.admission_date,
+        saf.aadhaar_number,
+        saf.pan_number,
+        saf.scholarship_amount,
+        saf.scholarship_disbursed_date,
+        sap.semester_no,
+        sap.sgpa,
+        sap.attendance_percent,
+        sap.backlogs,
+        fi.installment_no,
+        fi.installment_amount,
+        fi.due_date,
+        fi.paid_date
+    FROM public.student_profile sp
+    LEFT JOIN public.institution_branch ib 
+        ON sp.branch_id = ib.id
+    LEFT JOIN public.student_academic_finance saf 
+        ON sp.student_id = saf.student_id
+    LEFT JOIN public.student_sem_academic_progress sap 
+        ON sp.student_id = sap.student_id AND sp.academic_year = sap.academic_year
+    LEFT JOIN public.student_fee_installments fi 
+        ON sp.student_id = fi.student_id AND sp.academic_year = fi.academic_year
+    WHERE sp.is_active = TRUE
+      AND (p_student_id = '-1' OR sp.student_id = p_student_id)
+      AND (p_branch_id = -1 OR sp.branch_id = p_branch_id)
+    ORDER BY sp.student_id, sap.semester_no, fi.installment_no;
+END;
+$$;
+
+select * from fn_get_student_full_details()

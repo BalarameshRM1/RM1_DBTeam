@@ -1,0 +1,60 @@
+CREATE OR REPLACE FUNCTION public.fn_get_staff_payslip_summary(
+    p_staff_id VARCHAR DEFAULT '-1',
+    p_month VARCHAR DEFAULT '-1'
+)
+RETURNS TABLE (
+    staff_id VARCHAR,
+    staff_name VARCHAR,
+    job_title VARCHAR,
+    department VARCHAR,
+    payroll_month VARCHAR,
+    payment_date DATE,
+    basic_pay NUMERIC,
+    hra NUMERIC,
+    medical_allowance NUMERIC,
+    conveyance NUMERIC,
+    performance_bonus NUMERIC,
+    gross_earnings NUMERIC,
+    pf_deduction NUMERIC,
+    income_tax NUMERIC,
+    professional_tax NUMERIC,
+    health_insurance NUMERIC,
+    total_deductions NUMERIC,
+    net_salary NUMERIC,
+    status VARCHAR
+)
+LANGUAGE plpgsql
+AS $$
+BEGIN
+    RETURN QUERY
+    SELECT
+        sp.staff_id,
+        sp.staff_name,
+        sp.job_title,
+        sp.department,
+        ps.payroll_month,
+        ps.payment_date,
+        ps.basic_pay,
+        ps.hra,
+        ps.medical_allowance,
+        ps.conveyance,
+        ps.performance_bonus,
+        ps.gross_earnings,
+        ps.pf_deduction,
+        ps.income_tax,
+        ps.professional_tax,
+        ps.health_insurance,
+        ps.total_deductions,
+        ps.net_salary,
+        ps.status
+    FROM public.staff_profile sp
+    LEFT JOIN public.staff_payslip ps ON sp.staff_id = ps.staff_id
+    WHERE sp.is_active = TRUE
+      AND (p_staff_id = '-1' OR sp.staff_id = p_staff_id)
+      AND (p_month = '-1' OR ps.payroll_month = p_month)
+    ORDER BY sp.staff_id, ps.payroll_month;
+END;
+$$;
+
+select * from fn_get_staff_payslip_summary()
+

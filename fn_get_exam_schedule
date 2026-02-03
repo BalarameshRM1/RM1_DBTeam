@@ -37,3 +37,27 @@ BEGIN
     ORDER BY es.exam_date, es.start_time;
 END;
 $$;
+
+-------------------upadted
+CREATE OR REPLACE FUNCTION public.fn_get_exam_schedule(
+    p_branch_id BIGINT,
+    p_exam_type VARCHAR
+)
+RETURNS TABLE (
+    subject_name VARCHAR,
+    exam_date DATE
+)
+LANGUAGE plpgsql
+AS $$
+BEGIN
+    RETURN QUERY
+    SELECT es.subject_name, es.exam_date
+    FROM public.exam_schedule es
+    WHERE (p_branch_id = -1 OR branch_id = p_branch_id)   -- -1 means all branches
+      AND (p_exam_type = '-1' OR exam_type = p_exam_type) -- -1 means all exam types
+      AND is_active = TRUE
+    ORDER BY exam_date;
+END;
+$$;
+
+SELECT * FROM fn_get_exam_schedule(-1, '-1');

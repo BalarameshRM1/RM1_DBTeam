@@ -2984,44 +2984,7 @@ constraint fk_student_family_members_relation_type_id foreign key (relation_type
 );
 
 ----------------------- 28 jan 2026 --- dhanusha-buy & sale
-CREATE OR REPLACE FUNCTION get_filtered_property_listings(
-    p_property_type_id INT DEFAULT NULL,
-    p_updated_range TEXT DEFAULT NULL,
-    p_min_rating NUMERIC DEFAULT NULL
-)
-RETURNS TABLE (
-    id BIGINT,
-    title VARCHAR,
-    price NUMERIC,
-    location TEXT,
-    rating NUMERIC,
-    created_date DATE,
-    property_type TEXT
-) AS $$
-BEGIN
-    RETURN QUERY
-    SELECT 
-        p.id,
-        p.property_description AS title,
-        p.expected_price AS price,
-        CONCAT(p.locality_area, ', ', p.landmark) AS location,
-        p.rating,
-        p.created_date,
-        pt.type_name AS property_type
-    FROM property_sell_listing p
-    JOIN master_property_type pt ON pt.id = p.property_type_id
-    WHERE p.is_active = true
-      AND (p_property_type_id IS NULL OR p.property_type_id = p_property_type_id)
-      AND (p_min_rating IS NULL OR p.rating >= p_min_rating)
-      AND (
-          p_updated_range IS NULL OR
-          (p_updated_range = 'Today' AND p.created_date = CURRENT_DATE) OR
-          (p_updated_range = 'Last 7 Days' AND p.created_date >= CURRENT_DATE - INTERVAL '7 days') OR
-          (p_updated_range = 'Last 30 Days' AND p.created_date >= CURRENT_DATE - INTERVAL '30 days') OR
-          (p_updated_range = 'Last 3 Months' AND p.created_date >= CURRENT_DATE - INTERVAL '3 months')
-      );
-END;
-$$ LANGUAGE plpgsql;
+
 
 ----swachify_product
 CREATE TABLE IF NOT EXISTS product_rating (
@@ -3095,38 +3058,6 @@ CREATE TABLE IF NOT EXISTS product_order (
 );
 
 -------------------------------------------
-
-CREATE OR REPLACE FUNCTION get_filtered_products(
-    p_category_id INT DEFAULT NULL,
-    p_min_rating NUMERIC DEFAULT NULL,
-    p_distance_range TEXT DEFAULT NULL
-)
-RETURNS TABLE (
-    product_id INT,product_name VARCHAR,description VARCHAR,product_price NUMERIC,avg_rating NUMERIC,
-    total_ratings INT,,category_name VARCHAR
-) AS $$
-BEGIN
-    RETURN QUERY
-    SELECT 
-        pr.id, pr.product_name, pr.description,pr.product_price,ROUND(AVG(r.rating), 1) AS avg_rating,
-        COUNT(r.id) AS total_ratings,pr.latitude, pr.longitude,
-        pc.category_name
-    FROM product_registration pr
-    JOIN master_product_category pc ON pc.id = pr.category_id
-    LEFT JOIN product_rating r ON r.product_id = pr.id
-    WHERE pr.is_active = true
-      AND (p_category_id = -1 OR pr.category_id = p_category_id)
-      AND (
-          p_distance_range =-1 OR
-          (p_distance_range = '0-10' AND pr.latitude BETWEEN 0 AND 10) OR
-          (p_distance_range = '10-20' AND pr.distance_km BETWEEN 10 AND 20) OR
-          (p_distance_range = '20-40' AND pr.distance_km BETWEEN 20 AND 40) OR
-          (p_distance_range = 'Above 40' AND pr.distance_km > 40)
-      )
-    GROUP BY pr.id, pc.category_name
-    HAVING (p_min_rating IS NULL OR ROUND(AVG(r.rating), 1) >= p_min_rating);
-END;
-$$ LANGUAGE plpgsql;				
 
 
 
@@ -3327,76 +3258,8 @@ INSERT INTO public.master_identity_type (identity_type_name)SELECT 'Registration
 INSERT INTO public.master_identity_type (identity_type_name)SELECT 'Government Approval' WHERE NOT EXISTS (SELECT 1 FROM public.master_identity_type WHERE identity_type_name = 'Government Approval');
 
 ---------------------------------------------- 
-CREATE OR REPLACE FUNCTION public.fn_get_branch_directory(
-    p_branch_id BIGINT DEFAULT -1
-)
-RETURNS TABLE (
-    total_students BIGINT,
-    branch_count BIGINT,
-    branch_id BIGINT,
-    branch_name VARCHAR(255),
-    location VARCHAR,
-    status VARCHAR(20),
-    student_count BIGINT
-)
-LANGUAGE plpgsql
-AS $$
-BEGIN
-    RETURN QUERY
-    WITH branch_data AS (
-        SELECT
-            ib.id,ib.branch_name,ib.city AS location,ib.status,COUNT(sp.id) AS student_count
-        FROM public.institution_branch ib
- LEFT JOIN public.student_profile sp ON sp.branch_id = ib.id AND sp.is_active = TRUE WHERE ib.is_active = TRUE AND (p_branch_id = -1 OR ib.id = p_branch_id)
-        GROUP BY ib.id, ib.branch_name, ib.city, ib.status
-    )
-    SELECT
-        (SELECT COUNT(*) FROM public.student_profile WHERE is_active = TRUE) AS total_students,
-        (SELECT COUNT(*) FROM public.institution_branch WHERE is_active = TRUE) AS branch_count,
-        bd.id,bd.branch_name,bd.location,bd.status,bd.student_count
-    FROM branch_data bd
-    ORDER BY bd.branch_name;
-END;
-$$;
-
-select * from fn_get_branch_directory(-1)
 -------------------
 
-CREATE OR REPLACE  FUNCTION public.fn_get_students_by_branch(
-    p_branch_id BIGINT,
-    p_limit INT DEFAULT 10,
-    p_offset INT DEFAULT 0
-)
-RETURNS TABLE (
-    student_id VARCHAR,
-    student_name VARCHAR,
-    academic_year varchar,
-    profile_image_url VARCHAR,
-    branch_name VARCHAR
-)
-LANGUAGE plpgsql
-AS $$
-BEGIN
-    RETURN QUERY
-    SELECT
-        sp.student_id,
-        sp.student_name,
-        sp.academic_year,
-        sp.profile_image_url,
-        ib.branch_name
-    FROM public.student_profile sp
-    JOIN public.institution_branch ib ON sp.branch_id = ib.id
-    WHERE sp.is_active = TRUE
-      AND (p_branch_id = -1 OR sp.branch_id = p_branch_id)
-    ORDER BY ib.branch_name, sp.academic_year, sp.student_name
-    LIMIT p_limit OFFSET p_offset;
-END;
-$$;
-
-
-select * from fn_get_students_by_branch(-1)
-
---------------------------------------------------
 
 CREATE TABLE IF NOT EXISTS  public.student_profile (
     id SERIAL not null,
@@ -3460,50 +3323,7 @@ CREATE TABLE IF NOT EXISTS public.student_fee_installments (
 );
 
 ---------------------------------------------------------
-	CREATE OR REPLACE FUNCTION public.fn_get_student_full_details(
-    p_student_id VARCHAR DEFAULT '-1',
-    p_branch_id BIGINT DEFAULT -1
-)
-RETURNS TABLE (
-    student_id VARCHAR,
-    student_name VARCHAR,
-    academic_year VARCHAR,
-    branch_name VARCHAR,
-    father_name VARCHAR,
-    background VARCHAR,
-    admission_date DATE,
-    aadhaar_number VARCHAR,
-    pan_number VARCHAR,
-    scholarship_amount NUMERIC,
-    scholarship_disbursed_date DATE,
-    sgpa NUMERIC,
-    attendance_percent INT,
-    backlogs INT,
-    installment_no INT,
-    installment_amount NUMERIC,
-    due_date DATE,
-    paid_date DATE
-)
-LANGUAGE plpgsql
-AS $$
-BEGIN
-    RETURN QUERY
-    SELECT
-        sp.student_id,sp.student_name,sp.academic_year,ib.branch_name,saf.father_name,saf.background,
-        saf.admission_date,saf.aadhaar_number,saf.pan_number,saf.scholarship_amount,saf.scholarship_disbursed_date,
-        saf.sgpa,saf.attendance_percent,saf.backlogs,fi.installment_no,fi.installment_amount,fi.due_date,fi.paid_date
-    FROM public.student_profile sp
-    LEFT JOIN public.institution_branch ib ON sp.branch_id = ib.id
-    LEFT JOIN public.student_academic_finance saf ON sp.student_id = saf.student_id
-    LEFT JOIN public.student_fee_installments fi ON sp.student_id = fi.student_id
-    WHERE sp.is_active = TRUE
-      AND (p_student_id = '-1' OR sp.student_id = p_student_id)   -- -1 = all students
-      AND (p_branch_id = -1 OR sp.branch_id = p_branch_id)        -- -1 = all branches
-    ORDER BY sp.student_id, fi.installment_no;
-END;
-$$;
-SELECT * FROM fn_get_student_full_details('-1', -1);
-
+	
 ---------------------------------------------------------------------------------------
 ALTER TABLE public.student_profile ADD COLUMN parent_mobile VARCHAR(100);
 --------------------------------------------------------------------------------------
@@ -3524,75 +3344,8 @@ CREATE TABLE IF NOT EXISTS public.exam_schedule (
 );
 
 -----------------------------------------------------------------------------
-CREATE OR REPLACE FUNCTION public.fn_get_exam_schedule(
-    p_branch_id BIGINT,
-    p_exam_type VARCHAR
-)
-RETURNS TABLE (
-    subject_name VARCHAR,
-    exam_date DATE
-)
-LANGUAGE plpgsql
-AS $$
-BEGIN
-    RETURN QUERY
-    SELECT es.subject_name, es.exam_date
-    FROM public.exam_schedule es
-    WHERE (p_branch_id = -1 OR branch_id = p_branch_id)   -- -1 means all branches
-      AND (p_exam_type = '-1' OR exam_type = p_exam_type) -- -1 means all exam types
-      AND is_active = TRUE
-    ORDER BY exam_date;
-END;
-$$;
 
-SELECT * FROM fn_get_exam_schedule(-1, '-1');
 -------------------------------------------------------------------------------
-CREATE OR REPLACE FUNCTION public.fn_get_management_overview(
-    p_branch_id BIGINT DEFAULT -1,
-    p_exam_type VARCHAR DEFAULT '-1'
-)
-RETURNS TABLE (
-    parents_connected BIGINT,
-    exam_type VARCHAR,
-    exam_start_date DATE,
-    subject_name VARCHAR,
-    subject_exam_date DATE
-)
-LANGUAGE plpgsql
-AS $$
-BEGIN
-    RETURN QUERY
-    SELECT 
-        -- Parents Connected
-        (SELECT COUNT(*) 
-         FROM student_profile 
-         WHERE is_active = TRUE
-           AND parent_mobile IS NOT NULL
-           AND (p_branch_id = -1 OR branch_id = p_branch_id)) AS parents_connected,
-
-        -- Exam Type
-        es.exam_type,
-
-        -- Exam Start Date
-        (SELECT MIN(es2.exam_date) 
-         FROM exam_schedule es2
-         WHERE es2.is_active = TRUE
-           AND (p_branch_id = -1 OR es2.branch_id = p_branch_id)
-           AND (p_exam_type = '-1' OR es2.exam_type = p_exam_type)) AS exam_start_date,
-
-        -- Exam Timetable (subject + date list)
-        es.subject_name,
-        es.exam_date AS subject_exam_date
-    FROM exam_schedule es
-    WHERE es.is_active = TRUE
-      AND (p_branch_id = -1 OR es.branch_id = p_branch_id)
-      AND (p_exam_type = '-1' OR es.exam_type = p_exam_type)
-    ORDER BY es.exam_date;
-END;
-$$;
-
-
-SELECT * FROM fn_get_management_overview(-1, '-1');
 
 CREATE TABLE IF NOT EXISTS public.otp_verification (
     id SERIAL NOT NULL,
@@ -3662,72 +3415,7 @@ CREATE TABLE IF NOT EXISTS public.student_sem_academic_progress (
 
 ALTER TABLE public.student_fee_installments ADD COLUMN academic_year VARCHAR(100);
 
-CREATE OR REPLACE FUNCTION public.fn_get_student_full_details(
-    p_student_id VARCHAR DEFAULT '-1',
-    p_branch_id BIGINT DEFAULT -1
-)
-RETURNS TABLE (
-    student_id VARCHAR,
-    student_name VARCHAR,
-    academic_year VARCHAR,
-    branch_name VARCHAR,
-    father_name VARCHAR,
-    background VARCHAR,
-    admission_date DATE,
-    aadhaar_number VARCHAR,
-    pan_number VARCHAR,
-    scholarship_amount NUMERIC,
-    scholarship_disbursed_date DATE,
-    semester_no INT,
-    sgpa NUMERIC,
-    attendance_percent INT,
-    backlogs INT,
-    installment_no INT,
-    installment_amount NUMERIC,
-    due_date DATE,
-    paid_date DATE
-)
-LANGUAGE plpgsql
-AS $$
-BEGIN
-    RETURN QUERY
-    SELECT
-        sp.student_id,
-        sp.student_name,
-        sp.academic_year,
-        ib.branch_name,
-        saf.father_name,
-        saf.background,
-        saf.admission_date,
-        saf.aadhaar_number,
-        saf.pan_number,
-        saf.scholarship_amount,
-        saf.scholarship_disbursed_date,
-        sap.semester_no,
-        sap.sgpa,
-        sap.attendance_percent,
-        sap.backlogs,
-        fi.installment_no,
-        fi.installment_amount,
-        fi.due_date,
-        fi.paid_date
-    FROM public.student_profile sp
-    LEFT JOIN public.institution_branch ib 
-        ON sp.branch_id = ib.id
-    LEFT JOIN public.student_academic_finance saf 
-        ON sp.student_id = saf.student_id
-    LEFT JOIN public.student_sem_academic_progress sap 
-        ON sp.student_id = sap.student_id AND sp.academic_year = sap.academic_year
-    LEFT JOIN public.student_fee_installments fi 
-        ON sp.student_id = fi.student_id AND sp.academic_year = fi.academic_year
-    WHERE sp.is_active = TRUE
-      AND (p_student_id = '-1' OR sp.student_id = p_student_id)
-      AND (p_branch_id = -1 OR sp.branch_id = p_branch_id)
-    ORDER BY sp.student_id, sap.semester_no, fi.installment_no;
-END;
-$$;
 
-select * from fn_get_student_full_details()
 
 ------------------------------------------------- 30 jan 2026 -- dhanusha
 CREATE TABLE IF NOT EXISTS public.enrollment_status (
@@ -3796,61 +3484,6 @@ CREATE TABLE IF NOT EXISTS public.bus_alert_log (
     CONSTRAINT fk_bus_alert_log_bus_id FOREIGN KEY (bus_id) REFERENCES public.bus_fleet(bus_id)
 );
 
-CREATE OR REPLACE FUNCTION public.fn_get_bus_tracking_overview()
-RETURNS TABLE (
-    bus_id VARCHAR,
-    bus_name VARCHAR,
-    driver_name VARCHAR,
-    status VARCHAR,
-    location_description TEXT,
-    current_speed NUMERIC,
-    eta_minutes INT,
-    next_stop VARCHAR
-)
-LANGUAGE plpgsql
-AS $$
-BEGIN
-    RETURN QUERY
-    SELECT
-        bf.bus_id,
-        bf.bus_name,
-        bf.driver_name,
-        bts.status,
-        bts.location_description,
-        bts.current_speed,
-        bts.eta_minutes,
-        bts.next_stop
-    FROM public.bus_fleet bf
-    LEFT JOIN public.bus_tracking_status bts ON bf.bus_id = bts.bus_id
-    WHERE bf.is_active = TRUE
-    ORDER BY bf.bus_id;
-END;
-$$;
-
-select * from fn_get_bus_tracking_overview()
-
-
-CREATE OR REPLACE FUNCTION public.fn_get_bus_dashboard_summary()
-RETURNS TABLE (
-    active_buses BIGINT,
-    total_buses BIGINT,
-    unresolved_alerts BIGINT
-)
-LANGUAGE plpgsql
-AS $$
-BEGIN
-    RETURN QUERY
-    SELECT 
-        COUNT(*) FILTER (WHERE bts.status = 'MOVING') AS active_buses,
-        COUNT(*) AS total_buses,
-        (SELECT COUNT(*) FROM public.bus_alert_log WHERE resolved = FALSE) AS unresolved_alerts
-    FROM public.bus_fleet bf
-    LEFT JOIN public.bus_tracking_status bts ON bf.bus_id = bts.bus_id
-    WHERE bf.is_active = TRUE;
-END;
-$$;
-
-select * from fn_get_bus_dashboard_summary()
 ----------------------------------------------------------------------------------------
 
 CREATE TABLE IF NOT EXISTS public.staff_profile (
@@ -3909,66 +3542,6 @@ CREATE TABLE IF NOT EXISTS public.payroll_summary (
     is_active BOOLEAN DEFAULT TRUE,
     CONSTRAINT pk_payroll_summary_id PRIMARY KEY (id)
 );
-
-CREATE OR REPLACE FUNCTION public.fn_get_staff_payslip_summary(
-    p_staff_id VARCHAR DEFAULT '-1',
-    p_month VARCHAR DEFAULT '-1'
-)
-RETURNS TABLE (
-    staff_id VARCHAR,
-    staff_name VARCHAR,
-    job_title VARCHAR,
-    department VARCHAR,
-    payroll_month VARCHAR,
-    payment_date DATE,
-    basic_pay NUMERIC,
-    hra NUMERIC,
-    medical_allowance NUMERIC,
-    conveyance NUMERIC,
-    performance_bonus NUMERIC,
-    gross_earnings NUMERIC,
-    pf_deduction NUMERIC,
-    income_tax NUMERIC,
-    professional_tax NUMERIC,
-    health_insurance NUMERIC,
-    total_deductions NUMERIC,
-    net_salary NUMERIC,
-    status VARCHAR
-)
-LANGUAGE plpgsql
-AS $$
-BEGIN
-    RETURN QUERY
-    SELECT
-        sp.staff_id,
-        sp.staff_name,
-        sp.job_title,
-        sp.department,
-        ps.payroll_month,
-        ps.payment_date,
-        ps.basic_pay,
-        ps.hra,
-        ps.medical_allowance,
-        ps.conveyance,
-        ps.performance_bonus,
-        ps.gross_earnings,
-        ps.pf_deduction,
-        ps.income_tax,
-        ps.professional_tax,
-        ps.health_insurance,
-        ps.total_deductions,
-        ps.net_salary,
-        ps.status
-    FROM public.staff_profile sp
-    LEFT JOIN public.staff_payslip ps ON sp.staff_id = ps.staff_id
-    WHERE sp.is_active = TRUE
-      AND (p_staff_id = '-1' OR sp.staff_id = p_staff_id)
-      AND (p_month = '-1' OR ps.payroll_month = p_month)
-    ORDER BY sp.staff_id, ps.payroll_month;
-END;
-$$;
-
-select * from fn_get_staff_payslip_summary()
 
 ------------------------------------------------------------------------------------
 
@@ -4210,7 +3783,7 @@ ALTER TABLE institution_branch DROP CONSTRAINT uq_institution_branch_branch_name
 
 
 select * from appointments
-------------------------------------------------------------------------------------------------------
+-----------------------------------------------------------------
 select * from staff_profile
 select * from staff_payslip
 select * from payroll_summary
@@ -4280,3 +3853,75 @@ create table if not exists salary_deductions (
     constraint pk_salary_deductions_id primary key (id),
     constraint fk_salary_deductions_salary_overview_id foreign key (salary_overview_id) references salary_overview(id)
 );
+
+------------------------------- 3rd_feb_2026 dhanusha
+drop table salary_deductions
+drop table salary_earnings
+ drop table salary_overview
+ 
+create table if not exists salary_earnings (
+    id bigserial not null,
+    payroll_period_id bigint not null,
+	total_net_disbursement numeric(12,2) not null,
+    staff_count int,
+    status varchar, -- disbursed / pending
+	basic_salary numeric(10,2),
+	hra numeric(10,2),
+	medical numeric(10,2),
+	conveyance numeric(10,2),
+	gross_earnings numeric(12,2),
+	pf numeric(10,2),
+	professional_tax numeric(10,2),
+	insurance numeric(10,2),
+    total_deduction numeric(10,2) not null, 
+    created_by bigint,
+    created_date timestamp default now(),
+    modified_by bigint,
+    modified_date timestamp,
+    is_active boolean default true,
+    constraint pk_salary_earnings_id primary key (id),
+    constraint fk_salary_earnings_payroll_period_id foreign key (payroll_period_id) references payroll_period(id)
+
+);
+----------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS public.master_lab_specialization (
+    id SERIAL not null,
+    specialization_name VARCHAR(100) NOT NULL UNIQUE,
+    description varchar(255),
+    is_active BOOLEAN DEFAULT TRUE,
+	constraint pk_master_lab_specialization_id primary key (id)
+);
+============
+INSERT INTO public.master_lab_specialization (specialization_name, description)
+VALUES 
+('Pathology', 'Blood, urine, and tissue testing'),
+('Radiology', 'X-ray, MRI, CT scans'),
+('Microbiology', 'Infection and bacteria testing'),
+('Biochemistry', 'Chemical analysis of body fluids'),
+('Genetics', 'DNA and genetic testing');
+
+==================================================
+
+ALTER TABLE public.available_labs ADD COLUMN specialization_id INTEGER;
+
+ALTER TABLE public.available_labs
+ADD CONSTRAINT fk_available_labs_specialization_id
+FOREIGN KEY (specialization_id)
+REFERENCES public.master_lab_specialization(id);
+
+ALTER TABLE public.available_labs ADD COLUMN fees_per_test NUMERIC(10,2);
+ALTER TABLE public.available_labs
+ADD COLUMN IF NOT EXISTS specialization_id INTEGER,
+ADD COLUMN IF NOT EXISTS fees_per_test NUMERIC(10,2),
+ADD COLUMN IF NOT EXISTS available_from TIME,
+ADD COLUMN IF NOT EXISTS available_to TIME,
+ADD COLUMN IF NOT EXISTS estimated_delivery VARCHAR(50),
+ADD COLUMN IF NOT EXISTS latitude NUMERIC(9,6),
+ADD COLUMN IF NOT EXISTS longitude NUMERIC(9,6),
+ADD COLUMN IF NOT EXISTS home_collection BOOLEAN DEFAULT FALSE;
+ALTER TABLE public.available_labs ADD COLUMN is_available BOOLEAN DEFAULT TRUE;
+===============================
+
+ALTER TABLE public.doctor_profile DROP CONSTRAINT ck_doctor_profile_rating;
+ALTER TABLE public.doctor_profile ALTER COLUMN rating TYPE NUMERIC(3,2) USING rating::NUMERIC;
+alter table public.doctor_profile add constraint ck_public.doctor_profile_rating check (rating between 1 and 5);

@@ -1,0 +1,21 @@
+CREATE OR REPLACE FUNCTION public.fn_get_bus_dashboard_summary()
+RETURNS TABLE (
+    active_buses BIGINT,
+    total_buses BIGINT,
+    unresolved_alerts BIGINT
+)
+LANGUAGE plpgsql
+AS $$
+BEGIN
+    RETURN QUERY
+    SELECT 
+        COUNT(*) FILTER (WHERE bts.status = 'MOVING') AS active_buses,
+        COUNT(*) AS total_buses,
+        (SELECT COUNT(*) FROM public.bus_alert_log WHERE resolved = FALSE) AS unresolved_alerts
+    FROM public.bus_fleet bf
+    LEFT JOIN public.bus_tracking_status bts ON bf.bus_id = bts.bus_id
+    WHERE bf.is_active = TRUE;
+END;
+$$;
+
+select * from fn_get_bus_dashboard_summary()

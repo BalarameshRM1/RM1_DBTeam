@@ -1,0 +1,46 @@
+CREATE OR REPLACE FUNCTION public.fn_get_internship_list(
+    p_category_id BIGINT DEFAULT -1,
+    p_location_type_id INT DEFAULT -1,
+    p_limit INT DEFAULT 100,
+    p_offset INT DEFAULT 0
+)
+RETURNS TABLE (
+    internship_id BIGINT,
+    job_id BIGINT,
+    company_name VARCHAR(255),
+    company_address VARCHAR(255),
+    role_description VARCHAR(500),
+    internship_stipend BOOLEAN,
+    stipend_type_id INT,
+    internship_duration_id BIGINT,
+    category_id BIGINT,
+    location_type_id INT,
+    work_type_id INT,
+    created_date TIMESTAMP
+)
+LANGUAGE plpgsql
+AS $BODY$
+BEGIN
+    RETURN QUERY
+    SELECT
+        jo.id AS internship_id,
+        jo.job_id,
+        jo.company_name,
+        jo.company_address,
+        jo.role_description,
+        jo.internship_stipend,
+        jo.stipend_type_id,
+        jo.internship_duration_id,
+        jo.category_id,
+        jo.location_type_id,
+        jo.work_type_id,
+        jo.created_date
+    FROM public.job_openings jo
+    WHERE jo.is_active = TRUE
+      AND (p_category_id = -1 OR jo.category_id = p_category_id)
+      AND (p_location_type_id = -1 OR jo.location_type_id = p_location_type_id)
+    ORDER BY jo.created_date DESC
+    LIMIT p_limit OFFSET p_offset;
+END;
+$BODY$;
+

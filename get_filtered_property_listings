@@ -1,0 +1,38 @@
+CREATE OR REPLACE FUNCTION get_filtered_property_listings(
+    p_property_type_id INT DEFAULT NULL,
+    p_updated_range TEXT DEFAULT NULL,
+    p_min_rating NUMERIC DEFAULT NULL
+)
+RETURNS TABLE (
+    id BIGINT,
+    title VARCHAR,
+    price NUMERIC,
+    location TEXT,
+    rating NUMERIC,
+    created_date DATE,
+    property_type TEXT
+) AS $$
+BEGIN
+    RETURN QUERY
+    SELECT 
+        p.id,
+        p.property_description AS title,
+        p.expected_price AS price,
+        CONCAT(p.locality_area, ', ', p.landmark) AS location,
+        p.rating,
+        p.created_date,
+        pt.type_name AS property_type
+    FROM property_sell_listing p
+    JOIN master_property_type pt ON pt.id = p.property_type_id
+    WHERE p.is_active = true
+      AND (p_property_type_id IS NULL OR p.property_type_id = p_property_type_id)
+      AND (p_min_rating IS NULL OR p.rating >= p_min_rating)
+      AND (
+          p_updated_range IS NULL OR
+          (p_updated_range = 'Today' AND p.created_date = CURRENT_DATE) OR
+          (p_updated_range = 'Last 7 Days' AND p.created_date >= CURRENT_DATE - INTERVAL '7 days') OR
+          (p_updated_range = 'Last 30 Days' AND p.created_date >= CURRENT_DATE - INTERVAL '30 days') OR
+          (p_updated_range = 'Last 3 Months' AND p.created_date >= CURRENT_DATE - INTERVAL '3 months')
+      );
+END;
+$$ LANGUAGE plpgsql;

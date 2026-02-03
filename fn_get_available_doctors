@@ -36,3 +36,37 @@ $$ LANGUAGE plpgsql;
 
 
 select * from fn_get_available_doctors(-1)
+---------------------------------------------------------updated 3rd feb change rating datatype
+CREATE OR REPLACE FUNCTION public.fn_get_available_doctors(
+    p_specialization_id integer)
+    RETURNS TABLE(doctor_id bigint, doctor_name character varying, specialization_name character varying, experience_years integer, rating numeric, fees_per_hour numeric, available_from time without time zone, available_to time without time zone) 
+    LANGUAGE 'plpgsql'
+    COST 100
+    VOLATILE PARALLEL UNSAFE
+    ROWS 1000
+
+AS $BODY$
+BEGIN
+    RETURN QUERY
+    SELECT d.id,
+           CAST(concat_ws(' ', u.first_name, u.last_name) AS VARCHAR) AS doctor_name,
+           s.specialization_name,
+           d.experience_years,
+           d.rating,
+           d.fees_per_hour,
+           d.available_from,
+           d.available_to
+    FROM doctor_profile d
+    JOIN user_registration u ON d.user_id = u.id
+    JOIN master_doctor_specialization s ON d.specialization_id = s.id
+    WHERE d.consultation_type_id = (
+        SELECT id FROM master_consultation_type WHERE consultation_type = 'Online'
+    )
+      AND d.is_active = TRUE
+      AND d.is_available = TRUE
+      AND (
+          p_specialization_id = -1 
+          OR d.specialization_id = p_specialization_id
+      );
+END;
+$BODY$;

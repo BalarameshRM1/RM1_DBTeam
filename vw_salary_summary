@@ -1,0 +1,10 @@
+create or replace view vw_salary_summary as
+select
+    pe.id as payroll_period_id,pe.month,pe.year,se.staff_count,se.status,se.basic_salary,
+    se.hra,se.medical,se.conveyance,se.gross_earnings,se.pf,se.professional_tax,se.insurance,
+    se.total_deduction,se.total_net_disbursement,round(se.gross_earnings - se.total_deduction, 2) as net_payable
+from payroll_period pe
+join salary_earnings se on se.payroll_period_id = pe.id 
+where pe.is_active = true and se.is_active = true;
+
+select * from vw_salary_summary;	

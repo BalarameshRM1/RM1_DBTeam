@@ -1,0 +1,55 @@
+CREATE OR REPLACE FUNCTION public.fn_get_available_labs_list(
+    p_filter text DEFAULT 'ALL'::text,
+    p_user_lat numeric DEFAULT NULL::numeric,
+    p_user_long numeric DEFAULT NULL::numeric,
+    p_current_time time without time zone DEFAULT (now())::time without time zone)
+    RETURNS TABLE(lab_id bigint, lab_name character varying, specialization_name character varying, rating integer, fees_per_test numeric, available_from time without time zone, available_to time without time zone, home_collection boolean, distance_km numeric, status character varying, next_available character varying, estimated_delivery character varying) 
+    LANGUAGE 'plpgsql'
+    COST 100
+    VOLATILE PARALLEL UNSAFE
+    ROWS 1000
+
+AS $BODY$
+BEGIN
+RETURN QUERY
+SELECT 
+    l.id,l.lab_name,s.specialization_name,l.rating,l.fees_per_test,l.available_from,
+    l.available_to,l.home_collection,
+    CASE 
+        WHEN p_filter = 'NEARBY' AND p_user_lat IS NOT NULL AND p_user_long IS NOT NULL THEN
+            ROUND(SQRT(POWER(111.0 * (l.latitude - p_user_lat), 2) + POWER(102.0 * (l.longitude - p_user_long), 2)), 1)
+        ELSE NULL
+    END AS distance_km,
+    CAST(
+  CASE 
+    WHEN l.available_from <= p_current_time AND l.available_to > p_current_time THEN 'OPEN NOW'
+    ELSE 'CLOSED'
+  END AS VARCHAR
+) AS status,
+    CAST(
+  CASE 
+    WHEN l.available_from > p_current_time THEN to_char(l.available_from, 'HH12:MI AM')
+    WHEN l.available_to > p_current_time THEN to_char(p_current_time, 'HH12:MI AM')
+    ELSE 'Tomorrow ' || to_char(l.available_from, 'HH12:MI AM')
+  END AS VARCHAR
+) AS next_available,
+    l.estimated_delivery
+FROM available_labs l
+LEFT JOIN master_lab_specialization s ON l.specialization_id = s.id
+WHERE l.is_active = TRUE
+  AND l.is_available = TRUE
+  AND (
+        p_filter = 'ALL'
+     OR (p_filter = 'RATING' AND l.rating >= 4.5)
+     OR (p_filter = 'NEARBY')
+     OR (p_filter = 'HOME_COLLECT' AND l.home_collection = TRUE)
+  )
+ORDER BY 
+    CASE 
+        WHEN p_filter = 'NEARBY' AND p_user_lat IS NOT NULL AND p_user_long IS NOT NULL THEN
+            SQRT(POWER(111.0 * (l.latitude - p_user_lat), 2) + POWER(102.0 * (l.longitude - p_user_long), 2))
+        ELSE NULL
+    END,
+    l.rating DESC;
+END;
+$BODY$;

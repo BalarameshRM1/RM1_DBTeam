@@ -1,0 +1,32 @@
+CREATE OR REPLACE FUNCTION get_filtered_products(
+    p_category_id INT DEFAULT NULL,
+    p_min_rating NUMERIC DEFAULT NULL,
+    p_distance_range TEXT DEFAULT NULL
+)
+RETURNS TABLE (
+    product_id INT,product_name VARCHAR,description VARCHAR,product_price NUMERIC,avg_rating NUMERIC,
+    total_ratings INT,,category_name VARCHAR
+) AS $$
+BEGIN
+    RETURN QUERY
+    SELECT 
+        pr.id, pr.product_name, pr.description,pr.product_price,ROUND(AVG(r.rating), 1) AS avg_rating,
+        COUNT(r.id) AS total_ratings,pr.latitude, pr.longitude,
+        pc.category_name
+    FROM product_registration pr
+    JOIN master_product_category pc ON pc.id = pr.category_id
+    LEFT JOIN product_rating r ON r.product_id = pr.id
+    WHERE pr.is_active = true
+      AND (p_category_id = -1 OR pr.category_id = p_category_id)
+      AND (
+          p_distance_range =-1 OR
+          (p_distance_range = '0-10' AND pr.latitude BETWEEN 0 AND 10) OR
+          (p_distance_range = '10-20' AND pr.distance_km BETWEEN 10 AND 20) OR
+          (p_distance_range = '20-40' AND pr.distance_km BETWEEN 20 AND 40) OR
+          (p_distance_range = 'Above 40' AND pr.distance_km > 40)
+      )
+    GROUP BY pr.id, pc.category_name
+    HAVING (p_min_rating IS NULL OR ROUND(AVG(r.rating), 1) >= p_min_rating);
+END;
+$$ LANGUAGE plpgsql;				
+

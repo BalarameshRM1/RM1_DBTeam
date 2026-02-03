@@ -1,0 +1,48 @@
+CREATE OR REPLACE FUNCTION public.fn_get_management_overview(
+    p_branch_id BIGINT,
+    p_exam_type VARCHAR
+)
+RETURNS TABLE(
+    parents_connected BIGINT,
+    exam_type VARCHAR,
+    exam_start_date DATE,
+    subject_name VARCHAR,
+    subject_exam_date DATE
+)
+LANGUAGE plpgsql
+AS
+$$
+BEGIN
+    RETURN QUERY
+    WITH parents AS (
+        SELECT COUNT(*) AS total
+        FROM student_profile sp
+        JOIN institution_branch ib ON sp.branch_id = ib.id
+        WHERE sp.is_active = TRUE
+          AND sp.parent_mobile IS NOT NULL
+          AND (p_branch_id = -1 OR ib.id = p_branch_id)
+    ),
+    exam_start AS (
+        SELECT MIN(es.exam_date) AS start_date
+        FROM exam_schedule es
+        JOIN institution_branch ib ON es.institution_id = ib.institution_id
+        WHERE es.is_active = TRUE
+          AND (p_branch_id = -1 OR ib.id = p_branch_id)
+          AND (p_exam_type = '-1' OR es.exam_type = p_exam_type)
+    )
+    SELECT 
+        p.total,
+        es.exam_type,
+        e.start_date,
+        es.subject_name,
+        es.exam_date
+    FROM exam_schedule es
+    JOIN institution_branch ib ON es.institution_id = ib.institution_id
+    CROSS JOIN parents p
+    CROSS JOIN exam_start e
+    WHERE es.is_active = TRUE
+      AND (p_branch_id = -1 OR ib.id = p_branch_id)
+      AND (p_exam_type = '-1' OR es.exam_type = p_exam_type)
+    ORDER BY es.exam_date;
+END;
+$$;

@@ -1,0 +1,86 @@
+CREATE OR REPLACE FUNCTION public.fn_get_available_pharmacies(
+    p_filter TEXT DEFAULT 'ALL',
+    p_user_lat NUMERIC DEFAULT NULL,
+    p_user_long NUMERIC DEFAULT NULL,
+    p_current_time TIME DEFAULT now()::TIME
+)
+RETURNS TABLE (
+    pharmacy_id BIGINT,
+    pharmacy_name VARCHAR,
+    pharmacy_type VARCHAR,
+    services VARCHAR,
+    rating INTEGER,
+    delivery_time VARCHAR,
+    home_delivery BOOLEAN,
+    distance_km NUMERIC,
+    status VARCHAR,
+    next_available VARCHAR,
+    delivery_address VARCHAR,
+    special_instructions VARCHAR,
+    upload_prescription VARCHAR,
+    proceed_type VARCHAR
+) AS $$
+BEGIN
+RETURN QUERY
+SELECT 
+    p.id,
+    p.pharmacy_name,
+    p.pharmacy_type,
+    p.services,
+    p.rating,
+    p.delivery_time,
+    p.home_delivery,
+    CASE 
+        WHEN UPPER(p_filter) = 'NEARBY'
+         AND p_user_lat IS NOT NULL
+         AND p_user_long IS NOT NULL
+        THEN ROUND(
+            SQRT(
+                POWER(111.0 * (p.latitude - p_user_lat), 2) +
+                POWER(102.0 * (p.longitude - p_user_long), 2)
+            ), 1)
+        ELSE NULL
+    END AS distance_km,
+    CASE 
+        WHEN p.open_from <= p_current_time AND p.open_to > p_current_time
+        THEN 'OPEN NOW'
+        ELSE 'CLOSED'
+    END::VARCHAR AS status,   
+    CASE 
+        WHEN p.open_from > p_current_time
+        THEN to_char(p.open_from, 'HH12:MI AM')
+        WHEN p.open_to > p_current_time
+        THEN to_char(p_current_time, 'HH12:MI AM')
+        ELSE 'Tomorrow ' || to_char(p.open_from, 'HH12:MI AM')
+    END::VARCHAR AS next_available,   
+    p.delivery_address,
+    p.special_instructions,
+    p.upload_prescription,
+    p.proceed_type
+FROM available_pharmacies p
+WHERE p.is_active = TRUE
+  AND (
+        UPPER(p_filter) = 'ALL'
+     OR (UPPER(p_filter) = 'RATING' AND p.rating >= 4)
+     OR (UPPER(p_filter) = 'NEARBY')
+     OR (UPPER(p_filter) = 'HOME_DELIVERY' AND p.home_delivery = TRUE)
+  )
+ORDER BY 
+    CASE 
+        WHEN UPPER(p_filter) = 'NEARBY'
+         AND p_user_lat IS NOT NULL
+         AND p_user_long IS NOT NULL
+        THEN SQRT(
+            POWER(111.0 * (p.latitude - p_user_lat), 2) +
+            POWER(102.0 * (p.longitude - p_user_long), 2)
+        )
+        ELSE NULL
+    END,
+    p.rating DESC;
+END;
+$$ LANGUAGE plpgsql;
+
+SELECT * FROM fn_get_available_pharmacies('ALL');
+
+ALTER TABLE available_pharmacies
+ADD COLUMN home_delivery BOOLEAN DEFAULT FALSE;

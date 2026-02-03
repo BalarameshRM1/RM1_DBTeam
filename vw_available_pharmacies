@@ -1,0 +1,19 @@
+CREATE OR REPLACE VIEW vw_available_pharmacies AS
+SELECT id AS pharmacy_id,
+       pharmacy_name,
+       pharmacy_type,
+       services,
+       rating,
+       delivery_time,
+       is_active,
+       latitude,
+       longitude,
+       upload_prescription,
+       proceed_type,
+       delivery_address,
+       special_instructions
+FROM public.available_pharmacies
+WHERE is_active = TRUE;
+
+
+SELECT * FROM vw_available_pharmacies;
