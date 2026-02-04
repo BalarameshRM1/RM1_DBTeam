@@ -1,0 +1,48 @@
+CREATE OR REPLACE FUNCTION fn_get_hospital_doctors(
+    p_hospital_id BIGINT,
+    p_specialization_id BIGINT DEFAULT -1
+)
+RETURNS TABLE (
+    hospital_id BIGINT,            
+    doctor_id BIGINT,
+    doctor_name VARCHAR,
+    specialization_id BIGINT,
+    specialization_name VARCHAR,
+    experience_years INT,
+    rating NUMERIC,
+    fees_per_hour NUMERIC,
+    available_from TIME,
+    available_to TIME,
+    is_available BOOLEAN
+)
+LANGUAGE plpgsql
+AS $$
+BEGIN
+    RETURN QUERY
+    SELECT
+        d.hospital_id,                                   
+        d.id AS doctor_id,
+        CONCAT(u.first_name, ' ', u.last_name)::VARCHAR AS doctor_name,
+        d.specialization_id,
+        s.specialization_name,
+        d.experience_years,
+        d.rating,
+        d.fees_per_hour,
+        d.available_from,
+        d.available_to,
+        d.is_available
+    FROM doctor_profile d
+    JOIN user_registration u
+        ON u.id = d.user_id
+    JOIN master_doctor_specialization s
+        ON s.id = d.specialization_id
+    WHERE d.hospital_id = p_hospital_id
+      AND d.is_active = true
+      AND d.is_available = true
+      AND (
+            p_specialization_id = -1
+            OR d.specialization_id = p_specialization_id
+          )
+    ORDER BY s.specialization_name, doctor_name;
+END;
+$$;

@@ -3782,12 +3782,6 @@ ALTER TABLE student_profile DROP CONSTRAINT fk_student_profile_branch_name;
 ALTER TABLE institution_branch DROP CONSTRAINT uq_institution_branch_branch_name;
 
 
-select * from appointments
------------------------------------------------------------------
-select * from staff_profile
-select * from staff_payslip
-select * from payroll_summary
-
 create table if not exists payroll_period (
     id bigserial not null,
     month varchar not null,
@@ -3925,3 +3919,228 @@ ALTER TABLE public.available_labs ADD COLUMN is_available BOOLEAN DEFAULT TRUE;
 ALTER TABLE public.doctor_profile DROP CONSTRAINT ck_doctor_profile_rating;
 ALTER TABLE public.doctor_profile ALTER COLUMN rating TYPE NUMERIC(3,2) USING rating::NUMERIC;
 alter table public.doctor_profile add constraint ck_public.doctor_profile_rating check (rating between 1 and 5);
+
+------------------------------------------4/2/2026 dhanusha 
+CREATE TABLE IF NOT EXISTS public.master_mechanic
+(
+    id BIGSERIAL not null,
+    garage_id BIGINT NOT NULL,              -- FK to master_garage
+    user_id BIGINT NOT NULL,                -- FK to user_registration (mechanic profile)
+    rating NUMERIC(3,2),                -- average rating from feedback
+    is_active BOOLEAN DEFAULT TRUE,         -- active/inactive mechanic
+    created_date TIMESTAMP DEFAULT now(),
+    modified_date TIMESTAMP,
+constraint pk_master_mechanic_id primary key (id),
+CONSTRAINT uk_mechanic_garage_garage_id_user_id UNIQUE (garage_id, user_id),
+CONSTRAINT fk_master_mechanic_garage_id FOREIGN KEY (garage_id) REFERENCES public.master_garage (id),
+CONSTRAINT fk_master_mechanic_user_id FOREIGN KEY (user_id) REFERENCES public.user_registration (id)
+);
+
+ALTER TABLE master_mechanic ADD COLUMN mechanic_name varchar(255);
+UPDATE master_mechanic m
+SET mechanic_name = CONCAT_WS(' ', u.first_name, u.last_name)
+FROM user_registration u
+WHERE m.user_id = u.id;
+
+
+alter table freelancer_task_history add column home_service_booking_id bigint;
+CREATE TABLE IF NOT EXISTS public.home_service_booking (
+    id BIGSERIAL NOT NULL,
+
+    -- Service Hierarchy
+    module_id BIGINT NOT NULL,
+    sub_module_id BIGINT NOT NULL,
+    service_id BIGINT NOT NULL,
+    sub_service_id BIGINT NOT NULL,
+
+    -- Customer Info
+    full_name VARCHAR(255) NOT NULL,
+    email VARCHAR(150) NOT NULL,
+    mobile VARCHAR(255) NOT NULL,
+
+    -- Address & Location
+    address VARCHAR(500) NOT NULL,
+    others_address VARCHAR(255),
+    latitude NUMERIC(9,6),
+    longitude NUMERIC(9,6),
+
+    -- Booking Details
+    preferred_date DATE NOT NULL,
+    time_slot_id INTEGER,
+    extra_hours INTEGER DEFAULT 0,
+    bhk_type_id INT,
+    brand_id INT,
+    fule_id INT,
+    garage_id INT,
+    garage_service_id INT,
+    mechanic_id INT,
+    special_instructions VARCHAR(500),
+
+    -- Services & Media
+    service_summary JSONB NOT NULL,
+    upload_photos VARCHAR(500),
+
+    -- Payment
+    total_amount NUMERIC(10,2) NOT NULL,
+    payment_done BOOLEAN,
+
+    -- Status & Audit
+    status_id INTEGER,
+    created_by BIGINT,
+    created_date TIMESTAMP DEFAULT now(),
+    modified_by BIGINT,
+    modified_date TIMESTAMP,
+    is_active BOOLEAN DEFAULT TRUE,
+
+    CONSTRAINT pk_home_service_booking_id PRIMARY KEY (id),
+
+    -- Foreign Keys
+    CONSTRAINT fk_booking_module_id FOREIGN KEY (module_id) REFERENCES public.master_module(id),
+    CONSTRAINT fk_booking_sub_module_id FOREIGN KEY (sub_module_id) REFERENCES public.master_sub_module(id),
+    CONSTRAINT fk_booking_service_id FOREIGN KEY (service_id) REFERENCES public.master_service(id),
+    CONSTRAINT fk_booking_sub_service_id FOREIGN KEY (sub_service_id) REFERENCES public.master_sub_service(id),
+    CONSTRAINT fk_booking_time_slot_id FOREIGN KEY (time_slot_id) REFERENCES public.master_time_slot(id),
+    CONSTRAINT fk_booking_status_id FOREIGN KEY (status_id) REFERENCES public.master_status(id),
+    CONSTRAINT fk_booking_created_by FOREIGN KEY (created_by) REFERENCES public.user_registration(id),
+    CONSTRAINT fk_booking_modified_by FOREIGN KEY (modified_by) REFERENCES public.user_registration(id),
+    CONSTRAINT fk_booking_bhk_type_id FOREIGN KEY (bhk_type_id) REFERENCES public.master_bhk_type(id),
+    CONSTRAINT fk_booking_brand_id FOREIGN KEY (brand_id) REFERENCES public.master_vehicle_brand(id),
+    CONSTRAINT fk_booking_fuel_id FOREIGN KEY (fule_id) REFERENCES public.master_fuel_type(id),
+    CONSTRAINT fk_booking_garage_id FOREIGN KEY (garage_id) REFERENCES public.master_garage(id),
+    CONSTRAINT fk_booking_garage_service_id FOREIGN KEY (garage_service_id) REFERENCES public.master_garage_service(id),
+    CONSTRAINT fk_booking_mechanic_id FOREIGN KEY (mechanic_id) REFERENCES public.master_mechanic(id),
+
+    -- Uniqueness to prevent duplicate bookings for same config
+    CONSTRAINT uq_booking_vehicle_combo UNIQUE (
+        sub_service_id,
+        brand_id,
+        fule_id,
+        garage_id,
+        garage_service_id,
+        mechanic_id
+    )
+);
+
+ALTER TABLE public.home_service_booking ADD COLUMN convenience_fee NUMERIC(10,2) DEFAULT 0;
+ALTER TABLE public.home_service_booking ADD COLUMN payment_id BIGINT;
+
+ALTER TABLE public.home_service_booking
+ADD CONSTRAINT fk_booking_payment_id FOREIGN KEY (payment_id) REFERENCES public.home_service_payment(id);
+ 
+ALTER TABLE public.home_service_booking ADD COLUMN item_total NUMERIC(10,2) DEFAULT 0;
+
+ALTER TABLE public.home_service_booking RENAME COLUMN payment_id TO home_service_payment_id;
+
+============================================================
+
+CREATE TABLE IF NOT EXISTS public.home_service_booking_add_on (
+    id BIGSERIAL PRIMARY KEY,
+    home_service_booking_id INTEGER NOT NULL,
+    add_on_id INTEGER NOT NULL,
+    duration_id INTEGER,
+    created_by BIGINT,
+    created_date TIMESTAMP DEFAULT now(),
+    modified_by BIGINT,
+    modified_date TIMESTAMP,
+    is_active BOOLEAN DEFAULT TRUE,
+
+    CONSTRAINT fk_booking_add_on_booking_id FOREIGN KEY (home_service_booking_id)
+        REFERENCES public.home_service_booking(id)
+        ON DELETE CASCADE,
+    CONSTRAINT fk_booking_add_on_id FOREIGN KEY (add_on_id)
+        REFERENCES public.master_package_add_on(id),
+    CONSTRAINT fk_booking_add_on_duration_id FOREIGN KEY (duration_id)
+        REFERENCES public.master_duration(id),
+    CONSTRAINT fk_booking_add_on_created_by FOREIGN KEY (created_by)
+        REFERENCES public.user_registration(id),
+    CONSTRAINT fk_booking_add_on_modified_by FOREIGN KEY (modified_by)
+        REFERENCES public.user_registration(id),
+    CONSTRAINT uq_booking_add_on_unique_combo UNIQUE (home_service_booking_id, add_on_id)
+);
+CREATE TABLE IF NOT EXISTS public.home_service_payment (
+    id BIGSERIAL NOT NULL,
+    booking_id BIGINT NOT NULL,
+    user_id BIGINT NOT NULL,
+    payment_mode VARCHAR(100),         -- UPI, Card, Netbanking, etc.
+    payment_gateway VARCHAR(100),      -- Razorpay, Paytm, etc.
+    transaction_id VARCHAR(255),       -- Gateway transaction reference
+    item_total NUMERIC(10,2) NOT NULL,
+    convenience_fee NUMERIC(10,2) DEFAULT 0,
+    total_paid NUMERIC(10,2) NOT NULL,
+    payment_status VARCHAR(50),        -- SUCCESS, FAILED, PENDING
+    payment_date TIMESTAMP DEFAULT now(),
+    created_by BIGINT,
+    created_date TIMESTAMP DEFAULT now(),
+    modified_by BIGINT,
+    modified_date TIMESTAMP,
+    is_active BOOLEAN DEFAULT TRUE,
+ CONSTRAINT pk_home_service_payment_id PRIMARY KEY (id),
+CONSTRAINT fk_payment_booking_id FOREIGN KEY (booking_id) REFERENCES public.home_service_booking(id),
+ CONSTRAINT fk_payment_user_id FOREIGN KEY (user_id) REFERENCES public.user_registration(id),
+CONSTRAINT fk_payment_created_by FOREIGN KEY (created_by) REFERENCES public.user_registration(id),
+CONSTRAINT fk_payment_modified_by FOREIGN KEY (modified_by) REFERENCES public.user_registration(id),
+CONSTRAINT uk_home_service_payment_transaction_id UNIQUE (transaction_id)
+);
+
+========================================================
+
+CREATE TABLE IF NOT EXISTS public.home_service_booking_service_map (
+    id BIGSERIAL PRIMARY KEY,
+    home_service_booking_id BIGINT NOT NULL,
+    garage_service_id BIGINT NOT NULL,
+    quantity INTEGER DEFAULT 1,
+    service_price NUMERIC(10,2),
+    created_by BIGINT,
+    created_date TIMESTAMP DEFAULT now(),
+    modified_by BIGINT,
+    modified_date TIMESTAMP,
+    is_active BOOLEAN DEFAULT TRUE,
+
+    CONSTRAINT uq_booking_service UNIQUE (home_service_booking_id, garage_service_id),
+
+    CONSTRAINT fk_booking_service_booking_id FOREIGN KEY (home_service_booking_id)
+        REFERENCES public.home_service_booking(id)
+        ON DELETE CASCADE,
+
+    CONSTRAINT fk_booking_service_garage_service_id FOREIGN KEY (garage_service_id)
+        REFERENCES public.master_garage_service(id),
+
+    CONSTRAINT fk_booking_service_created_by FOREIGN KEY (created_by)
+        REFERENCES public.user_registration(id),
+
+    CONSTRAINT fk_booking_service_modified_by FOREIGN KEY (modified_by)
+        REFERENCES public.user_registration(id)
+);
+=============================================================lavanya
+
+update master_sub_module set sub_module_name = 'Cleaning Services' where id =1;
+delete from master_service where id =9;
+
+INSERT INTO public.master_sub_service (sub_service_name,service_id) SELECT 'Pipe Leakage',4 WHERE NOT EXISTS (SELECT 1 FROM public.master_sub_service WHERE sub_service_name='Pipe Leakage' AND service_id=4);
+INSERT INTO public.master_sub_service (sub_service_name,service_id) SELECT 'Tap Fixing',4 WHERE NOT EXISTS (SELECT 1 FROM public.master_sub_service WHERE sub_service_name='Tap Fixing' AND service_id=4);
+INSERT INTO public.master_sub_service (sub_service_name,service_id) SELECT 'Bathroom Fitting',4 WHERE NOT EXISTS (SELECT 1 FROM public.master_sub_service WHERE sub_service_name='Bathroom Fitting' AND service_id=4);
+INSERT INTO public.master_sub_service (sub_service_name,service_id) SELECT 'Water Tank Cleaning',4 WHERE NOT EXISTS (SELECT 1 FROM public.master_sub_service WHERE sub_service_name='Water Tank Cleaning' AND service_id=4);
+============================
+INSERT INTO public.master_sub_service (sub_service_name,service_id) SELECT 'Interior Painting',5 WHERE NOT EXISTS (SELECT 1 FROM public.master_sub_service WHERE sub_service_name='Interior Painting' AND service_id=5);
+INSERT INTO public.master_sub_service (sub_service_name,service_id) SELECT 'Exterior Painting',5 WHERE NOT EXISTS (SELECT 1 FROM public.master_sub_service WHERE sub_service_name='Exterior Painting' AND service_id=5);
+=============================
+INSERT INTO public.master_sub_service (sub_service_name,service_id) SELECT 'Wiring',6 WHERE NOT EXISTS (SELECT 1 FROM public.master_sub_service WHERE sub_service_name='Wiring' AND service_id=6);
+INSERT INTO public.master_sub_service (sub_service_name,service_id) SELECT 'Fan Repair',6 WHERE NOT EXISTS (SELECT 1 FROM public.master_sub_service WHERE sub_service_name='Fan Repair' AND service_id=6);
+==============================
+alter table  appointments add column call_booking_status varchar(255);
+
+alter table  master_add_on rename column add_on to packages_add_on;
+alter table  master_add_on add column sub_service_id int;
+alter table  master_add_on add constraint fk_master_add_on_sub_service_id foreign key (sub_service_id) references master_sub_service(id);
+alter table master_add_on add constraint uk_master_add_on_sub_service_id_packages_add_on unique (sub_service_id,packages_add_on);
+
+update master_add_on set packages_add_on = 'Chimney Cleaning',price = 799 ,sub_service_id =  1 where id =1;
+update master_add_on set packages_add_on = 'Complete Kitchen Deep Cleaning',price = 1499 ,sub_service_id =  1 where id =2;
+update master_add_on set packages_add_on = 'Fridge Deep Cleaning',price = 499 ,sub_service_id =  1 where id =3;
+===========
+update master_add_on set packages_add_on = 'Intense Bathroom Cleaning',price = 599 ,sub_service_id =  2 where id =4;
+update master_add_on set packages_add_on = 'Bathroom Sanitization',price = 299 ,sub_service_id =  2 where id =5;
+==============
+update master_add_on set packages_add_on = '3-Seater Sofa Cleaning',price = 599 ,sub_service_id =  3 where id =6;
+update master_add_on set packages_add_on = '5-Seater Sofa Cleaning',price = 899 ,sub_service_id =  3 where id =7;
+INSERT INTO master_add_on (packages_add_on,price,sub_service_id) SELECT 'Cushion Cleaning(Set of 5)',199,3 WHERE NOT EXISTS (SELECT 1 FROM master_add_on WHERE packages_add_on='Cushion Cleaning(Set of 5)' AND sub_service_id=3);

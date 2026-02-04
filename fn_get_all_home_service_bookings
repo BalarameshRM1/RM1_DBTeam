@@ -1,0 +1,77 @@
+CREATE OR REPLACE FUNCTION public.fn_get_all_home_service_bookings(
+    p_module_id INTEGER DEFAULT -1,
+    p_sub_module_id INTEGER DEFAULT -1,
+    p_service_id BIGINT DEFAULT -1,
+    p_sub_service_id INTEGER DEFAULT -1,
+    p_user_id BIGINT DEFAULT -1,
+    p_limit INTEGER DEFAULT 100,
+    p_offset INTEGER DEFAULT 0
+)
+RETURNS TABLE (
+    booking_id BIGINT,
+    module_name VARCHAR,
+    sub_module_name VARCHAR,
+    service_name VARCHAR,
+    sub_service_name VARCHAR,
+    full_name VARCHAR,
+    mobile VARCHAR,
+    email VARCHAR,
+    address VARCHAR,
+    preferred_date DATE,
+    time_slot VARCHAR,
+    service_summary JSONB,
+    brand_name VARCHAR,
+    fuel_type_name VARCHAR,
+    garage_name VARCHAR,
+    mechanic_name VARCHAR,
+    garage_services JSONB,
+    item_total NUMERIC,
+    convenience_fee NUMERIC,
+    total_amount NUMERIC,
+    payment_done BOOLEAN,
+    status_name VARCHAR,
+    created_date TIMESTAMP
+)
+LANGUAGE plpgsql
+AS $$
+BEGIN
+    RETURN QUERY
+    SELECT
+        b.id AS booking_id,mm.module_name,msm.sub_module_name,ms.service_name,mss.sub_service_name,
+        b.full_name,b.mobile,b.email,b.address,b.preferred_date,mts.time_slot,b.service_summary,
+        vb.brand_name,ft.fuel_type_name,g.garage_name,
+        CONCAT_WS(' ', ur.first_name, ur.last_name)::VARCHAR AS mechanic_name,
+(
+  SELECT json_agg(json_build_object(
+    'garage_service_id', gsm.garage_service_id,
+    'service_name', gs.service_name,
+    'price', gsm.service_price,
+    'quantity', gsm.quantity
+  ))::JSONB
+  FROM home_service_booking_service_map gsm
+  JOIN master_garage_service gs ON gsm.garage_service_id = gs.id
+  WHERE gsm.home_service_booking_id = b.id AND gsm.is_active = true
+) AS garage_services,
+        b.item_total,b.convenience_fee,b.total_amount,b.payment_done,s.status_name,b.created_date
+    FROM home_service_booking b
+    LEFT JOIN master_module mm ON b.module_id = mm.id
+    LEFT JOIN master_sub_module msm ON b.sub_module_id = msm.id
+    LEFT JOIN master_service ms ON b.service_id = ms.id
+    LEFT JOIN master_sub_service mss ON b.sub_service_id = mss.id
+    LEFT JOIN master_vehicle_brand vb ON b.brand_id = vb.id
+    LEFT JOIN master_fuel_type ft ON b.fuel_id = ft.id
+    LEFT JOIN master_garage g ON b.garage_id = g.id
+    LEFT JOIN master_mechanic m ON b.mechanic_id = m.id
+    LEFT JOIN user_registration ur ON m.user_id = ur.id
+    LEFT JOIN master_time_slot mts ON b.time_slot_id = mts.id
+    LEFT JOIN master_status s ON b.status_id = s.id
+    WHERE b.is_active = true
+      AND (b.module_id = p_module_id OR p_module_id = -1)
+      AND (b.sub_module_id = p_sub_module_id OR p_sub_module_id = -1)
+      AND (b.service_id = p_service_id OR p_service_id = -1)
+      AND (b.sub_service_id = p_sub_service_id OR p_sub_service_id = -1)
+      AND (b.created_by = p_user_id OR p_user_id = -1)
+    ORDER BY b.id DESC
+    LIMIT p_limit OFFSET p_offset;
+END;
+$$;

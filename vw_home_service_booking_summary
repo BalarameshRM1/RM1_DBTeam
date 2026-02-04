@@ -1,0 +1,13 @@
+CREATE OR REPLACE VIEW vw_home_service_booking_summary AS
+SELECT
+    b.id,b.full_name,b.mobile,b.email,b.address,b.others_address,b.preferred_date,b.time_slot_id,
+    b.extra_hours,b.special_instructions,b.service_summary,b.upload_photos,b.item_total,
+    b.convenience_fee,b.total_amount,b.payment_done,
+    b.status_id,m.module_name,sm.sub_module_name,s.service_name,ss.sub_service_name
+
+FROM
+    home_service_booking b
+JOIN master_module m ON b.module_id = m.id
+JOIN master_sub_module sm ON b.sub_module_id = sm.id
+JOIN master_service s ON b.service_id = s.id
+JOIN master_sub_service ss ON b.sub_service_id = ss.id;
