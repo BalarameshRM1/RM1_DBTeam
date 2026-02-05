@@ -743,31 +743,18 @@ order by 1 desc;
 --------------- Tharun ---08/01/2026
 
 INSERT INTO master_module (module_name) SELECT 'Dashboard' WHERE NOT EXISTS (SELECT 1 FROM master_module WHERE module_name = 'Dashboard');
-
 INSERT INTO master_module (module_name) SELECT 'Employees' WHERE NOT EXISTS (SELECT 1 FROM master_module WHERE module_name = 'Employees');
-
 INSERT INTO master_module (module_name) SELECT 'Attendance Management' WHERE NOT EXISTS (SELECT 1 FROM master_module WHERE module_name = 'Attendance Management');
-
 INSERT INTO master_module (module_name) SELECT 'Task Management' WHERE NOT EXISTS (SELECT 1 FROM master_module WHERE module_name = 'Task Management');
-
 INSERT INTO master_module (module_name) SELECT 'Leave Management' WHERE NOT EXISTS (SELECT 1 FROM master_module WHERE module_name = 'Leave Management');
-
 INSERT INTO master_module (module_name) SELECT 'Payroll management' WHERE NOT EXISTS (SELECT 1 FROM master_module WHERE module_name = 'Payroll management');
-
 INSERT INTO master_module (module_name) SELECT 'Salary' WHERE NOT EXISTS (SELECT 1 FROM master_module WHERE module_name = 'Salary');
-
 INSERT INTO master_module (module_name) SELECT 'Performance' WHERE NOT EXISTS (SELECT 1 FROM master_module WHERE module_name = 'Performance');
-
 INSERT INTO master_module (module_name) SELECT 'Recruitment' WHERE NOT EXISTS (SELECT 1 FROM master_module WHERE module_name = 'Recruitment');
-
 INSERT INTO master_module (module_name) SELECT 'Reports' WHERE NOT EXISTS (SELECT 1 FROM master_module WHERE module_name = 'Reports');
-
 INSERT INTO master_module (module_name) SELECT 'Analytics' WHERE NOT EXISTS (SELECT 1 FROM master_module WHERE module_name = 'Analytics');
-
 INSERT INTO master_module (module_name) SELECT 'Access' WHERE NOT EXISTS (SELECT 1 FROM master_module WHERE module_name = 'Access');
-
 INSERT INTO master_module (module_name) SELECT 'Access Management' WHERE NOT EXISTS (SELECT 1 FROM master_module WHERE module_name = 'Access Management');
-
 INSERT INTO master_module (module_name) SELECT 'Settings' WHERE NOT EXISTS (SELECT 1 FROM master_module WHERE module_name = 'Settings');
 
 
@@ -1254,6 +1241,39 @@ INSERT INTO master_emp_status (status_name) SELECT 'Inactive'WHERE NOT EXISTS (S
 INSERT INTO master_emp_status (status_name) SELECT 'On leave' WHERE NOT EXISTS (SELECT 1 FROM master_emp_status WHERE status_name = 'On leave');
 INSERT INTO master_emp_status (status_name) SELECT 'Resigned' WHERE NOT EXISTS (SELECT 1 FROM master_emp_status WHERE status_name = 'Resigned');
 
+---------------------05/02/2026   -----Tharun
+INSERT INTO master_module(module_name) SELECT 'Dashboard' WHERE NOT EXISTS (SELECT 1 FROM master_module WHERE module_name='Dashboard');
+INSERT INTO master_module(module_name) SELECT 'Employees' WHERE NOT EXISTS (SELECT 1 FROM master_module WHERE module_name='Employees');
+INSERT INTO master_module(module_name) SELECT 'Attendance Management' WHERE NOT EXISTS (SELECT 1 FROM master_module WHERE module_name='Attendance Management');
+INSERT INTO master_module(module_name) SELECT 'Task Management' WHERE NOT EXISTS (SELECT 1 FROM master_module WHERE module_name='Task Management');
+INSERT INTO master_module(module_name) SELECT 'Leave Management' WHERE NOT EXISTS (SELECT 1 FROM master_module WHERE module_name='Leave Management');
+INSERT INTO master_module(module_name) SELECT 'Payroll Management' WHERE NOT EXISTS (SELECT 1 FROM master_module WHERE module_name='Payroll management');
+INSERT INTO master_module(module_name) SELECT 'Salary' WHERE NOT EXISTS (SELECT 1 FROM master_module WHERE module_name='Salary');
+INSERT INTO master_module(module_name) SELECT 'Performance' WHERE NOT EXISTS (SELECT 1 FROM master_module WHERE module_name='Performance');
+INSERT INTO master_module(module_name) SELECT 'Recruitment' WHERE NOT EXISTS (SELECT 1 FROM master_module WHERE module_name='Recruitment');
+INSERT INTO master_module(module_name) SELECT 'Config' WHERE NOT EXISTS (SELECT 1 FROM master_module WHERE module_name='Config');
+INSERT INTO master_module(module_name) SELECT 'Reports' WHERE NOT EXISTS (SELECT 1 FROM master_module WHERE module_name='Reports');
+INSERT INTO master_module(module_name) SELECT 'Analytics' WHERE NOT EXISTS (SELECT 1 FROM master_module WHERE module_name='Analytics');
+INSERT INTO master_module(module_name) SELECT 'Access Management' WHERE NOT EXISTS (SELECT 1 FROM master_module WHERE module_name='Access Management');
+INSERT INTO master_module(module_name) SELECT 'Settings' WHERE NOT EXISTS (SELECT 1 FROM master_module WHERE module_name='Settings');
+INSERT INTO master_module(module_name) SELECT 'All' WHERE NOT EXISTS (SELECT 1 FROM master_module WHERE module_name='All');
+
+-------
+INSERT INTO master_sub_module (sub_module_name, module_id, screen_label)SELECT 'Attendance', 3, 'Attendance Management' WHERE NOT EXISTS (SELECT 1 FROM master_sub_module WHERE sub_module_name = 'Attendance' AND module_id = 3);
+INSERT INTO master_sub_module (sub_module_name, module_id, screen_label)SELECT 'Mark My Attendance', 3, 'Attendance Management' WHERE NOT EXISTS (SELECT 1 FROM master_sub_module WHERE sub_module_name = 'Mark My Attendance' AND module_id = 3);
+INSERT INTO master_sub_module (sub_module_name, module_id, screen_label)SELECT 'Create Task', 4, 'Task Management' WHERE NOT EXISTS (SELECT 1 FROM master_sub_module WHERE sub_module_name = 'Create Task' AND module_id = 4);
+INSERT INTO master_sub_module (sub_module_name, module_id, screen_label)SELECT 'Assign Task', 4, 'Task Management' WHERE NOT EXISTS (SELECT 1 FROM master_sub_module WHERE sub_module_name = 'Assign Task'AND module_id = 4);
+INSERT INTO master_sub_module (sub_module_name, module_id, screen_label)SELECT 'Task Board', 4, 'Task Management'WHERE NOT EXISTS ( SELECT 1 FROM master_sub_module WHERE sub_module_name = 'Task Board'AND module_id = 4);
+INSERT INTO master_sub_module (sub_module_name, module_id, screen_label)SELECT 'Task History', 4, 'Task Management'WHERE NOT EXISTS ( SELECT 1 FROM master_sub_module WHERE sub_module_name = 'Task History'AND module_id = 4);
+INSERT INTO master_sub_module (sub_module_name, module_id, screen_label)SELECT 'Leave Apply', 5, 'Leave Management' WHERE NOT EXISTS (SELECT 1 FROM master_sub_module WHERE sub_module_name = 'Leave Apply' AND module_id = 5);
+INSERT INTO master_sub_module (sub_module_name, module_id, screen_label)SELECT 'Leave Balance', 5, 'Leave Management' WHERE NOT EXISTS (SELECT 1 FROM master_sub_module WHERE sub_module_name = 'Leave Balance' AND module_id = 5);
+INSERT INTO master_sub_module (sub_module_name, module_id, screen_label)SELECT 'Leave Calendar', 5, 'Leave Management' WHERE NOT EXISTS (SELECT 1 FROM master_sub_module WHERE sub_module_name = 'Leave Calendar' AND module_id = 5);
+INSERT INTO master_sub_module (sub_module_name, module_id, screen_label)SELECT 'My Approvals', 5, 'Leave Management'WHERE NOT EXISTS (SELECT 1 FROM master_sub_module WHERE sub_module_name = 'My Approvals' AND module_id = 5);
+INSERT INTO master_sub_module (sub_module_name, module_id, screen_label)SELECT 'Holiday Calendar', 5, 'Leave Management'WHERE NOT EXISTS (SELECT 1 FROM master_sub_module WHERE sub_module_name = 'Holiday Calendar' AND module_id = 5);
+INSERT INTO master_sub_module (sub_module_name, module_id, screen_label)SELECT 'Payslips', 7, 'Salary' WHERE NOT EXISTS (SELECT 1 FROM master_sub_module WHERE sub_module_name = 'Payslips' AND module_id = 7);
+INSERT INTO master_sub_module (sub_module_name, module_id, screen_label) SELECT 'Salary Revision', 7, 'Salary' WHERE NOT EXISTS (SELECT 1 FROM master_sub_module WHERE sub_module_name = 'Salary Revision' AND module_id = 7);
+INSERT INTO master_sub_module (sub_module_name, module_id, screen_label) SELECT 'IT Declaration', 7, 'Salary' WHERE NOT EXISTS (SELECT 1 FROM master_sub_module WHERE sub_module_name = 'IT Declaration' AND module_id = 7);
+INSERT INTO master_sub_module(sub_module_name,module_id,screen_label) SELECT 'ALL',15,'ALL'   WHERE NOT EXISTS (SELECT 1 FROM master_sub_module WHERE sub_module_name='ALL' AND module_id=15  AND screen_label='ALL');
 
 
 
