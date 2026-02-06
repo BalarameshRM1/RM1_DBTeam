@@ -1,0 +1,58 @@
+CREATE OR REPLACE FUNCTION fn_get_filtered_property_listings(
+    p_id BIGINT DEFAULT -1,
+    p_property_type_id INT DEFAULT -1,
+    p_listing_type_id INT DEFAULT -1,
+    p_updated_range TEXT DEFAULT '-1',
+    p_min_rating NUMERIC DEFAULT -1,
+    p_limit INT DEFAULT 50,        -- ✅ pagination
+    p_offset INT DEFAULT 0         -- ✅ pagination
+)
+RETURNS TABLE (
+    id BIGINT,
+    title VARCHAR,
+    price NUMERIC,
+    location VARCHAR,
+    rating NUMERIC,
+    created_date TIMESTAMP,
+    property_type VARCHAR,
+    listing_type_id INT
+)
+LANGUAGE plpgsql
+AS $$
+BEGIN
+    RETURN QUERY
+    SELECT 
+        p.id,
+        p.property_description AS title,
+        p.expected_price AS price,
+        p.locality_area AS location,
+        p.rating,
+        p.created_date,
+        pt.property_type,
+        p.listing_type_id
+    FROM property_sell_listing p
+    LEFT JOIN master_property_type pt 
+        ON pt.id = p.property_type_id
+    WHERE p.is_active = true
+      AND (p_id = -1 OR p.id = p_id)
+      AND (p_property_type_id = -1 OR p.property_type_id = p_property_type_id)
+      AND (p_listing_type_id = -1 OR p.listing_type_id = p_listing_type_id)
+      AND (p_min_rating = -1 OR p.rating >= p_min_rating)
+      AND (
+            p_updated_range = '-1'
+         OR (p_updated_range = 'Today' 
+             AND p.created_date::DATE = CURRENT_DATE)
+         OR (p_updated_range = 'Last 7 Days' 
+             AND p.created_date >= CURRENT_DATE - INTERVAL '7 days')
+         OR (p_updated_range = 'Last 30 Days' 
+             AND p.created_date >= CURRENT_DATE - INTERVAL '30 days')
+         OR (p_updated_range = 'Last 3 Months' 
+             AND p.created_date >= CURRENT_DATE - INTERVAL '3 months')
+      )
+    ORDER BY p.created_date DESC          -- ✅ important for pagination
+    LIMIT p_limit
+    OFFSET p_offset;
+END;
+$$;
+
+SELECT * FROM fn_get_filtered_property_listings(-1,-1,-1,'-1',-1,10,0)

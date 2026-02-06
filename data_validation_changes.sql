@@ -4144,3 +4144,225 @@ update master_add_on set packages_add_on = 'Bathroom Sanitization',price = 299 ,
 update master_add_on set packages_add_on = '3-Seater Sofa Cleaning',price = 599 ,sub_service_id =  3 where id =6;
 update master_add_on set packages_add_on = '5-Seater Sofa Cleaning',price = 899 ,sub_service_id =  3 where id =7;
 INSERT INTO master_add_on (packages_add_on,price,sub_service_id) SELECT 'Cushion Cleaning(Set of 5)',199,3 WHERE NOT EXISTS (SELECT 1 FROM master_add_on WHERE packages_add_on='Cushion Cleaning(Set of 5)' AND sub_service_id=3);
+======================== 6/2/2026 dhanusha
+alter table  public.appointments add column assistants_id int;
+alter table  public.appointments add constraint fk_appointments_assistants_id foreign key(assistants_id) references master_assistants(id);
+
+CREATE TABLE IF NOT EXISTS master_assistants
+(
+    id SERIAL NOT NULL,
+    name VARCHAR(100) NOT NULL,
+    rating NUMERIC(3,2),
+    role VARCHAR(50) DEFAULT 'Professional',
+    is_active BOOLEAN DEFAULT true,
+    cost_per_visit NUMERIC(10,2) NOT NULL,
+    currency VARCHAR(100) ,
+    services jsonb NOT NULL,  
+    hospital_id BIGINT NOT NULL,
+    CONSTRAINT pk_master_assistants_id PRIMARY KEY (id),
+    CONSTRAINT uk_master_assistants_name_hospital_id UNIQUE (name, hospital_id),
+    CONSTRAINT uk_master_assistants_service_hospital_id_name UNIQUE (services, hospital_id, name),
+    CONSTRAINT fk_master_assistants_hospital_id FOREIGN KEY (hospital_id) 
+        REFERENCES master_hospital(id)
+);
+
+INSERT INTO master_assistants (name, rating, role, cost_per_visit, currency, services, hospital_id) SELECT 'Emily Watson', 4.80, 'Professional', 1200, 'INR', '["Queue Management","Report Collection","Medicine Assistance","Food Assistance"]'::jsonb, 1 WHERE NOT EXISTS (SELECT 1 FROM master_assistants WHERE name = 'Emily Watson' AND hospital_id = 1); 
+INSERT INTO master_assistants (name, rating, role, cost_per_visit, currency, services, hospital_id) SELECT 'Sophia Brown', 4.60, 'Professional', 1000, 'INR', '["Queue Management","Report Collection","Medicine Assistance","Food Assistance"]'::jsonb, 1 WHERE NOT EXISTS (SELECT 1 FROM master_assistants WHERE name = 'Sophia Brown' AND hospital_id = 1); 
+INSERT INTO master_assistants (name, rating, role, cost_per_visit, currency, services, hospital_id) SELECT 'Assistant A', 4.90, 'Professional', 900, 'INR', '["Queue Management","Lab Report Collection"]'::jsonb, 2 WHERE NOT EXISTS (SELECT 1 FROM master_assistants WHERE name = 'Assistant A' AND hospital_id = 2);
+
+=============================================6/2/2026 lavanya
+
+
+CREATE TABLE IF NOT EXISTS master_sharing_type
+(
+    id SERIAL NOT NULL,
+    sharing_type INT NOT NULL,         
+    price NUMERIC(10,2) NOT NULL,       
+    is_active BOOLEAN DEFAULT true,
+    CONSTRAINT pk_master_sharing_type_id PRIMARY KEY (id),
+    CONSTRAINT uk_master_sharing_type UNIQUE (sharing_type)
+);
+
+INSERT INTO master_sharing_type (sharing_type, price) SELECT 1, 15000 WHERE NOT EXISTS (SELECT 1 FROM master_sharing_type WHERE sharing_type = 1); 
+INSERT INTO master_sharing_type (sharing_type, price) SELECT 2, 10000 WHERE NOT EXISTS (SELECT 1 FROM master_sharing_type WHERE sharing_type = 2); 
+INSERT INTO master_sharing_type (sharing_type, price) SELECT 3, 7500 WHERE NOT EXISTS (SELECT 1 FROM master_sharing_type WHERE sharing_type = 3); 
+INSERT INTO master_sharing_type (sharing_type, price) SELECT 4, 6500 WHERE NOT EXISTS (SELECT 1 FROM master_sharing_type WHERE sharing_type = 4);
+
+
+alter table property_sell_listing add column rooms_per_floor int; 
+alter table property_sell_listing add column beds_per_room int;
+alter table property_sell_listing add column sharing_type int;
+alter table property_sell_listing add column current_bill_excluded boolean;
+
+alter table property_sell_listing add column band_name varchar(255);
+alter table property_sell_listing add column model_name varchar(255);
+alter table property_sell_listing add column year int;
+alter table property_sell_listing add column distance_km numeric(9,2);
+alter table property_sell_listing add column owner_name varchar(255);
+alter table property_sell_listing add column mobile_number varchar(255);
+
+==============================================================================
+CREATE TABLE IF NOT EXISTS master_registration_status
+(
+    id SERIAL NOT NULL,
+    registration_status VARCHAR(100) NOT NULL,
+    is_active BOOLEAN DEFAULT true,
+    CONSTRAINT pk_master_registration_status_id PRIMARY KEY (id),
+    CONSTRAINT uk_master_registration_status_registration_status UNIQUE (registration_status)
+);
+
+INSERT INTO master_registration_status (registration_status) SELECT 'Registered Land' WHERE NOT EXISTS (SELECT 1 FROM master_registration_status WHERE registration_status = 'Registered Land'); 
+INSERT INTO master_registration_status (registration_status) SELECT 'Non-Registered Land' WHERE NOT EXISTS (SELECT 1 FROM master_registration_status WHERE registration_status = 'Non-Registered Land');
+
+alter table property_sell_listing add column registration_status_id int;
+alter table property_sell_listing add constraint property_sell_listing_registration_status_id foreign key (registration_status_id) references master_registration_status(id) ;
+alter table property_sell_listing add column registration_value numeric(9,2);
+alter table property_sell_listing add column land_type_id int;
+alter table property_sell_listing add constraint property_sell_listing_land_type_id foreign key (land_type_id) references master_land_type(id) ;
+alter table property_sell_listing add column upload_document varchar(500);
+alter table property_sell_listing add column price_per_night numeric(9,2);
+alter table property_sell_listing add column hotel_name varchar(255);
+
+CREATE TABLE IF NOT EXISTS master_star_rating
+(
+    id SERIAL NOT NULL,
+    star_value INT NOT NULL,          -- 1 to 5 stars
+    is_active BOOLEAN DEFAULT true,
+    CONSTRAINT pk_master_star_rating_id PRIMARY KEY (id),
+    CONSTRAINT uk_master_star_rating UNIQUE (star_value)
+);
+INSERT INTO master_star_rating (star_value) SELECT 1 WHERE NOT EXISTS (SELECT 1 FROM master_star_rating WHERE star_value = 1);
+INSERT INTO master_star_rating (star_value) SELECT 2 WHERE NOT EXISTS (SELECT 1 FROM master_star_rating WHERE star_value = 2);
+INSERT INTO master_star_rating (star_value) SELECT 3 WHERE NOT EXISTS (SELECT 1 FROM master_star_rating WHERE star_value = 3); 
+INSERT INTO master_star_rating (star_value) SELECT 4 WHERE NOT EXISTS (SELECT 1 FROM master_star_rating WHERE star_value = 4); 
+INSERT INTO master_star_rating (star_value) SELECT 5 WHERE NOT EXISTS (SELECT 1 FROM master_star_rating WHERE star_value = 5);
+
+alter table property_sell_listing add column star_rating_id int;
+alter table property_sell_listing add constraint property_sell_listing_star_rating_id foreign key (star_rating_id) references master_star_rating(id) ;
+alter table property_sell_listing add column check_in_time time;
+alter table property_sell_listing add column check_out_time time;
+
+CREATE TABLE IF NOT EXISTS master_room_type
+(
+    id SERIAL NOT NULL,
+    room_type VARCHAR(100) NOT NULL,
+    is_active BOOLEAN DEFAULT true,
+    CONSTRAINT pk_master_room_type_id PRIMARY KEY (id),
+    CONSTRAINT uk_master_room_type UNIQUE (room_type)
+);
+
+INSERT INTO master_room_type (room_type) SELECT 'Standard' WHERE NOT EXISTS (SELECT 1 FROM master_room_type WHERE room_type = 'Standard'); 
+INSERT INTO master_room_type (room_type) SELECT 'Deluxe' WHERE NOT EXISTS (SELECT 1 FROM master_room_type WHERE room_type = 'Deluxe'); 
+INSERT INTO master_room_type (room_type) SELECT 'Premium' WHERE NOT EXISTS (SELECT 1 FROM master_room_type WHERE room_type = 'Premium'); 
+INSERT INTO master_room_type (room_type) SELECT 'Suite' WHERE NOT EXISTS (SELECT 1 FROM master_room_type WHERE room_type = 'Suite');
+INSERT INTO master_room_type (room_type) SELECT 'Executive' WHERE NOT EXISTS (SELECT 1 FROM master_room_type WHERE room_type = 'Executive'); 
+INSERT INTO master_room_type (room_type) SELECT 'Luxury' WHERE NOT EXISTS (SELECT 1 FROM master_room_type WHERE room_type = 'Luxury'); 
+INSERT INTO master_room_type (room_type) SELECT 'Business' WHERE NOT EXISTS (SELECT 1 FROM master_room_type WHERE room_type = 'Business');
+
+alter table property_sell_listing add column room_type_id int;
+alter table property_sell_listing add constraint property_sell_listing_room_type_id foreign key (room_type_id) references master_room_type(id) ;
+=================================
+
+CREATE TABLE IF NOT EXISTS master_facility
+(
+    id SERIAL NOT NULL,
+    facility_name VARCHAR(100) NOT NULL,
+    is_active BOOLEAN DEFAULT true,
+    CONSTRAINT pk_master_facility_id PRIMARY KEY (id),
+    CONSTRAINT uk_master_facility UNIQUE (facility_name)
+);
+INSERT INTO master_facility (facility_name) SELECT 'WiFi' WHERE NOT EXISTS (SELECT 1 FROM master_facility WHERE facility_name='WiFi'); 
+INSERT INTO master_facility (facility_name) SELECT 'AC' WHERE NOT EXISTS (SELECT 1 FROM master_facility WHERE facility_name='AC'); 
+INSERT INTO master_facility (facility_name) SELECT 'Laundry' WHERE NOT EXISTS (SELECT 1 FROM master_facility WHERE facility_name='Laundry'); 
+INSERT INTO master_facility (facility_name) SELECT 'Security' WHERE NOT EXISTS (SELECT 1 FROM master_facility WHERE facility_name='Security'); 
+INSERT INTO master_facility (facility_name) SELECT 'Pool' WHERE NOT EXISTS (SELECT 1 FROM master_facility WHERE facility_name='Pool'); 
+INSERT INTO master_facility (facility_name) SELECT 'Restaurant' WHERE NOT EXISTS (SELECT 1 FROM master_facility WHERE facility_name='Restaurant'); 
+INSERT INTO master_facility (facility_name) SELECT 'Spa' WHERE NOT EXISTS (SELECT 1 FROM master_facility WHERE facility_name='Spa'); 
+INSERT INTO master_facility (facility_name) SELECT 'Parking' WHERE NOT EXISTS (SELECT 1 FROM master_facility WHERE facility_name='Parking'); 
+INSERT INTO master_facility (facility_name) SELECT 'Gym' WHERE NOT EXISTS (SELECT 1 FROM master_facility WHERE facility_name='Gym'); 
+INSERT INTO master_facility (facility_name) SELECT 'Conference' WHERE NOT EXISTS (SELECT 1 FROM master_facility WHERE facility_name='Conference'); 
+INSERT INTO master_facility (facility_name) SELECT 'Pet Friendly' WHERE NOT EXISTS (SELECT 1 FROM master_facility WHERE facility_name='Pet Friendly'); 
+INSERT INTO master_facility (facility_name) SELECT 'TV' WHERE NOT EXISTS (SELECT 1 FROM master_facility WHERE facility_name='TV');
+
+
+CREATE TABLE master_property_type_facilities (
+    id SERIAL PRIMARY KEY,
+    property_type_id BIGINT NOT NULL,
+    facility_id BIGINT NOT NULL,
+    CONSTRAINT fk_master_property_type_id FOREIGN KEY (property_type_id) REFERENCES master_property_type(id),
+    CONSTRAINT fk_master_facility_id FOREIGN KEY (facility_id) REFERENCES master_facility(id),
+    CONSTRAINT uk_master_property_facility UNIQUE (property_type_id, facility_id)
+);
+INSERT INTO master_property_type_facilities (property_type_id, facility_id) 
+SELECT 14, 1 WHERE NOT EXISTS (SELECT 1 FROM master_property_type_facilities WHERE property_type_id=14 AND facility_id=1);
+
+INSERT INTO master_property_type_facilities (property_type_id, facility_id) 
+SELECT 14, 2 WHERE NOT EXISTS (SELECT 1 FROM master_property_type_facilities WHERE property_type_id=14 AND facility_id=2);
+
+INSERT INTO master_property_type_facilities (property_type_id, facility_id) 
+SELECT 14, 3 WHERE NOT EXISTS (SELECT 1 FROM master_property_type_facilities WHERE property_type_id=14 AND facility_id=3);
+
+INSERT INTO master_property_type_facilities (property_type_id, facility_id) 
+SELECT 14, 4 WHERE NOT EXISTS (SELECT 1 FROM master_property_type_facilities WHERE property_type_id=14 AND facility_id=4);
+
+INSERT INTO master_property_type_facilities (property_type_id, facility_id) 
+SELECT 14, 12 WHERE NOT EXISTS (SELECT 1 FROM master_property_type_facilities WHERE property_type_id=14 AND facility_id=12);
+
+INSERT INTO master_property_type_facilities (property_type_id, facility_id) 
+SELECT 15, 5 WHERE NOT EXISTS (SELECT 1 FROM master_property_type_facilities WHERE property_type_id=15 AND facility_id=5);
+
+INSERT INTO master_property_type_facilities (property_type_id, facility_id) 
+SELECT 15, 6 WHERE NOT EXISTS (SELECT 1 FROM master_property_type_facilities WHERE property_type_id=15 AND facility_id=6);
+
+INSERT INTO master_property_type_facilities (property_type_id, facility_id) 
+SELECT 15, 7 WHERE NOT EXISTS (SELECT 1 FROM master_property_type_facilities WHERE property_type_id=15 AND facility_id=7);
+
+INSERT INTO master_property_type_facilities (property_type_id, facility_id) 
+SELECT 15, 8 WHERE NOT EXISTS (SELECT 1 FROM master_property_type_facilities WHERE property_type_id=15 AND facility_id=8);
+
+INSERT INTO master_property_type_facilities (property_type_id, facility_id) 
+SELECT 15, 9 WHERE NOT EXISTS (SELECT 1 FROM master_property_type_facilities WHERE property_type_id=15 AND facility_id=9);
+
+INSERT INTO master_property_type_facilities (property_type_id, facility_id) 
+SELECT 15, 10 WHERE NOT EXISTS (SELECT 1 FROM master_property_type_facilities WHERE property_type_id=15 AND facility_id=10);
+
+INSERT INTO master_property_type_facilities (property_type_id, facility_id) 
+SELECT 15, 11 WHERE NOT EXISTS (SELECT 1 FROM master_property_type_facilities WHERE property_type_id=15 AND facility_id=11);
+
+INSERT INTO master_property_type_facilities (property_type_id, facility_id) 
+SELECT 15, 2 WHERE NOT EXISTS (SELECT 1 FROM master_property_type_facilities WHERE property_type_id=15 AND facility_id=2);
+
+INSERT INTO master_property_type_facilities (property_type_id, facility_id) 
+SELECT 15, 1 WHERE NOT EXISTS (SELECT 1 FROM master_property_type_facilities WHERE property_type_id=15 AND facility_id=1);
+INSERT INTO master_property_type_facilities (property_type_id, facility_id) 
+SELECT 15, 5 WHERE NOT EXISTS (SELECT 1 FROM master_property_type_facilities WHERE property_type_id=15 AND facility_id=5);
+
+INSERT INTO master_property_type_facilities (property_type_id, facility_id) 
+SELECT 15, 6 WHERE NOT EXISTS (SELECT 1 FROM master_property_type_facilities WHERE property_type_id=15 AND facility_id=6);
+
+INSERT INTO master_property_type_facilities (property_type_id, facility_id) 
+SELECT 15, 7 WHERE NOT EXISTS (SELECT 1 FROM master_property_type_facilities WHERE property_type_id=15 AND facility_id=7);
+
+INSERT INTO master_property_type_facilities (property_type_id, facility_id) 
+SELECT 15, 8 WHERE NOT EXISTS (SELECT 1 FROM master_property_type_facilities WHERE property_type_id=15 AND facility_id=8);
+
+INSERT INTO master_property_type_facilities (property_type_id, facility_id) 
+SELECT 15, 9 WHERE NOT EXISTS (SELECT 1 FROM master_property_type_facilities WHERE property_type_id=15 AND facility_id=9);
+
+INSERT INTO master_property_type_facilities (property_type_id, facility_id) 
+SELECT 15, 10 WHERE NOT EXISTS (SELECT 1 FROM master_property_type_facilities WHERE property_type_id=15 AND facility_id=10);
+
+INSERT INTO master_property_type_facilities (property_type_id, facility_id) 
+SELECT 15, 11 WHERE NOT EXISTS (SELECT 1 FROM master_property_type_facilities WHERE property_type_id=15 AND facility_id=11);
+
+INSERT INTO master_property_type_facilities (property_type_id, facility_id) 
+SELECT 15, 2 WHERE NOT EXISTS (SELECT 1 FROM master_property_type_facilities WHERE property_type_id=15 AND facility_id=2);
+
+INSERT INTO master_property_type_facilities (property_type_id, facility_id) 
+SELECT 15, 1 WHERE NOT EXISTS (SELECT 1 FROM master_property_type_facilities WHERE property_type_id=15 AND facility_id=1);
+
+alter table property_sell_listing add column property_type_facilities_id int;
+alter table property_sell_listing add constraint fk_property_sell_listing_property_type_facilities_id foreign key (property_type_facilities_id) references master_property_type_facilities(id);
+
+INSERT INTO master_property_type (property_type) SELECT 'Hotel' WHERE NOT EXISTS (SELECT 1 FROM master_property_type WHERE property_type='Hotel');
+insert into master_listing_type(listing_type) select 'Buy' where not exists (select 1 from master_listing_type where listing_type='Buy');
