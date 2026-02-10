@@ -4366,3 +4366,15 @@ alter table property_sell_listing add constraint fk_property_sell_listing_proper
 
 INSERT INTO master_property_type (property_type) SELECT 'Hotel' WHERE NOT EXISTS (SELECT 1 FROM master_property_type WHERE property_type='Hotel');
 insert into master_listing_type(listing_type) select 'Buy' where not exists (select 1 from master_listing_type where listing_type='Buy');
+
+============================================ 6-feb-2026 -- dhanusha
+
+alter table property_sell_listing alter column sub_module_id drop not null;
+INSERT INTO master_sub_service (sub_service_name,service_id) SELECT 'AC Installation',7 WHERE NOT EXISTS (SELECT 1 FROM master_sub_service WHERE sub_service_name='AC Installation' AND service_id=7);
+INSERT INTO master_sub_service (sub_service_name,service_id) SELECT 'AC Servicing',7 WHERE NOT EXISTS (SELECT 1 FROM master_sub_service WHERE sub_service_name='AC Servicing' AND service_id=7);
+
+INSERT INTO master_sub_service (sub_service_name,service_id) SELECT '1 Day Chef',8 WHERE NOT EXISTS (SELECT 1 FROM master_sub_service WHERE sub_service_name='1 Day Chef' AND service_id=8);
+INSERT INTO master_sub_service (sub_service_name,service_id) SELECT '3 Day Chef',8 WHERE NOT EXISTS (SELECT 1 FROM master_sub_service WHERE sub_service_name='3 Day Chef' AND service_id=8);
+ALTER TABLE student_academic_finance ALTER COLUMN father_name SET NOT NULL;
+
+
