@@ -4377,4 +4377,22 @@ INSERT INTO master_sub_service (sub_service_name,service_id) SELECT '1 Day Chef'
 INSERT INTO master_sub_service (sub_service_name,service_id) SELECT '3 Day Chef',8 WHERE NOT EXISTS (SELECT 1 FROM master_sub_service WHERE sub_service_name='3 Day Chef' AND service_id=8);
 ALTER TABLE student_academic_finance ALTER COLUMN father_name SET NOT NULL;
 
+--------------------------------------10-feb-2026
+alter table property_sell_listing alter column sub_module_id drop not null;
+INSERT INTO master_sub_service (sub_service_name,service_id) SELECT 'AC Installation',7 WHERE NOT EXISTS (SELECT 1 FROM master_sub_service WHERE sub_service_name='AC Installation' AND service_id=7);
+INSERT INTO master_sub_service (sub_service_name,service_id) SELECT 'AC Servicing',7 WHERE NOT EXISTS (SELECT 1 FROM master_sub_service WHERE sub_service_name='AC Servicing' AND service_id=7);
+
+INSERT INTO master_sub_service (sub_service_name,service_id) SELECT '1 Day Chef',8 WHERE NOT EXISTS (SELECT 1 FROM master_sub_service WHERE sub_service_name='1 Day Chef' AND service_id=8);
+INSERT INTO master_sub_service (sub_service_name,service_id) SELECT '3 Day Chef',8 WHERE NOT EXISTS (SELECT 1 FROM master_sub_service WHERE sub_service_name='3 Day Chef' AND service_id=8);
+ALTER TABLE student_academic_finance ALTER COLUMN father_name SET NOT NULL;
+
+---------------------11-feb-2026
+
+
+alter table property_sell_listing alter column locality_area drop not null;
+
+alter table property_sell_listing alter column upload_photos drop not null;
+
+alter table property_sell_listing alter column bhk_type_id drop not null;
+alter table property_sell_listing alter column furnishing_id drop not null;
 
