@@ -1,0 +1,43 @@
+CREATE OR REPLACE FUNCTION fn_get_trending_institutions(
+    p_education_level INTEGER DEFAULT -1,
+    p_limit INTEGER DEFAULT 10,
+    p_offset INTEGER DEFAULT 0
+)
+RETURNS TABLE (
+    institution_id BIGINT,
+    institution_name VARCHAR,
+    branch_name VARCHAR,
+    city VARCHAR,
+    seats_available INT,
+    student_count INT,
+    rating NUMERIC(2,1),
+    education_level_id bigint,
+    education_level_type VARCHAR
+) 
+LANGUAGE 'plpgsql'
+AS $$
+BEGIN
+    RETURN QUERY
+    SELECT 
+        ir.id AS institution_id,ir.institution_name,ib.branch_name,ib.city,
+        ib.seats_available,ib.student_count,ib.rating,
+        mit.id AS education_level_id,mit.institute_type AS education_level_type
+    FROM institution_registration ir
+    JOIN institution_branch ib ON ir.id = ib.institution_id
+    JOIN master_institute_type mit ON ir.institution_type_id = mit.id
+    WHERE ib.is_active = TRUE AND (p_education_level = -1 OR ir.institution_type_id = p_education_level)
+ORDER BY ib.rating DESC, ib.seats_available DESC
+	LIMIT p_limit
+    OFFSET p_offset;
+END;
+$$ ;
+
+
+-- All institutions
+SELECT * FROM fn_get_trending_institutions(-1);
+
+-- Only Graduation institutions
+SELECT * FROM fn_get_trending_institutions(2);
+
+
+

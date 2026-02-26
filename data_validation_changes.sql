@@ -4396,3 +4396,16 @@ alter table property_sell_listing alter column upload_photos drop not null;
 alter table property_sell_listing alter column bhk_type_id drop not null;
 alter table property_sell_listing alter column furnishing_id drop not null;
 
+-------------------------------- 26 feb 2026 --dhanusha
+
+
+ALTER TABLE institution_branch ADD COLUMN seats_available INT;
+
+ALTER TABLE institution_branch ADD COLUMN rating NUMERIC(2,1);
+alter table institution_branch add constraint ck_institution_branch_rating check (rating between 1 and 5);
+
+update master_institute_type set institute_type = 'Primary School' where id =1;
+update master_institute_type set institute_type = 'High School' where id =2;
+update master_institute_type set institute_type = 'Intermediate' where id =3;
+update master_institute_type set institute_type = 'Graduation' where id =4;
+INSERT INTO master_institute_type (institute_type, is_active) VALUES ('Post Graduation', true);
