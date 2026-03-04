@@ -4409,3 +4409,812 @@ update master_institute_type set institute_type = 'High School' where id =2;
 update master_institute_type set institute_type = 'Intermediate' where id =3;
 update master_institute_type set institute_type = 'Graduation' where id =4;
 INSERT INTO master_institute_type (institute_type, is_active) VALUES ('Post Graduation', true);
+
+
+-------------------------------- dhanusha march-3rd-4th
+create table partner_registration(
+id bigserial not null,
+module_id int not null,
+service_module_category_id int not null, 
+email varchar(255) not null,
+password character varying(500) not null,
+phone_number varchar(255) not null,
+created_by BIGINT,
+created_date TIMESTAMP DEFAULT now(),
+modified_by BIGINT,
+modified_date TIMESTAMP,
+is_active BOOLEAN DEFAULT TRUE,
+constraint pk_partner_registration_id primary key (id),
+constraint fk_partner_registration_module_id foreign key (module_id) references master_module(id),
+constraint fk_partner_registration_service_module_category_id foreign key (service_module_category_id) references master_service_module_category(id)
+);
+==========================================================================================
+
+create table general_education_registration(
+id bigserial not null,
+partner_registration_id bigint not null,
+name varchar(255) not null,
+registration_type_id int not null,
+pan_number varchar(150) not null,
+gst_registration boolean,
+upload_gst_certificate varchar(500),
+bank_account varchar(255),
+trade_license boolean ,
+noc boolean ,
+building_type_id int ,
+upload_rental_agreement varchar(500),
+upload_fire_safety_certificate varchar(500) not null,
+address_pincode varchar(255) not null,
+official_email varchar(255) not null,
+phone_number varchar(150) ,
+verify_official_email varchar(255), -- dbt
+created_by BIGINT,
+created_date TIMESTAMP DEFAULT now(),
+modified_by BIGINT,
+modified_date TIMESTAMP,
+is_active BOOLEAN DEFAULT TRUE,
+constraint pk_general_education_registration_id primary key (id),
+constraint fk_general_education_registration_partner_registration_id foreign key (partner_registration_id) references partner_registration(id),
+constraint fk_general_education_registration_registration_type_id foreign key (registration_type_id) references master_registration_type(id),
+constraint fk_general_education_registration_building_type_id foreign key (building_type_id) references master_building_type(id)
+);
+============================================================================================
+create table institution_school_college_registration(
+id bigserial not null,
+partner_registration_id bigint not null,
+institution_type_id bigint,
+institution_name varchar(255) not null,
+upload_institution_logo varchar(500),
+establishment_year int not null,
+management_type_id int  not null,
+country varchar(255) not null,
+state varchar(255)  not null,
+district varchar(255)  not null,
+city varchar(255)  not null,
+address varchar(255)  not null,
+pincode int  not null,
+official_email varchar(255)  not null,
+official_phone_number varchar(255)  not null,
+website_url varchar(500),
+director_principal_name varchar(255)  not null,
+director_contact_number varchar(255)  not null,
+registration_number varchar(255)  not null,
+affiliation_board_university varchar(255)  not null,
+accreditation varchar(255),
+gst_number varchar(255),
+upload_registration_certificate varchar(500)  not null,
+upload_affiliation_proof varchar(500)  not null,
+upload_principal_id_proof varchar(500) not null,
+education_medium json  not null,
+education_grades_offered json  not null,
+student_capacity int  not null,
+current_student_strength int  not null,
+teacher_count int  not null,
+streams_offered json not null,
+degree_courses_offered json  not null,
+available_departments json,
+intake_per_course numeric(10,2),
+mid_day_meal_available boolean,
+transport_facility boolean,
+playground_available boolean,
+smart_classrooms boolean,
+computer_lab boolean,
+library boolean,
+cctv_surveillance boolean,
+ro_drinking_water boolean,
+first_aid_room boolean,
+security_guard boolean,
+placement_cell boolean,
+internship_support boolean,
+research_labs boolean,
+innovation_cell boolean,
+auditorium boolean,
+seminar_halls boolean,
+wifi_campus boolean,
+cafeteria boolean,
+boys_hostel boolean,
+girls_hostel boolean,
+sports_complex boolean,
+placement_year_1 numeric(3,2),
+placement_year_2 numeric(3,2),
+placement_year_3 numeric(3,2),
+extra_curricular_activities json,
+board_affiliation_id int  not null,
+year_1_10th_result numeric(3,2),
+year_2_10th_result numeric(3,2),
+year_3_10th_result numeric(3,2),
+competitive_exam_training json,
+science_lab boolean,
+physics_lab boolean,
+chemistry_lab boolean,
+biology_lab boolean,
+separate_labs boolean,
+digital_attendance_system boolean,
+parent_portal_access boolean,
+career_guidance  boolean,
+performance_pass_percentage_year1 numeric(3,2),
+performance_pass_percentage_year2 numeric(3,2),
+performance_pass_percentage_year3 numeric(3,2),
+top_rankers_info varchar(255),
+faculty_experience int,
+available_pg_programs json not null,
+phd_resarch_programs json,
+naac_grade_id int,
+research_publication_count int,
+industry_collaborations varchar(255),
+mou_partnerships int,
+startup_incubation_center boolean,
+created_by BIGINT,
+created_date TIMESTAMP DEFAULT now(),
+modified_by BIGINT,
+modified_date TIMESTAMP,
+is_active BOOLEAN DEFAULT TRUE,
+constraint pk_institution_s_c_registration_id primary key (id),
+constraint fk_institution_s_c_registration_partner_registration_id foreign key (partner_registration_id) references partner_registration(id),
+constraint fk_institution_s_c_registration_institution_type_id foreign key (institution_type_id) references master_institute_type(id),
+constraint fk_institution_s_c_registration_management_type_id foreign key (management_type_id) references master_management_type (id),
+constraint fk_institution_s_c_registration_board_affiliation_id foreign key (board_affiliation_id) references master_board_affiliation(id),
+constraint fk_institution_s_c_registration_naac_grade_id foreign key (naac_grade_id) references master_naac_grade(id)
+
+);
+========================================================================================
+create table IF NOT EXISTS student_registration(
+id bigserial not null,
+partner_registration_id bigint not null,
+student_name varchar(255)not null,
+date_of_birth date,
+gender_id int,
+aadhar_number varchar(255) not null,
+mobile_number varchar(255) not null,
+email varchar(255) not null,
+residential_address varchar(255) not null,
+city varchar(255) not null,
+state varchar(255) not null,
+pincode int not null,
+highest_qualification_id int not null,
+school_college_name varchar(255) not null,
+board_university varchar(255) not null,
+passing_year int not null,
+cgpa_percentage numeric(3,2) not null,
+study_medium_id int not null,
+applying_application_interst json not null,
+preferred_institution_course varchar(255),
+preferred_location varchar(255),
+cast_category_id int not null,
+require_scholarship boolean,
+require_hostel_facility boolean,
+require_transport_facility boolean,
+technical_skills json,
+extra_curricular_achievements varchar(255),
+career_objective varchar(255),
+upload_profile_photo varchar(500) not null,
+upload_aadhar_card varchar(500) not null,
+upload_10th_marksheet varchar(500) not null,
+upload_12th_marksheet varchar(500),
+upload_degree_certificate varchar(500),
+upload_resume varchar(500),
+upload_transfer_certificate varchar(500),
+upload_cast_certificate varchar(500),
+upload_income_certificate varchar(500),
+created_by BIGINT,
+created_date TIMESTAMP DEFAULT now(),
+modified_by BIGINT,
+modified_date TIMESTAMP,
+is_active BOOLEAN DEFAULT TRUE,
+constraint pk_student_registration_id primary key (id),
+constraint fk_student_registration_partner_registration_id foreign key (partner_registration_id) references partner_registration(id),
+constraint fk_student_registration_highest_qualification_id foreign key (highest_qualification_id) references master_highest_qualification(id),
+constraint fk_student_registration_study_medium_id foreign key (study_medium_id) references master_medium_of_study(id),
+constraint fk_student_registration_cast_category_id foreign key (cast_category_id) references master_cast_category(id)
+);
+
+
+
+====================================================================================
+create table IF NOT EXISTS companies_registration(
+id bigserial not null,
+partner_registration_id bigint not null,
+company_name varchar(255) not null,
+company_registration_number varchar(255) not null,
+company_website_url varchar(500),
+official_email varchar(150) not null,
+hr_contact_number varchar(255) not null,
+company_hq_address varchar(255) not null,
+company_type_id int not null,
+upload_company_logo varchar(500),
+upload_gst_certificate varchar(500) not null,
+job_sector_id bigint not null,
+job_title varchar(255) not null,
+job_description varchar(255) not null,
+job_type_id int not null,
+work_mode_id int not null,
+job_locations json not null,
+no_of_vacancies int not null,
+salary_ctc_range varchar(255) not null,
+application_deadline date not null,
+minimun_education_id  int not null,
+required_experience varchar(255),
+minimum_percentage_required numeric(3,2),
+age_limit varchar(150),
+cast_category_preferences json,
+required_skills json,
+exam_notification_number varchar(255),
+department_ministry_name varchar(255) not null,
+pay_scale numeric(10,2) not null,
+selection_process varchar(255) not null,
+exam_date_announced boolean,
+exam_date date,
+official_notification_url varchar(500),
+upload_notification_pdf varchar(500),
+tech_stack_category_id int,
+preferred_tech_stack varchar(255),
+service_agreement_required boolean,
+stock_options_available boolean,
+joining_timeline varchar(255),
+benefits_perks json,
+created_by BIGINT,
+created_date TIMESTAMP DEFAULT now(),
+modified_by BIGINT,
+modified_date TIMESTAMP,
+is_active BOOLEAN DEFAULT TRUE,
+constraint pk_companies_registration_id primary key (id),
+constraint fk_companies_registration_partner_registration_id foreign key (partner_registration_id) references partner_registration(id),
+constraint fk_companies_registration_company_type_id foreign key (company_type_id) references master_company_type(id),
+constraint fk_companies_registration_job_sector_id foreign key (job_sector_id) references master_job_sector(id),
+constraint fk_companies_registration_job_type_id foreign key (job_type_id) references master_work_type(id),
+constraint fk_companies_registration_work_mode_id foreign key (work_mode_id) references master_location_type(id),
+constraint fk_companies_registration_minimun_education_id foreign key (minimun_education_id) references master_highest_qualification(id),
+constraint fk_companies_registration_tech_stack_category_id foreign key (tech_stack_category_id) references master_tech_stack_category(id)
+
+);
+===============================================================================
+
+create table IF NOT EXISTS training_registration(
+id bigserial not null,
+partner_registration_id bigint not null,
+training_type_id int not null,
+course_exam_category_id int not null,
+exam_category_id int not null,
+institute_provider_name varchar(255)not null,
+provider_contact_email varchar(255)not null,
+provider_phone_number varchar(255)not null,
+provider_location varchar(255)not null,
+institute_logo varchar(500),
+course_title varchar(255)not null,
+course_tagline varchar(255),
+course_description varchar(255)not null,
+course_duration varchar(255),
+total_sessions_hours varchar(150),
+training_fee varchar(255),
+training_mode_id int not null,
+batch_start_date date not null,
+class_schedule_timings varchar(255),
+max_students_per_batch int,
+language_instruction json not null,--dbt
+course_modules json,
+min_qualification_required_id int not null,
+technologies_covered varchar(255),
+projects_included varchar(255),
+completion_certificate_provided boolean,
+placement_assistance boolean,
+instructor_name_linkedin varchar(255),
+previous_batch_enrolled_count int,
+previous_batch_pass_percentage numeric(3,2),
+exam_stages_covered json,
+target_exam_year int,
+pyq_coverage varchar(255),
+no_of_mock_tests int,
+study_material_provided boolean,
+current_affairs_coverage boolean,
+past_selection_rank_holders varchar(255),
+hostel_facility boolean,
+upload_course_banner_image varchar(500) not null,
+upload_sample_study_material varchar(500),
+upload_sample_certificate varchar(500),
+created_by BIGINT,
+created_date TIMESTAMP DEFAULT now(),
+modified_by BIGINT,
+modified_date TIMESTAMP,
+is_active BOOLEAN DEFAULT TRUE,
+constraint pk_training_registration_id primary key (id),
+constraint fk_training_registration_partner_registration_id foreign key(partner_registration_id) references partner_registration(id),
+constraint fk_training_registration_training_type_id foreign key (training_type_id) references master_training_type(id),
+constraint fk_training_registration_course_exam_category_id foreign key (course_exam_category_id) references master_course_exam_category(id),
+constraint fk_training_registration_training_mode_id foreign key (training_mode_id) references master_location_type(id),
+constraint fk_training_registration_min_qualification_required_id foreign key (min_qualification_required_id) references master_highest_qualification(id)
+);
+============================================================================================== health_care
+create table IF NOT EXISTS hospital_registration(
+id bigserial not null,
+partner_registration_id bigint not null,
+hospital_name varchar(255) not null,
+upload_entity_photo varchar(500) not null,
+hospital_type_id int not null,
+bed_capacity int not null,
+icu_bed_count int,
+management_type_id int not null,
+establishment_year int not null,
+address varchar(255) not null,
+city varchar(255) not null,
+state varchar(255) not null,
+pincode int not null,
+registration_number varchar(255) not null,
+doctor_registration varchar(255) not null,
+drug_license_applicable boolean,
+bmw_obtained boolean,
+cbwtf_tied_up boolean,
+fire_noc_obtained boolean,
+aerb_license_applicable boolean,
+pcpndt_certificate_applicable boolean,
+nabh_accreditation boolean,
+gst_registered boolean,
+upload_registration_certificate varchar(500),
+upload_owner_id_proof varchar(500),
+upload_owner_address_proof varchar(500),
+upload_doctor_registration varchar(500),
+upload_building_completion_certificate varchar(500),
+upload_water_sanitation_noc varchar(500),
+official_email varchar(255) not null,
+primary_phone_number varchar(255) not null,
+alternate_phone_number varchar(255),
+website_url varchar(500),
+emergency_helpline_number varchar(255),
+medical_superintendent_name varchar(255) not null,
+medical_superintendent_contact varchar(255) not null,
+official_mobile_for_otp varchar(255) not null,
+official_email_for_otp varchar(255) not null,
+created_by BIGINT,
+created_date TIMESTAMP DEFAULT now(),
+modified_by BIGINT,
+modified_date TIMESTAMP,
+is_active BOOLEAN DEFAULT TRUE,
+constraint pk_hospital_registration_id primary key (id),
+constraint fk_hospital_registration_partner_registration_id foreign key(partner_registration_id) references partner_registration(id),
+constraint fk_hospital_registration_hospital_type_id foreign key(hospital_type_id) references master_hospital_type(id),
+constraint fk_pk_hospital_registration_management_type_id foreign key (management_type_id) references master_management_type (id)
+);
+
+
+====================================================================================
+create table IF NOT EXISTS lab_registration(
+id bigserial not null,
+partner_registration_id bigint not null,
+lab_name varchar(255) not null,
+upload_entity_photo varchar(500) not null,
+lab_type_id int not null,
+services_offered json not null,
+establishment_year int not null,
+address varchar(255) not null,
+city varchar(255) not null,
+state varchar(255) not null,
+pincode int not null,
+registration_number varchar(255) not null,
+doctor_registration varchar(255) not null,
+drug_license_applicable boolean,
+bmw_obtained boolean,
+cbwtf_tied_up boolean,
+fire_noc_obtained boolean,
+aerb_licence_applicable boolean,
+pcpndt_certificate_applicable boolean,
+nabl_accreditation boolean,
+gst_registered boolean,
+upload_registration_certificate varchar(500) not null,
+upload_owner_id_proof varchar(500)not null,
+upload_owner_address_proof varchar(500) not null,
+upload_doctor_registration varchar(500) not null,
+upload_labs_equipment_calibration_reports varchar(500) not null,
+official_email varchar(255) not null,
+primary_phone_number varchar(255) not null,
+alternate_phone_number varchar(255),
+website_url varchar(500),
+lab_in_charge_name varchar(255) not null,
+lab_in_charge_contact varchar(255) not null,
+home_sample_collection_available boolean ,
+official_mobile_for_otp varchar(255) not null,
+official_email_for_otp varchar(255) not null,
+created_by BIGINT,
+created_date TIMESTAMP DEFAULT now(),
+modified_by BIGINT,
+modified_date TIMESTAMP,
+is_active BOOLEAN DEFAULT TRUE,
+constraint pk_lab_registration_id primary key (id),
+constraint fk_lab_registration_partner_registration_id foreign key(partner_registration_id) references partner_registration(id),
+constraint fk_lab_registration_lab_type_id foreign key(lab_type_id) references master_lab_type(id)
+);
+
+====================================================================================
+create table medical_store_registration(
+id bigserial not null,
+partner_registration_id bigint not null,
+medical_store_name varchar(255) not null,
+upload_entity_photo varchar(500) not null,
+store_type_id int not null,
+is_24hours_operation boolean,
+home_delivery_available boolean,
+establishment_year int not null,
+address varchar(255) not null,
+city varchar(255) not null,
+state varchar(255) not null,
+pincode int not null,
+registration_number varchar(255) not null,
+pharmacist_registration varchar(255) not null,
+drug_license_applicable boolean,
+fire_noc_obtained boolean,
+gst_registered boolean,
+upload_registration_certificate varchar(500) not null,
+upload_owner_id_proof varchar(500)not null,
+upload_owner_address_proof varchar(500) not null,
+upload_pharmacist_registration_certificate varchar(500) not null,
+upload_shop_registration varchar(500) not null,
+official_email varchar(255) not null,
+primary_phone_number varchar(255) not null,
+alternate_phone_number varchar(255),
+website_url varchar(500),
+pharmacist_owner_name varchar(255) not null,
+pharmacist_contact varchar(255) not null,
+official_mobile_for_otp varchar(255) not null,
+official_email_for_otp varchar(255) not null,
+created_by BIGINT,
+created_date TIMESTAMP DEFAULT now(),
+modified_by BIGINT,
+modified_date TIMESTAMP,
+is_active BOOLEAN DEFAULT TRUE,
+constraint pk_medical_store_registration_id primary key (id),
+constraint fk_medical_store_registration_partner_registration_id foreign key(partner_registration_id) references partner_registration(id),
+constraint fk_medical_store_registration_store_type_id foreign key(store_type_id) references master_store_type(id)
+);
+
+=====================================================================================
+
+create table IF NOT EXISTS doctor_registration(
+id bigserial not null,
+partner_registration_id bigint not null,
+doctor_clinic_name varchar(255) not null,
+upload_clinic_photo varchar(500) not null,
+doctor_name varchar(255) not null,
+specialization varchar(255) not null,
+qualification varchar(255) not null,
+experience_years int not null,
+practice_type_id int not null,
+establishment_year int not null,
+address varchar(255) not null,
+city varchar(255) not null,
+state varchar(255) not null,
+pincode int not null,
+registration_number varchar(255) not null,
+doctor_registration varchar(255) not null,
+fire_noc_obtained boolean,
+gst_registered boolean,
+upload_registration_certificate varchar(500) not null,
+upload_owner_id_proof varchar(500)not null,
+upload_owner_address_proof varchar(500) not null,
+upload_doctor_registration varchar(500) not null,
+upload_medical_degree_certificate varchar(500) not null,
+upload_specialization_certificate varchar(500) not null,
+official_email varchar(255) not null,
+primary_phone_number varchar(255) not null,
+alternate_phone_number varchar(255),
+website_url varchar(500),
+consultation_timings varchar(255) not null,
+consultation_fee numeric(10,2),
+online_consulation_available boolean,
+official_mobile_for_otp varchar(255) not null,
+official_email_for_otp varchar(255) not null,
+created_by BIGINT,
+created_date TIMESTAMP DEFAULT now(),
+modified_by BIGINT,
+modified_date TIMESTAMP,
+is_active BOOLEAN DEFAULT TRUE,
+constraint pk_doctor_registration_id primary key (id),
+constraint fk_doctor_registration_partner_registration_id foreign key(partner_registration_id) references partner_registration(id),
+constraint fk_doctor_registration_practice_type_id foreign key(practice_type_id) references master_practice_type(id)
+);
+
+
+----------------------------------------------- lavanya march 3rd-4th
+
+CREATE TABLE IF NOT EXISTS public.master_service_module_category (
+    id SERIAL NOT NULL,
+    module_id INT NOT NULL,
+    service_module_category VARCHAR(255),
+    is_active BOOLEAN DEFAULT TRUE,
+    CONSTRAINT pk_master_service_module_category_id PRIMARY KEY (id),
+    CONSTRAINT fk_master_service_module_category_module_id
+        FOREIGN KEY (module_id)
+        REFERENCES public.master_module (id)
+);
+
+INSERT INTO public.master_service_module_category (module_id, service_module_category) 
+SELECT 5, 'General Education' WHERE NOT EXISTS (SELECT 1 FROM public.master_service_module_category WHERE module_id = 5 AND service_module_category = 'General Education');
+
+INSERT INTO public.master_service_module_category (module_id, service_module_category) 
+SELECT 5, 'Institution / School / College' WHERE NOT EXISTS (SELECT 1 FROM public.master_service_module_category WHERE module_id = 5 AND service_module_category = 'Institution / School / College');
+
+INSERT INTO public.master_service_module_category (module_id, service_module_category) 
+SELECT 5, 'Students' WHERE NOT EXISTS (SELECT 1 FROM public.master_service_module_category WHERE module_id = 5 AND service_module_category = 'Students');
+
+INSERT INTO public.master_service_module_category (module_id, service_module_category) 
+SELECT 5, 'Companies' WHERE NOT EXISTS (SELECT 1 FROM public.master_service_module_category WHERE module_id = 5 AND service_module_category = 'Companies');
+
+INSERT INTO public.master_service_module_category (module_id, service_module_category) 
+SELECT 5, 'Training' WHERE NOT EXISTS (SELECT 1 FROM public.master_service_module_category WHERE module_id = 5 AND service_module_category = 'Training');
+
+INSERT INTO public.master_service_module_category (module_id, service_module_category) 
+SELECT 8, 'Hospital' WHERE NOT EXISTS (SELECT 1 FROM public.master_service_module_category WHERE module_id = 8 AND service_module_category = 'Hospital');
+
+INSERT INTO public.master_service_module_category (module_id, service_module_category) 
+SELECT 8, 'Lab' WHERE NOT EXISTS (SELECT 1 FROM public.master_service_module_category WHERE module_id = 8 AND service_module_category = 'Lab');
+
+INSERT INTO public.master_service_module_category (module_id, service_module_category) 
+SELECT 8, 'Medical Store' WHERE NOT EXISTS (SELECT 1 FROM public.master_service_module_category WHERE module_id = 8 AND service_module_category = 'Medical Store');
+
+INSERT INTO public.master_service_module_category (module_id, service_module_category) 
+SELECT 8, 'Doctor' WHERE NOT EXISTS (SELECT 1 FROM public.master_service_module_category WHERE module_id = 8 AND service_module_category = 'Doctor');
+
+select * from master_service_module_category;
+=================================================================================
+CREATE TABLE IF NOT EXISTS public.master_registration_type (
+    id SERIAL NOT NULL,
+    registration_type VARCHAR(255),
+    is_active BOOLEAN DEFAULT TRUE,
+    CONSTRAINT pk_master_registration_type_id PRIMARY KEY (id)
+);
+INSERT INTO public.master_registration_type (registration_type) SELECT 'Proprietorship' WHERE NOT EXISTS (SELECT 1 FROM public.master_registration_type WHERE registration_type = 'Proprietorship'); 
+INSERT INTO public.master_registration_type (registration_type) SELECT 'Partnership' WHERE NOT EXISTS (SELECT 1 FROM public.master_registration_type WHERE registration_type = 'Partnership');
+INSERT INTO public.master_registration_type (registration_type) SELECT 'LLP' WHERE NOT EXISTS (SELECT 1 FROM public.master_registration_type WHERE registration_type = 'LLP'); 
+INSERT INTO public.master_registration_type (registration_type) SELECT 'Pvt Ltd' WHERE NOT EXISTS (SELECT 1 FROM public.master_registration_type WHERE registration_type = 'Pvt Ltd');
+INSERT INTO public.master_registration_type (registration_type) SELECT 'Trust' WHERE NOT EXISTS (SELECT 1 FROM public.master_registration_type WHERE registration_type = 'Trust');
+INSERT INTO public.master_registration_type (registration_type) SELECT 'Society' WHERE NOT EXISTS (SELECT 1 FROM public.master_registration_type WHERE registration_type = 'Society');
+
+select * from master_registration_type;
+===========================================================================================
+CREATE TABLE IF NOT EXISTS public.master_building_type (
+    id SERIAL NOT NULL,
+    building_type VARCHAR(255),
+    is_active BOOLEAN DEFAULT TRUE,
+    CONSTRAINT pk_master_building_type_id PRIMARY KEY (id)
+);
+
+INSERT INTO public.master_building_type (building_type) SELECT 'Owner' WHERE NOT EXISTS (SELECT 1 FROM public.master_building_type WHERE building_type = 'Owner');
+ INSERT INTO public.master_building_type (building_type) SELECT 'Rental' WHERE NOT EXISTS (SELECT 1 FROM public.master_building_type WHERE building_type = 'Rental');
+________________
+
+CREATE TABLE IF NOT EXISTS public.master_management_type (
+    id SERIAL NOT NULL,
+    management_type VARCHAR(255),
+    is_active BOOLEAN DEFAULT TRUE,
+    CONSTRAINT pk_master_management_type_id PRIMARY KEY (id)
+);
+
+INSERT INTO public.master_management_type (management_type) SELECT 'Private' WHERE NOT EXISTS (SELECT 1 FROM public.master_management_type WHERE management_type = 'Private');
+ INSERT INTO public.master_management_type (management_type) SELECT 'Government' WHERE NOT EXISTS (SELECT 1 FROM public.master_management_type WHERE management_type = 'Government'); 
+INSERT INTO public.master_management_type (management_type) SELECT 'Aided' WHERE NOT EXISTS (SELECT 1 FROM public.master_management_type WHERE management_type = 'Aided');
+ INSERT INTO public.master_management_type (management_type) SELECT 'Trust / Society' WHERE NOT EXISTS (SELECT 1 FROM public.master_management_type WHERE management_type = 'Trust / Society');
+
+============================================
+CREATE TABLE IF NOT EXISTS public.master_board_affiliation (
+    id SERIAL NOT NULL,
+    board_affiliation VARCHAR(255),
+    is_active BOOLEAN DEFAULT TRUE,
+    CONSTRAINT pk_master_board_affiliation_id PRIMARY KEY (id)
+);
+
+INSERT INTO public.master_board_affiliation (board_affiliation) SELECT 'CBSE' WHERE NOT EXISTS (SELECT 1 FROM public.master_board_affiliation WHERE board_affiliation = 'CBSE'); 
+INSERT INTO public.master_board_affiliation (board_affiliation) SELECT 'ICSE' WHERE NOT EXISTS (SELECT 1 FROM public.master_board_affiliation WHERE board_affiliation = 'ICSE'); 
+INSERT INTO public.master_board_affiliation (board_affiliation) SELECT 'State Board' WHERE NOT EXISTS (SELECT 1 FROM public.master_board_affiliation WHERE board_affiliation = 'State Board');
+ INSERT INTO public.master_board_affiliation (board_affiliation) SELECT 'IB' WHERE NOT EXISTS (SELECT 1 FROM public.master_board_affiliation WHERE board_affiliation = 'IB');
+
+===============================================
+CREATE TABLE IF NOT EXISTS public.master_naac_grade (
+    id SERIAL NOT NULL,
+    naac_grade VARCHAR(255),
+    is_active BOOLEAN DEFAULT TRUE,
+    CONSTRAINT pk_master_naac_grade_id PRIMARY KEY (id)
+);
+INSERT INTO public.master_naac_grade (naac_grade) SELECT 'A++' WHERE NOT EXISTS (SELECT 1 FROM public.master_naac_grade WHERE naac_grade = 'A++'); 
+INSERT INTO public.master_naac_grade (naac_grade) SELECT 'A+' WHERE NOT EXISTS (SELECT 1 FROM public.master_naac_grade WHERE naac_grade = 'A+'); 
+INSERT INTO public.master_naac_grade (naac_grade) SELECT 'A' WHERE NOT EXISTS (SELECT 1 FROM public.master_naac_grade WHERE naac_grade = 'A');
+ INSERT INTO public.master_naac_grade (naac_grade) SELECT 'B++' WHERE NOT EXISTS (SELECT 1 FROM public.master_naac_grade WHERE naac_grade = 'B++'); 
+ INSERT INTO public.master_naac_grade (naac_grade) SELECT 'B+' WHERE NOT EXISTS (SELECT 1 FROM public.master_naac_grade WHERE naac_grade = 'B+');
+ INSERT INTO public.master_naac_grade (naac_grade) SELECT 'B' WHERE NOT EXISTS (SELECT 1 FROM public.master_naac_grade WHERE naac_grade = 'B');
+ INSERT INTO public.master_naac_grade (naac_grade) SELECT 'C' WHERE NOT EXISTS (SELECT 1 FROM public.master_naac_grade WHERE naac_grade = 'C');
+ INSERT INTO public.master_naac_grade (naac_grade) SELECT 'Not Accredited' WHERE NOT EXISTS (SELECT 1 FROM public.master_naac_grade WHERE naac_grade = 'Not Accredited');
+
+==========================================================
+CREATE TABLE IF NOT EXISTS public.master_highest_qualification (
+    id SERIAL NOT NULL,
+    highest_qualification VARCHAR(255),
+    is_active BOOLEAN DEFAULT TRUE,
+    CONSTRAINT pk_master_highest_qualification_id PRIMARY KEY (id)
+);
+
+INSERT INTO public.master_highest_qualification (highest_qualification) SELECT '10th / SSC' WHERE NOT EXISTS (SELECT 1 FROM public.master_highest_qualification WHERE highest_qualification = '10th / SSC'); 
+INSERT INTO public.master_highest_qualification (highest_qualification) SELECT '12th / Intermediate' WHERE NOT EXISTS (SELECT 1 FROM public.master_highest_qualification WHERE highest_qualification = '12th / Intermediate');
+ INSERT INTO public.master_highest_qualification (highest_qualification) SELECT 'Graduation' WHERE NOT EXISTS (SELECT 1 FROM public.master_highest_qualification WHERE highest_qualification = 'Graduation'); 
+ INSERT INTO public.master_highest_qualification (highest_qualification) SELECT 'Post Graduation' WHERE NOT EXISTS (SELECT 1 FROM public.master_highest_qualification WHERE highest_qualification = 'Post Graduation'); 
+ INSERT INTO public.master_highest_qualification (highest_qualification) SELECT 'PhD' WHERE NOT EXISTS (SELECT 1 FROM public.master_highest_qualification WHERE highest_qualification = 'PhD');
+
+===============================
+
+CREATE TABLE IF NOT EXISTS public.master_medium_of_study (
+    id SERIAL NOT NULL,
+    medium_of_study VARCHAR(255),
+    is_active BOOLEAN DEFAULT TRUE,
+    CONSTRAINT pk_master_medium_of_study_id PRIMARY KEY (id)
+);
+
+INSERT INTO public.master_medium_of_study (medium_of_study) SELECT 'English' WHERE NOT EXISTS (SELECT 1 FROM public.master_medium_of_study WHERE medium_of_study = 'English');
+ INSERT INTO public.master_medium_of_study (medium_of_study) SELECT 'Telugu' WHERE NOT EXISTS (SELECT 1 FROM public.master_medium_of_study WHERE medium_of_study = 'Telugu');
+ INSERT INTO public.master_medium_of_study (medium_of_study) SELECT 'Hindi' WHERE NOT EXISTS (SELECT 1 FROM public.master_medium_of_study WHERE medium_of_study = 'Hindi'); 
+INSERT INTO public.master_medium_of_study(medium_of_study) SELECT 'Other' WHERE NOT EXISTS (SELECT 1 FROM public.master_medium_of_study WHERE medium_of_study = 'Other');
+
+
+=====================================================
+CREATE TABLE IF NOT EXISTS public.master_cast_category (
+    id SERIAL NOT NULL,
+    cast_category_name VARCHAR(100),
+    is_active BOOLEAN DEFAULT TRUE,
+    CONSTRAINT pk_master_cast_category_id PRIMARY KEY (id)
+);
+
+INSERT INTO public.master_cast_category (cast_category_name) SELECT 'General' WHERE NOT EXISTS (SELECT 1 FROM public.master_cast_category WHERE cast_category_name = 'General');
+ INSERT INTO public.master_cast_category (cast_category_name) SELECT 'OBC' WHERE NOT EXISTS (SELECT 1 FROM public.master_cast_category WHERE cast_category_name = 'OBC'); 
+ INSERT INTO public.master_cast_category (cast_category_name) SELECT 'SC' WHERE NOT EXISTS (SELECT 1 FROM public.master_cast_category WHERE cast_category_name = 'SC'); 
+ INSERT INTO public.master_cast_category (cast_category_name) SELECT 'ST' WHERE NOT EXISTS (SELECT 1 FROM public.master_cast_category WHERE cast_category_name = 'ST'); 
+ INSERT INTO public.master_cast_category (cast_category_name) SELECT 'EWS' WHERE NOT EXISTS (SELECT 1 FROM public.master_cast_category WHERE cast_category_name = 'EWS');
+
+===========================================================
+CREATE TABLE IF NOT EXISTS public.master_company_type (
+    id SERIAL NOT NULL,
+    company_type VARCHAR(150),
+    is_active BOOLEAN DEFAULT TRUE,
+    CONSTRAINT pk_master_company_type_id PRIMARY KEY (id)
+);
+INSERT INTO public.master_company_type (company_type) SELECT 'Startup' WHERE NOT EXISTS (SELECT 1 FROM public.master_company_type WHERE company_type = 'Startup'); 
+INSERT INTO public.master_company_type (company_type) SELECT 'SME' WHERE NOT EXISTS (SELECT 1 FROM public.master_company_type WHERE company_type = 'SME'); INSERT INTO public.master_company_type (company_type) SELECT 'MNC' WHERE NOT EXISTS (SELECT 1 FROM public.master_company_type WHERE company_type = 'MNC'); INSERT INTO public.master_company_type (company_type) SELECT 'PSU' WHERE NOT EXISTS (SELECT 1 FROM public.master_company_type WHERE company_type = 'PSU'); INSERT INTO public.master_company_type (company_type) SELECT 'Government Body' WHERE NOT EXISTS (SELECT 1 FROM public.master_company_type WHERE company_type = 'Government Body'); INSERT INTO public.master_company_type (company_type) SELECT 'NGO' WHERE NOT EXISTS (SELECT 1 FROM public.master_company_type WHERE company_type = 'NGO');
+
+===================================================================
+CREATE TABLE IF NOT EXISTS public.master_job_sector (
+    id SERIAL NOT NULL,
+    job_sector VARCHAR(200),
+    is_active BOOLEAN DEFAULT TRUE,
+    CONSTRAINT pk_master_job_sector_id PRIMARY KEY (id)
+);
+
+INSERT INTO public.master_job_sector (job_sector) SELECT 'Government / PSU' WHERE NOT EXISTS (SELECT 1 FROM public.master_job_sector WHERE job_sector = 'Government / PSU');
+ INSERT INTO public.master_job_sector (job_sector) SELECT 'IT / Software' WHERE NOT EXISTS (SELECT 1 FROM public.master_job_sector WHERE job_sector = 'IT / Software'); 
+ INSERT INTO public.master_job_sector (job_sector) SELECT 'Healthcare / Medical' WHERE NOT EXISTS (SELECT 1 FROM public.master_job_sector WHERE job_sector = 'Healthcare / Medical'); 
+INSERT INTO public.master_job_sector (job_sector) SELECT 'Banking / Finance' WHERE NOT EXISTS (SELECT 1 FROM public.master_job_sector WHERE job_sector = 'Banking / Finance'); 
+INSERT INTO public.master_job_sector (job_sector) SELECT 'Education / Teaching' WHERE NOT EXISTS (SELECT 1 FROM public.master_job_sector WHERE job_sector = 'Education / Teaching'); 
+INSERT INTO public.master_job_sector (job_sector) SELECT 'Manufacturing / Engineering' WHERE NOT EXISTS (SELECT 1 FROM public.master_job_sector WHERE job_sector = 'Manufacturing / Engineering'); 
+INSERT INTO public.master_job_sector (job_sector) SELECT 'Railway / Transport' WHERE NOT EXISTS (SELECT 1 FROM public.master_job_sector WHERE job_sector = 'Railway / Transport'); 
+INSERT INTO public.master_job_sector (job_sector) SELECT 'Legal / Law' WHERE NOT EXISTS (SELECT 1 FROM public.master_job_sector WHERE job_sector = 'Legal / Law'); 
+INSERT INTO public.master_job_sector (job_sector) SELECT 'Marketing / Sales' WHERE NOT EXISTS (SELECT 1 FROM public.master_job_sector WHERE job_sector = 'Marketing / Sales');
+ INSERT INTO public.master_job_sector (job_sector) SELECT 'Retail / E-Commerce' WHERE NOT EXISTS (SELECT 1 FROM public.master_job_sector WHERE job_sector = 'Retail / E-Commerce');
+ INSERT INTO public.master_job_sector (job_sector) SELECT 'Construction / Real Estate' WHERE NOT EXISTS (SELECT 1 FROM public.master_job_sector WHERE job_sector = 'Construction / Real Estate');
+ INSERT INTO public.master_job_sector (job_sector) SELECT 'Design / Creative' WHERE NOT EXISTS (SELECT 1 FROM public.master_job_sector WHERE job_sector = 'Design / Creative');
+INSERT INTO public.master_job_sector (job_sector) SELECT 'Data / Analytics' WHERE NOT EXISTS (SELECT 1 FROM public.master_job_sector WHERE job_sector = 'Data / Analytics'); 
+INSERT INTO public.master_job_sector (job_sector) SELECT 'Other' WHERE NOT EXISTS (SELECT 1 FROM public.master_job_sector WHERE job_sector = 'Other');
+
+
+==================
+CREATE TABLE IF NOT EXISTS public.master_tech_stack_category (
+    id SERIAL NOT NULL,
+    tech_stack_category VARCHAR(255),
+    is_active BOOLEAN DEFAULT TRUE,
+    CONSTRAINT master_tech_stack_category_id PRIMARY KEY (id)
+);
+INSERT INTO public.master_tech_stack_category (tech_stack_category) SELECT 'Frontend' WHERE NOT EXISTS (SELECT 1 FROM public.master_tech_stack_category WHERE tech_stack_category = 'Frontend'); 
+INSERT INTO public.master_tech_stack_category (tech_stack_category) SELECT 'Backend' WHERE NOT EXISTS (SELECT 1 FROM public.master_tech_stack_category WHERE tech_stack_category = 'Backend');
+ INSERT INTO public.master_tech_stack_category (tech_stack_category) SELECT 'Full Stack' WHERE NOT EXISTS (SELECT 1 FROM public.master_tech_stack_category WHERE tech_stack_category = 'Full Stack');
+ INSERT INTO public.master_tech_stack_category (tech_stack_category) SELECT 'Mobile' WHERE NOT EXISTS (SELECT 1 FROM public.master_tech_stack_category WHERE tech_stack_category = 'Mobile');
+ INSERT INTO public.master_tech_stack_category (tech_stack_category) SELECT 'DevOps' WHERE NOT EXISTS (SELECT 1 FROM public.master_tech_stack_category WHERE tech_stack_category = 'DevOps');
+ INSERT INTO public.master_tech_stack_category (tech_stack_category) SELECT 'Data / ML' WHERE NOT EXISTS (SELECT 1 FROM public.master_tech_stack_category WHERE tech_stack_category = 'Data / ML');
+ INSERT INTO public.master_tech_stack_category (tech_stack_category) SELECT 'QA / Testing' WHERE NOT EXISTS (SELECT 1 FROM public.master_tech_stack_category WHERE tech_stack_category = 'QA / Testing');
+ INSERT INTO public.master_tech_stack_category (tech_stack_category) SELECT 'Other' WHERE NOT EXISTS (SELECT 1 FROM public.master_tech_stack_category WHERE tech_stack_category = 'Other');
+
+=================================
+
+INSERT INTO public.master_highest_qualification (highest_qualification) SELECT 'Any' WHERE NOT EXISTS (SELECT 1 FROM public.master_highest_qualification WHERE highest_qualification = 'Any');
+
+====================================================
+
+CREATE TABLE IF NOT EXISTS public.master_training_type (
+    id SERIAL NOT NULL,
+    training_side VARCHAR(150),
+    is_active BOOLEAN DEFAULT TRUE,
+    CONSTRAINT pk_master_training_side_id PRIMARY KEY (id)
+);
+INSERT INTO public.master_training_type (training_side) SELECT 'IT / Technology' WHERE NOT EXISTS (SELECT 1 FROM public.master_training_type WHERE training_side = 'IT / Technology'); 
+INSERT INTO public.master_training_type (training_side) SELECT 'Government Exam' WHERE NOT EXISTS (SELECT 1 FROM public.master_training_type WHERE training_side = 'Government Exam');
+===========================================================================
+CREATE TABLE IF NOT EXISTS public.master_course_exam_category (
+    id SERIAL NOT NULL,
+    course_exam_category VARCHAR(255),
+    training_type_id INT,
+    is_active BOOLEAN DEFAULT TRUE,
+    CONSTRAINT pk_master_course_exam_category_id PRIMARY KEY (id),
+    CONSTRAINT fk_master_course_exam_category_training_type
+        FOREIGN KEY (training_type_id)
+        REFERENCES public.master_training_type (id)
+);
+
+INSERT INTO public.master_course_exam_category (course_exam_category, training_type_id) SELECT 'Java / Backend', 1 WHERE NOT EXISTS (SELECT 1 FROM public.master_course_exam_category WHERE course_exam_category = 'Java / Backend' AND training_type_id = 1);
+ INSERT INTO public.master_course_exam_category (course_exam_category, training_type_id) SELECT 'Python / Data', 1 WHERE NOT EXISTS (SELECT 1 FROM public.master_course_exam_category WHERE course_exam_category = 'Python / Data' AND training_type_id = 1); 
+ INSERT INTO public.master_course_exam_category (course_exam_category, training_type_id) SELECT 'React / Frontend', 1 WHERE NOT EXISTS (SELECT 1 FROM public.master_course_exam_category WHERE course_exam_category = 'React / Frontend' AND training_type_id = 1);
+ INSERT INTO public.master_course_exam_category (course_exam_category, training_type_id) SELECT 'Mobile Development', 1 WHERE NOT EXISTS (SELECT 1 FROM public.master_course_exam_category WHERE course_exam_category = 'Mobile Development' AND training_type_id = 1);
+ INSERT INTO public.master_course_exam_category (course_exam_category, training_type_id) SELECT 'Cloud / DevOps', 1 WHERE NOT EXISTS (SELECT 1 FROM public.master_course_exam_category WHERE course_exam_category = 'Cloud / DevOps' AND training_type_id = 1);
+ INSERT INTO public.master_course_exam_category (course_exam_category, training_type_id) SELECT 'AI/ML / Data Science', 1 WHERE NOT EXISTS (SELECT 1 FROM public.master_course_exam_category WHERE course_exam_category = 'AI/ML / Data Science' AND training_type_id = 1); 
+ INSERT INTO public.master_course_exam_category (course_exam_category, training_type_id) SELECT 'Cybersecurity', 1 WHERE NOT EXISTS (SELECT 1 FROM public.master_course_exam_category WHERE course_exam_category = 'Cybersecurity' AND training_type_id = 1); 
+ INSERT INTO public.master_course_exam_category (course_exam_category, training_type_id) SELECT 'Data Analytics', 1 WHERE NOT EXISTS (SELECT 1 FROM public.master_course_exam_category WHERE course_exam_category = 'Data Analytics' AND training_type_id = 1); 
+ INSERT INTO public.master_course_exam_category (course_exam_category, training_type_id) SELECT 'Database / SQL', 1 WHERE NOT EXISTS (SELECT 1 FROM public.master_course_exam_category WHERE course_exam_category = 'Database / SQL' AND training_type_id = 1);
+ INSERT INTO public.master_course_exam_category (course_exam_category, training_type_id) SELECT 'Full Stack', 1 WHERE NOT EXISTS (SELECT 1 FROM public.master_course_exam_category WHERE course_exam_category = 'Full Stack' AND training_type_id = 1); 
+ INSERT INTO public.master_course_exam_category (course_exam_category, training_type_id) SELECT 'Management / Agile', 1 WHERE NOT EXISTS (SELECT 1 FROM public.master_course_exam_category WHERE course_exam_category = 'Management / Agile' AND training_type_id = 1);
+INSERT INTO public.master_course_exam_category (course_exam_category, training_type_id) SELECT 'UPSC / IAS Prep', 2 WHERE NOT EXISTS (SELECT 1 FROM public.master_course_exam_category WHERE course_exam_category = 'UPSC / IAS Prep' AND training_type_id = 2); 
+INSERT INTO public.master_course_exam_category (course_exam_category, training_type_id) SELECT 'SSC (CGL / CHSL)', 2 WHERE NOT EXISTS (SELECT 1 FROM public.master_course_exam_category WHERE course_exam_category = 'SSC (CGL / CHSL)' AND training_type_id = 2); 
+INSERT INTO public.master_course_exam_category (course_exam_category, training_type_id) SELECT 'Banking (SBI / IBPS)', 2 WHERE NOT EXISTS (SELECT 1 FROM public.master_course_exam_category WHERE course_exam_category = 'Banking (SBI / IBPS)' AND training_type_id = 2); 
+INSERT INTO public.master_course_exam_category (course_exam_category, training_type_id) SELECT 'Railway (RRB)', 2 WHERE NOT EXISTS (SELECT 1 FROM public.master_course_exam_category WHERE course_exam_category = 'Railway (RRB)' AND training_type_id = 2); 
+INSERT INTO public.master_course_exam_category (course_exam_category, training_type_id) SELECT 'State PSC (TSPSC / APPSC)', 2 WHERE NOT EXISTS (SELECT 1 FROM public.master_course_exam_category WHERE course_exam_category = 'State PSC (TSPSC / APPSC)' AND training_type_id = 2); 
+INSERT INTO public.master_course_exam_category (course_exam_category, training_type_id) SELECT 'Defence (NDA / CDS)', 2 WHERE NOT EXISTS (SELECT 1 FROM public.master_course_exam_category WHERE course_exam_category = 'Defence (NDA / CDS)' AND training_type_id = 2); 
+INSERT INTO public.master_course_exam_category (course_exam_category, training_type_id) SELECT 'Police / SI', 2 WHERE NOT EXISTS (SELECT 1 FROM public.master_course_exam_category WHERE course_exam_category = 'Police / SI' AND training_type_id = 2); 
+INSERT INTO public.master_course_exam_category (course_exam_category, training_type_id) SELECT 'Teaching (TET / CTET / DSC)', 2 WHERE NOT EXISTS (SELECT 1 FROM public.master_course_exam_category WHERE course_exam_category = 'Teaching (TET / CTET / DSC)' AND training_type_id = 2); 
+INSERT INTO public.master_course_exam_category (course_exam_category, training_type_id) SELECT 'NEET / Medical Entrance', 2 WHERE NOT EXISTS (SELECT 1 FROM public.master_course_exam_category WHERE course_exam_category = 'NEET / Medical Entrance' AND training_type_id = 2); 
+INSERT INTO public.master_course_exam_category (course_exam_category, training_type_id) SELECT 'JEE / IIT Foundation', 2 WHERE NOT EXISTS (SELECT 1 FROM public.master_course_exam_category WHERE course_exam_category = 'JEE / IIT Foundation' AND training_type_id = 2);
+
+
+==================================================
+
+CREATE TABLE IF NOT EXISTS public.master_hospital_type (
+    id SERIAL NOT NULL,
+    hospital_type VARCHAR(255),
+    is_active BOOLEAN DEFAULT TRUE,
+    CONSTRAINT pk_master_hospital_type_id PRIMARY KEY (id)
+);
+INSERT INTO public.master_hospital_type (hospital_type) SELECT 'General' WHERE NOT EXISTS (SELECT 1 FROM public.master_hospital_type WHERE hospital_type = 'General');
+ INSERT INTO public.master_hospital_type (hospital_type) SELECT 'Multi-Specialty' WHERE NOT EXISTS (SELECT 1 FROM public.master_hospital_type WHERE hospital_type = 'Multi-Specialty');
+ INSERT INTO public.master_hospital_type (hospital_type) SELECT 'Super-Specialty' WHERE NOT EXISTS (SELECT 1 FROM public.master_hospital_type WHERE hospital_type = 'Super-Specialty'); 
+ INSERT INTO public.master_hospital_type (hospital_type) SELECT 'Teaching Hospital' WHERE NOT EXISTS (SELECT 1 FROM public.master_hospital_type WHERE hospital_type = 'Teaching Hospital');
+ INSERT INTO public.master_hospital_type (hospital_type) SELECT 'Maternity' WHERE NOT EXISTS (SELECT 1 FROM public.master_hospital_type WHERE hospital_type = 'Maternity');
+ INSERT INTO public.master_hospital_type (hospital_type) SELECT 'Trauma Center' WHERE NOT EXISTS (SELECT 1 FROM public.master_hospital_type WHERE hospital_type = 'Trauma Center');
+
+
+==================================
+CREATE TABLE IF NOT EXISTS public.master_lab_type (
+    id SERIAL NOT NULL,
+    lab_type VARCHAR(255),
+    is_active BOOLEAN DEFAULT TRUE,
+    CONSTRAINT pk_master_lab_type_id PRIMARY KEY (id)
+);
+INSERT INTO public.master_lab_type (lab_type) SELECT 'Pathology' WHERE NOT EXISTS (SELECT 1 FROM public.master_lab_type WHERE lab_type = 'Pathology');
+ INSERT INTO public.master_lab_type (lab_type) SELECT 'Radiology' WHERE NOT EXISTS (SELECT 1 FROM public.master_lab_type WHERE lab_type = 'Radiology'); 
+ INSERT INTO public.master_lab_type (lab_type) SELECT 'Microbiology' WHERE NOT EXISTS (SELECT 1 FROM public.master_lab_type WHERE lab_type = 'Microbiology'); 
+ INSERT INTO public.master_lab_type (lab_type) SELECT 'Biochemistry' WHERE NOT EXISTS (SELECT 1 FROM public.master_lab_type WHERE lab_type = 'Biochemistry');
+ INSERT INTO public.master_lab_type (lab_type) SELECT 'Multi-Diagnostic' WHERE NOT EXISTS (SELECT 1 FROM public.master_lab_type WHERE lab_type = 'Multi-Diagnostic');
+
+===========================================
+
+CREATE TABLE IF NOT EXISTS public.master_store_type (
+    id SERIAL NOT NULL,
+    store_type VARCHAR(255),
+    is_active BOOLEAN DEFAULT TRUE,
+    CONSTRAINT pk_master_store_type_id PRIMARY KEY (id)
+);
+
+INSERT INTO public.master_store_type (store_type) SELECT 'Retail Pharmacy' WHERE NOT EXISTS (SELECT 1 FROM public.master_store_type WHERE store_type = 'Retail Pharmacy'); 
+INSERT INTO public.master_store_type (store_type) SELECT 'Wholesale Pharmacy' WHERE NOT EXISTS (SELECT 1 FROM public.master_store_type WHERE store_type = 'Wholesale Pharmacy'); 
+INSERT INTO public.master_store_type (store_type) SELECT 'Online Pharmacy' WHERE NOT EXISTS (SELECT 1 FROM public.master_store_type WHERE store_type = 'Online Pharmacy');
+ INSERT INTO public.master_store_type (store_type) SELECT 'Hospital Pharmacy' WHERE NOT EXISTS (SELECT 1 FROM public.master_store_type WHERE store_type = 'Hospital Pharmacy');
+
+=======================================================
+
+CREATE TABLE IF NOT EXISTS public.master_practice_type (
+    id SERIAL NOT NULL,
+    practice_type VARCHAR(255),
+    is_active BOOLEAN DEFAULT TRUE,
+    CONSTRAINT pk_master_practice_type_id PRIMARY KEY (id)
+);
+
+INSERT INTO public.master_practice_type (practice_type) SELECT 'Individual Clinic' WHERE NOT EXISTS (SELECT 1 FROM public.master_practice_type WHERE practice_type = 'Individual Clinic'); 
+INSERT INTO public.master_practice_type (practice_type) SELECT 'Hospital-Attached' WHERE NOT EXISTS (SELECT 1 FROM public.master_practice_type WHERE practice_type = 'Hospital-Attached');
+ INSERT INTO public.master_practice_type (practice_type) SELECT 'Telemedicine' WHERE NOT EXISTS (SELECT 1 FROM public.master_practice_type WHERE practice_type = 'Telemedicine');
+ INSERT INTO public.master_practice_type (practice_type) SELECT 'Visiting Doctor' WHERE NOT EXISTS (SELECT 1 FROM public.master_practice_type WHERE practice_type = 'Visiting Doctor');
