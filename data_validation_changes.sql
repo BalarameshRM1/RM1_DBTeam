@@ -5218,3 +5218,175 @@ INSERT INTO public.master_practice_type (practice_type) SELECT 'Individual Clini
 INSERT INTO public.master_practice_type (practice_type) SELECT 'Hospital-Attached' WHERE NOT EXISTS (SELECT 1 FROM public.master_practice_type WHERE practice_type = 'Hospital-Attached');
  INSERT INTO public.master_practice_type (practice_type) SELECT 'Telemedicine' WHERE NOT EXISTS (SELECT 1 FROM public.master_practice_type WHERE practice_type = 'Telemedicine');
  INSERT INTO public.master_practice_type (practice_type) SELECT 'Visiting Doctor' WHERE NOT EXISTS (SELECT 1 FROM public.master_practice_type WHERE practice_type = 'Visiting Doctor');
+
+
+--------------------------------- 6th march - dhanusha
+ALTER TABLE public.partner_registration
+    DROP CONSTRAINT IF EXISTS uq_email,
+    DROP COLUMN IF EXISTS email,
+    DROP COLUMN IF EXISTS password;
+
+ALTER TABLE public.partner_registration
+    ADD COLUMN user_id BIGINT ;
+
+ALTER TABLE public.partner_registration
+    ADD CONSTRAINT fk_partner_registration_partner_user_id
+    FOREIGN KEY (user_id) REFERENCES public.partner_users(id);
+
+ALTER TABLE public.partner_registration
+    ADD CONSTRAINT uq_user_module_category
+    UNIQUE (user_id, module_id, service_module_category_id);
+	
+==========
+
+CREATE TABLE partner_users (
+    id BIGSERIAL NOT NULL,
+    email VARCHAR(255) NOT NULL,
+    password VARCHAR(500) NOT NULL,
+    created_by BIGINT,
+	created_date TIMESTAMP DEFAULT now(),
+	modified_by BIGINT,
+	modified_date TIMESTAMP,
+	is_active BOOLEAN DEFAULT TRUE,
+CONSTRAINT pk_partner_users_id PRIMARY KEY (id),
+CONSTRAINT uq_partner_users_email UNIQUE (email)
+);
+==================================
+ALTER TABLE hospital_registration ADD COLUMN drug_license_number VARCHAR(255);
+ALTER TABLE hospital_registration ADD CONSTRAINT ck_hospital_registration_drug_license_required 
+CHECK (NOT drug_license_applicable OR drug_license_number IS NOT NULL);
+
+ALTER TABLE hospital_registration ADD COLUMN bmw_authorization_number VARCHAR(255);
+ALTER TABLE hospital_registration ADD CONSTRAINT ck_hospital_registration_bmw_required 
+CHECK (NOT bmw_obtained OR bmw_authorization_number IS NOT NULL);
+
+ALTER TABLE hospital_registration ADD COLUMN cbwtf_facility_name VARCHAR(255);
+ALTER TABLE hospital_registration ADD COLUMN fire_noc_number VARCHAR(255);
+
+ALTER TABLE hospital_registration ADD COLUMN aerb_license_number VARCHAR(255);
+ALTER TABLE hospital_registration ADD CONSTRAINT ck_hospital_registration_aerb_required 
+CHECK (NOT aerb_license_applicable OR aerb_license_number IS NOT NULL);
+
+ALTER TABLE hospital_registration ADD COLUMN pcpndt_certificate_number VARCHAR(255);
+ALTER TABLE hospital_registration ADD CONSTRAINT ck_hospital_registration_pcpndt_required 
+CHECK (NOT pcpndt_certificate_applicable OR pcpndt_certificate_number IS NOT NULL);
+
+ALTER TABLE hospital_registration ADD COLUMN nabh_certificate_number VARCHAR(255);
+
+ALTER TABLE hospital_registration ADD COLUMN gst_number VARCHAR(255);
+ALTER TABLE hospital_registration ADD CONSTRAINT ck_hospital_registration_gst_required 
+CHECK (NOT gst_registered OR gst_number IS NOT NULL);
+=============================================================
+-------------------
+- Drug License
+ALTER TABLE lab_registration ADD COLUMN drug_license_number VARCHAR(255);
+ALTER TABLE lab_registration ADD CONSTRAINT ck_lab_registration_drug_license_required 
+CHECK (NOT drug_license_applicable OR drug_license_number IS NOT NULL);
+
+-- BMW Authorization
+ALTER TABLE lab_registration ADD COLUMN bmw_authorization_number VARCHAR(255);
+ALTER TABLE lab_registration ADD CONSTRAINT ck_lab_registration_bmw_required 
+CHECK (NOT bmw_obtained OR bmw_authorization_number IS NOT NULL);
+
+-- CBWTF & Fire NOC
+ALTER TABLE lab_registration ADD COLUMN cbwtf_facility_name VARCHAR(255);
+ALTER TABLE lab_registration ADD COLUMN fire_noc_number VARCHAR(255);
+
+-- AERB License
+ALTER TABLE lab_registration ADD COLUMN aerb_license_number VARCHAR(255);
+ALTER TABLE lab_registration ADD CONSTRAINT ck_lab_registration_aerb_required 
+CHECK (NOT aerb_licence_applicable OR aerb_license_number IS NOT NULL);
+
+-- PCPNDT Certificate
+ALTER TABLE lab_registration ADD COLUMN pcpndt_certificate_number VARCHAR(255);
+ALTER TABLE lab_registration ADD CONSTRAINT ck_lab_registration_pcpndt_required 
+CHECK (NOT pcpndt_certificate_applicable OR pcpndt_certificate_number IS NOT NULL);
+
+-- NABH Certificate
+ALTER TABLE lab_registration ADD COLUMN nabh_certificate_number VARCHAR(255);
+
+-- GST
+ALTER TABLE lab_registration ADD COLUMN gst_number VARCHAR(255);
+ALTER TABLE lab_registration ADD CONSTRAINT ck_lab_registration_gst_required 
+CHECK (NOT gst_registered OR gst_number IS NOT NULL);
+
+=====================================================
+-- Drug License
+ALTER TABLE medical_store_registration ADD COLUMN drug_license_number VARCHAR(255);
+ALTER TABLE medical_store_registration ADD CONSTRAINT ck_medical_store_registration_drug_license_required 
+CHECK (NOT drug_license_applicable OR drug_license_number IS NOT NULL);
+
+-- Fire NOC (optional, so no constraint)
+ALTER TABLE medical_store_registration ADD COLUMN fire_noc_number VARCHAR(255);
+
+-- GST
+ALTER TABLE medical_store_registration ADD COLUMN gst_number VARCHAR(255);
+ALTER TABLE medical_store_registration ADD CONSTRAINT ck_medical_store_registration_gst_required 
+CHECK (NOT gst_registered OR gst_number IS NOT NULL);
+------------------------------------
+
+-- Fire NOC (optional, so no constraint)
+ALTER TABLE doctor_registration ADD COLUMN fire_noc_number VARCHAR(255);
+
+-- GST
+ALTER TABLE doctor_registration ADD COLUMN gst_number VARCHAR(255);
+ALTER TABLE doctor_registration ADD CONSTRAINT ck_doctor_registration_gst_number_required 
+CHECK (NOT gst_registered OR gst_number IS NOT NULL);
+
+=====================================================
+==================================================== 6th march
+
+ALTER TABLE public.partner_registration
+ALTER COLUMN service_module_category_id DROP NOT NULL;
+
+-- 
+create table IF NOT EXISTS my_food_registration(
+id bigserial not null,
+partner_registration_id bigint not null,
+restaurant_name varchar(255) not null,
+restaurant_photo varchar(500) not null,
+establishment_year int not null,
+cuisine_type json not null,
+seating_capacity int not null,
+owner_name varchar(255) not null,
+owner_phone_number varchar(255) not null,
+manager_name varchar(255) ,
+manager_phone_number varchar(255),
+business_registration_number varchar(255) not null,
+fssai_license_registered boolean,
+fssai_license_number varchar(255),
+gst_registered boolean,
+gst_number varchar(255),
+food_license_applicable boolean,
+food_license_number varchar(255),
+health_safety_certfied boolean,
+health_inspection_certifiate_number varchar(255),
+fire_noc_certficate boolean,
+fire_noc_number varchar(255),
+special_menu_items json not null,
+average_price_per_meal numeric(10,2) not null,
+operating_hours varchar(255) not null,
+avialable_dining_options json ,
+upload_menu_card varchar(500) not null,
+upload_business_registration_certificate varchar(500) not null,
+upload_fssai_license_certificate varchar(500) not null,
+upload_gst_certificate varchar(500) not null,
+upload_owner_id_proof varchar(500)not null,
+upload_owner_address_proof varchar(500) not null,
+upload_food_license_certificate varchar(500) not null,
+upload_health_inspection_report varchar(500) not null,
+upload_fire_noc_certificate varchar(500) not null,
+created_by BIGINT,
+created_date TIMESTAMP DEFAULT now(),
+modified_by BIGINT,
+modified_date TIMESTAMP,
+is_active BOOLEAN DEFAULT TRUE,
+constraint pk_my_food_registration_id primary key (id),
+constraint fk_my_food_registration_partner_registration_id foreign key(partner_registration_id) references partner_registration(id),
+CONSTRAINT ck_my_food_registration_flnr CHECK (NOT fssai_license_registered OR fssai_license_number IS NOT NULL),
+CONSTRAINT ck_my_food_registration_gst_number_required CHECK (NOT gst_registered OR gst_number IS NOT NULL)
+);
+
+
+select * from master_module order by 1
+insert into public.master_module (module_name) SELECT 'My Food' WHERE NOT EXISTS (SELECT 1 FROM public.master_module WHERE module_name = 'My Food');
