@@ -1,0 +1,21 @@
+CREATE OR REPLACE FUNCTION fn_holiday_calendar()
+RETURNS TABLE (
+    id BIGINT,
+    holiday_name VARCHAR,
+	holiday_date DATE,
+	month_year VARCHAR
+)
+LANGUAGE plpgsql
+AS $$
+BEGIN
+    RETURN QUERY 
+    SELECT 
+        hc.id,
+        (TO_CHAR(hc.holiday_date,'DD') || ' ' || hc.holiday_name)::VARCHAR AS holiday_name,
+        hc.holiday_date,
+        (TO_CHAR(hc.holiday_date,'MON') || ' ' || EXTRACT(YEAR FROM hc.holiday_date))::VARCHAR AS month_year
+    FROM holiday_calendar hc
+    WHERE hc.is_active = TRUE
+    ORDER BY hc.holiday_date;
+END;
+$$;
